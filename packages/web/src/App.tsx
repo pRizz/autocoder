@@ -11,6 +11,7 @@ import { Sidebar } from "./components/Sidebar";
 import { Footer } from "./components/Footer";
 import { KanbanBoard } from "./components/KanbanBoard";
 import { SettingsForm } from "./components/SettingsForm";
+import { ProviderManager } from "./components/ProviderManager";
 import { Terminal } from "./components/Terminal";
 import { AssistantChatPanel } from "./components/AssistantChatPanel";
 import { KeyboardShortcutsModal } from "./components/KeyboardShortcutsModal";
@@ -605,6 +606,21 @@ function SettingsPage(): JSX.Element {
             />
           </div>
         )}
+
+        {/* Provider Management Section */}
+        <div className="mt-8">
+          <div
+            className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6"
+            style={{
+              backgroundColor: isDark ? "#1f2937" : "#fff",
+              borderRadius: "8px",
+              border: `1px solid ${isDark ? "#374151" : "#e5e7eb"}`,
+              padding: "24px",
+            }}
+          >
+            <ProviderManager apiBaseUrl="http://localhost:3001/api" />
+          </div>
+        </div>
       </div>
     </div>
   );
