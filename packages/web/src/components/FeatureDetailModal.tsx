@@ -3,9 +3,13 @@
  *
  * Displays detailed information about a feature in a modal dialog.
  * Closes when clicking the backdrop (overlay) or pressing Escape.
+ * Includes delete functionality with confirmation dialog.
  */
 
+import { useState, useCallback } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
+import { Trash2 } from "lucide-react";
+import { ConfirmDialog } from "./ConfirmDialog";
 
 export interface Feature {
   id: number;
@@ -25,6 +29,8 @@ interface FeatureDetailModalProps {
   feature: Feature | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  /** Callback when feature is deleted */
+  onDelete?: (featureId: number) => Promise<void>;
 }
 
 /**
@@ -51,7 +57,32 @@ export function FeatureDetailModal({
   feature,
   open,
   onOpenChange,
+  onDelete,
 }: FeatureDetailModalProps): JSX.Element | null {
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDeleteClick = useCallback(() => {
+    setShowDeleteConfirm(true);
+  }, []);
+
+  const handleDeleteCancel = useCallback(() => {
+    setShowDeleteConfirm(false);
+  }, []);
+
+  const handleDeleteConfirm = useCallback(async () => {
+    if (!feature || !onDelete) return;
+
+    setIsDeleting(true);
+    try {
+      await onDelete(feature.id);
+      setShowDeleteConfirm(false);
+      onOpenChange(false); // Close the feature modal after successful delete
+    } finally {
+      setIsDeleting(false);
+    }
+  }, [feature, onDelete, onOpenChange]);
+
   if (!feature) return null;
 
   const status = getStatusLabel(feature);
@@ -169,40 +200,63 @@ export function FeatureDetailModal({
                 #{feature.id} &middot; Priority: {feature.priority}
               </p>
             </div>
-            <Dialog.Close asChild>
-              <button
-                aria-label="Close feature details"
-                className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 rounded transition-colors"
-                style={{
-                  padding: "4px",
-                  color: "#9ca3af",
-                  backgroundColor: "transparent",
-                  border: "none",
-                  borderRadius: "4px",
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-                data-testid="feature-modal-close-button"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  style={{ width: "20px", height: "20px" }}
+            <div className="flex items-center gap-2" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              {onDelete && (
+                <button
+                  onClick={handleDeleteClick}
+                  aria-label="Delete feature"
+                  className="p-1.5 text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/30 rounded transition-colors"
+                  style={{
+                    padding: "6px",
+                    color: "#ef4444",
+                    backgroundColor: "transparent",
+                    border: "none",
+                    borderRadius: "4px",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                  data-testid="feature-modal-delete-button"
                 >
-                  <line x1="18" y1="6" x2="6" y2="18" />
-                  <line x1="6" y1="6" x2="18" y2="18" />
-                </svg>
-              </button>
-            </Dialog.Close>
+                  <Trash2 size={18} />
+                </button>
+              )}
+              <Dialog.Close asChild>
+                <button
+                  aria-label="Close feature details"
+                  className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 rounded transition-colors"
+                  style={{
+                    padding: "4px",
+                    color: "#9ca3af",
+                    backgroundColor: "transparent",
+                    border: "none",
+                    borderRadius: "4px",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                  data-testid="feature-modal-close-button"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    style={{ width: "20px", height: "20px" }}
+                  >
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                  </svg>
+                </button>
+              </Dialog.Close>
+            </div>
           </div>
 
           {/* Description for accessibility */}
@@ -348,6 +402,19 @@ export function FeatureDetailModal({
           </div>
         </Dialog.Content>
       </Dialog.Portal>
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={showDeleteConfirm}
+        onCancel={handleDeleteCancel}
+        onConfirm={handleDeleteConfirm}
+        title="Delete Feature"
+        message={`Are you sure you want to delete "${feature.name}"? This action cannot be undone.`}
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        variant="danger"
+        isLoading={isDeleting}
+      />
     </Dialog.Root>
   );
 }

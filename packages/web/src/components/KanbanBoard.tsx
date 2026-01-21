@@ -13,6 +13,7 @@ import { Download, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, X } f
 import { CategoryFilter } from "./CategoryFilter";
 import { StatusFilter } from "./StatusFilter";
 import { FeatureDetailModal, type Feature } from "./FeatureDetailModal";
+import { useToast } from "./Toast";
 
 // Pagination configuration
 const FEATURES_PER_PAGE = 20;
@@ -204,6 +205,7 @@ export function KanbanBoard({
   projectName = "open-autocoder",
   apiBaseUrl = "http://localhost:3001/api",
 }: KanbanBoardProps): JSX.Element {
+  const { showToast } = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
   const [features, setFeatures] = useState<Feature[]>([]);
   const [totalFeatures, setTotalFeatures] = useState(0);
@@ -464,6 +466,39 @@ export function KanbanBoard({
     }
   }, [setSearchParams]);
 
+  // Handle feature deletion
+  const handleDeleteFeature = useCallback(async (featureId: number) => {
+    try {
+      const response = await fetch(
+        `${apiBaseUrl}/projects/${encodeURIComponent(projectName)}/features/${featureId}`,
+        { method: "DELETE" }
+      );
+
+      if (!response.ok && response.status !== 204) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error ?? `Failed to delete feature: ${response.statusText}`);
+      }
+
+      // Remove the feature from local state
+      setFeatures((prev) => prev.filter((f) => f.id !== featureId));
+      setTotalFeatures((prev) => Math.max(0, prev - 1));
+
+      showToast({
+        type: "success",
+        title: "Feature deleted",
+        description: "The feature has been permanently deleted.",
+      });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to delete feature";
+      showToast({
+        type: "error",
+        title: "Delete failed",
+        description: message,
+      });
+      throw err; // Re-throw to let the modal handle error state
+    }
+  }, [apiBaseUrl, projectName, showToast]);
+
   // Export features to JSON file
   const handleExportToJson = useCallback(() => {
     if (features.length === 0) {
@@ -644,6 +679,7 @@ export function KanbanBoard({
         feature={selectedFeature}
         open={isModalOpen}
         onOpenChange={handleModalOpenChange}
+        onDelete={handleDeleteFeature}
       />
     </div>
   );
