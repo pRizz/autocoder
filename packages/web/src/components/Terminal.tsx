@@ -193,9 +193,21 @@ export function Terminal({
     }
   }, []);
 
-  // Filter logs by level
-  const filteredLogs =
-    filter === "all" ? logs : logs.filter((log) => log.level === filter);
+  // Filter logs by minimum severity level
+  // debug = show all, info = show info+warn+error, warn = show warn+error, error = show only errors
+  const filteredLogs = (() => {
+    if (filter === "all") return logs;
+
+    const levelHierarchy: Record<LogEntry["level"], number> = {
+      debug: 0,
+      info: 1,
+      warn: 2,
+      error: 3,
+    };
+
+    const minLevel = levelHierarchy[filter as LogEntry["level"]];
+    return logs.filter((log) => levelHierarchy[log.level] >= minLevel);
+  })();
 
   // Clear logs
   const clearLogs = useCallback(() => {
@@ -352,6 +364,16 @@ export function Terminal({
             }
           >
             {autoScroll ? "Auto" : "Manual"}
+          </button>
+
+          {/* Test Logs button (for demo/testing) */}
+          <button
+            onClick={generateTestLogs}
+            className="text-xs px-2 py-1 rounded bg-purple-700 text-purple-200 hover:bg-purple-600 hover:text-white transition-colors"
+            title="Generate test logs at different levels"
+            aria-label="Generate test logs"
+          >
+            Test Logs
           </button>
 
           {/* Clear button */}
