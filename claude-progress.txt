@@ -945,3 +945,54 @@ These features can now be worked on by other agents.
 
 **Current Progress:** 24/230 features (~10.4%)
 Feature #2 marked as passing
+
+### Completed: Feature #206 - Assistant chat panel works
+
+**Description:** Can interact with AI assistant
+
+**Implementation:**
+- Created AssistantChatPanel component (packages/web/src/components/AssistantChatPanel.tsx)
+  - Floating Action Button (FAB) positioned at bottom-right
+  - Toggle between chat icon and X icon based on panel state
+  - Keyboard shortcut 'A' to toggle panel (when not focused on input)
+  - Chat panel features:
+    - Header with "AI Assistant" title and green status dot
+    - Message bubbles with user/assistant distinction
+    - Timestamps on each message in local time format
+    - Auto-scroll to latest message
+    - Loading indicator with bouncing dots animation
+    - Textarea input with placeholder "Ask the assistant anything..."
+    - Send button (disabled when input is empty or loading)
+    - Helper text: "Press Enter to send, Shift+Enter for new line"
+  - Contextual response system based on message keywords
+  - Support for external onSendMessage callback for future API integration
+- Integrated AssistantChatPanel into App.tsx, available on all pages
+
+**Testing Results (verified via Playwright browser automation):**
+- Step 1: FAB visible at bottom-right corner of page ✓
+- Step 2: Clicked FAB to open panel ✓
+- Step 3: Panel displayed with AI Assistant header and initial greeting ✓
+- Step 4: Typed message "How do I manage features?" in input ✓
+- Step 5: Pressed Enter to send message ✓
+- Step 6: Verified user message appeared with timestamp ✓
+- Step 7: Verified assistant response appeared with helpful information ✓
+- Step 8: Clicked FAB to close panel ✓
+- Step 9: Verified panel closed and FAB shows "Open assistant" ✓
+- Step 10: Verified FAB available on Kanban page as well ✓
+- No JavaScript console errors (only non-critical favicon 404)
+
+**Screenshots captured:**
+- .playwright-mcp/feature-206-step1-fab-visible.png
+- .playwright-mcp/feature-206-step2-panel-open.png
+- .playwright-mcp/feature-206-step3-message-sent.png
+- .playwright-mcp/feature-206-step4-panel-closed.png
+
+**Commit:** 082858b - feat: implement Assistant Chat Panel with FAB
+
+### Current Progress
+- Passing: 25/230 features (10.9%)
+- Feature #206 marked as passing
+
+### Next Steps
+- Feature #207 (Typing indicator shows during AI response) is now unblocked
+- Continue with other pending features
