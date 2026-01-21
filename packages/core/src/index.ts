@@ -14,6 +14,9 @@ export * from "./repositories/features.js";
 export * from "./repositories/projects.js";
 export * from "./repositories/providers.js";
 
+// Services
+export * from "./services/orchestrator.js";
+
 // Domain types
 export * from "./types/index.js";
 

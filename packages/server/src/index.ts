@@ -15,6 +15,7 @@ import { existsSync } from "fs";
 import { registerProjectRoutes, getProjectPath } from "./routes/projects.js";
 import { registerFeatureRoutes } from "./routes/features.js";
 import { registerProviderRoutes } from "./routes/providers.js";
+import { registerAgentRoutes } from "./routes/agent.js";
 
 const DEFAULT_PORT = 3001;
 const DEFAULT_HOST = "0.0.0.0";
@@ -91,6 +92,7 @@ export async function createServer(options: ServerOptions = {}): Promise<Fastify
   await registerProjectRoutes(fastify);
   await registerFeatureRoutes(fastify, getProjectPath);
   await registerProviderRoutes(fastify);
+  await registerAgentRoutes(fastify, getProjectPath);
 
   return fastify;
 }
