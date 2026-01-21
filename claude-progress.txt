@@ -1265,3 +1265,35 @@ Feature #2 marked as passing
   - Console errors: Only favicon 404 and WebSocket warnings (non-critical)
   - Screenshots: feature-142-search-by-name.png, feature-142-search-results.png
   - Regression test completed successfully - no regression found
+
+### Completed: Feature #6 - SQLite database initializes correctly
+
+**Description:** Database file is created and all tables exist
+
+**Steps Verified:**
+1. Start the application ✓ - API server running on localhost:3001, health endpoint returns 200
+2. Verify features.db file exists ✓ - Database at ~/.open-autocoder/registry.db confirmed
+3. Verify features table exists with correct schema ✓ - 11 columns matching spec (id, priority, category, name, description, steps, passes, in_progress, dependencies, created_at, updated_at)
+4. Verify projects table exists with correct schema ✓ - 9 columns matching spec (name, path, created_at, updated_at, model, provider, concurrency, yolo_mode, testing_agent_ratio)
+5. Verify providers table exists with correct schema ✓ - 7 columns matching spec (id, name, api_key_encrypted, base_url, is_default, created_at, updated_at)
+6. Verify sessions table exists with correct schema ✓ - 8 columns matching spec (id, project_name, agent_type, feature_id, started_at, ended_at, status, output_log)
+
+**Verification Methods:**
+- Direct database inspection via better-sqlite3 script
+- API endpoint testing (GET /api/projects returns 11 projects, GET /api/providers returns [], GET /api/projects/:name/features/stats returns feature counts)
+- Browser automation showing Kanban board with 127 features loaded from database
+
+**Additional Tables Found:** users, tokens (for authentication - added as part of auth feature implementation)
+
+**Screenshots captured:**
+- .playwright-mcp/feature-6-app-running.png
+- .playwright-mcp/feature-6-projects-page.png
+- .playwright-mcp/feature-6-kanban-features-loaded.png
+
+### Current Progress
+- Passing: 29/230 features (~12.6%)
+- Feature #6 marked as passing
+
+### Next Steps
+- Session complete for Feature #6
+- All required database tables exist with correct schemas
