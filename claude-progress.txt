@@ -2,6 +2,83 @@
 
 ## Session: 2026-01-21
 
+### Completed: Feature #7 - WebSocket server starts successfully
+
+**Description:** WebSocket server accepts connections on /ws endpoint
+
+**Verification Results (Feature was already implemented):**
+- Step 1: Start the application server ✓ - Server running on port 3001
+- Step 2: Attempt WebSocket connection to /ws endpoint ✓ - Connection established
+- Step 3: Verify connection is established ✓ - "Connected" status shown in UI
+- Step 4: Verify server sends welcome/handshake message ✓ - `{"type":"connection_established","timestamp":"..."}` received
+- Step 5: Close connection cleanly ✓ - Verified via Node.js test script
+
+**Implementation Location:** packages/server/src/index.ts (lines 78-90)
+- Uses @fastify/websocket plugin
+- WebSocket endpoint registered at /ws
+- Sends JSON welcome message on connection: `{"type":"connection_established","timestamp":"..."}`
+- Handles incoming messages with logging
+
+**Testing Methods:**
+1. Node.js WebSocket client test (test-ws.cjs) - Direct connection test
+2. Browser UI verification - "Connected" status with green indicator
+3. Terminal view logs - Shows connection established messages
+
+**Screenshots:**
+- .playwright-mcp/feature-7-websocket-connected.png
+- .playwright-mcp/feature-7-terminal-websocket-connected.png
+
+**Console errors:** Only favicon 404 (non-critical)
+
+### Current Progress
+- Passing: 32/230 features (~13.9%)
+- Feature #7 marked as passing
+
+### Next Steps
+- Session complete for Feature #7
+- WebSocket server is fully functional and tested
+
+---
+
+### Completed: Feature #35 - Add provider via API
+
+**Description:** POST /api/providers adds new AI provider configuration
+
+**Implementation:**
+- Added POST /api/providers endpoint to packages/server/src/routes/providers.ts
+- Implemented AES-256-GCM encryption for API key storage using Node.js crypto module
+  - encryptApiKey() - Encrypts API key with IV and auth tag
+  - decryptApiKey() - Decrypts stored encrypted key (exported for future use)
+  - Uses scryptSync for key derivation from environment variable or default key
+- Request validation for required fields (id, name, apiKey)
+- Returns 201 status code on successful creation
+- API key is masked in response (first 4 + last 4 characters)
+- Added ValidationError handling with 400 status
+
+**Testing Results (verified via Playwright browser automation):**
+- Step 1: POST /api/providers with id, name, apiKey - Created successfully ✓
+- Step 2: Response status 201 ✓
+- Step 3: Provider appears in GET /api/providers list ✓
+- Step 4: API key is stored encrypted (masked key shows encrypted hex: "8948...976d") ✓
+
+**Screenshots:**
+- .playwright-mcp/feature-35-step3-list-providers.png
+- .playwright-mcp/feature-35-final-verification.png
+
+**Console errors:** None (only favicon 404 non-critical)
+
+**Commit:** 160338a - feat: implement POST /api/providers endpoint with API key encryption
+
+### Current Progress
+- Passing: 30/230 features (~13.0%)
+- Feature #35 marked as passing
+
+### Next Steps
+- Session complete for Feature #35
+- Provider management API now supports creating new providers with encrypted API keys
+
+---
+
 ### Completed: Feature #5 - Auth Check (Token Validation)
 
 **Description:** Verify authentication with token validation
@@ -1297,3 +1374,51 @@ Feature #2 marked as passing
 ### Next Steps
 - Session complete for Feature #6
 - All required database tables exist with correct schemas
+[Testing] 2026-01-21T03:31:05 Feature #72 verified - still passing (Sidebar navigation to Graph works)
+  - Step 1: Navigated to home page (/) ✓
+  - Step 2: Clicked Graph link in sidebar ✓
+  - Step 3: URL changed to /graph ✓
+  - Step 4: Dependency Graph view displayed with heading and description ✓
+  - Console errors: Only favicon 404 (non-critical)
+  - Screenshot: .playwright-mcp/.playwright-mcp/feature-72-regression-graph-view.png
+  - Regression test completed successfully - no regression found
+[Testing] 2026-01-21T03:32:00 Feature #17 verified - still passing (Create features in bulk via API)
+  - Step 1: Created test project 'test-bulk-regression-f17b' ✓
+  - Step 2: Sent POST request with array of 5 features including dependencies ✓
+  - Step 3: Response status is 201 Created ✓
+  - Step 4: Response contains 'created: 5' and 'withDependencies: 3' ✓
+  - Step 5: All 5 features exist in database (IDs 133-137) ✓
+  - Step 6: Priorities are sequential (133, 134, 135, 136, 137) ✓
+  - Step 7: Dependencies resolved correctly from indices:
+    - Feature 2 (ID 134): depends_on_indices: [0] → dependencies: [133] ✓
+    - Feature 4 (ID 136): depends_on_indices: [2] → dependencies: [135] ✓
+    - Feature 5 (ID 137): depends_on_indices: [0,1] → dependencies: [133,134] ✓
+  - Console errors: Only favicon 404 and CDN warning (non-critical)
+  - Screenshot: .playwright-mcp/.playwright-mcp/feature-17-regression-bulk-api.png
+  - Regression test completed successfully - no regression found
+[Testing] 2026-01-21T03:32:52 Feature #30 verified - still passing (Start agent orchestrator via API)
+  - Step 1: Created test project 'test-regression-30' with 2 features ✓
+  - Step 2: POST /api/projects/test-regression-30/agent/start returned success ✓
+    - Response: {"message":"Orchestrator started","status":"running","concurrency":1}
+  - Step 3: Response indicates orchestrator started ✓
+  - Step 4: GET /api/projects/test-regression-30/agent/status shows running state ✓
+    - Response: {"status":"running","activeAgents":0,"completedFeatures":0}
+  - Step 5: POST /agent/stop stopped orchestrator successfully ✓
+    - Response: {"message":"Orchestrator stopped","status":"stopped"}
+  - Verified status changed from 'running' to 'stopped' ✓
+  - Cleaned up test project after verification
+  - Console errors: Only WebSocket reconnection warnings (non-critical, web server restarted during test)
+  - Screenshot: .playwright-mcp/feature-30-regression-projects-page.png
+  - Regression test completed successfully - no regression found
+[Testing] 2026-01-21T03:34:34 Feature #150 verified - still passing (Required fields prevent submission)
+  - Step 1: Opened new feature form via 'Add New Feature' button ✓
+  - Step 2: Left name field empty ✓
+  - Step 3: Clicked 'Create Feature' to submit ✓
+  - Step 4: Submission blocked - validation errors displayed instead of submitting ✓
+  - Step 5: Error on name field: 'Name is required' shown in red ✓
+  - Additional: All 4 required fields show validation errors (name, category, description, steps) ✓
+  - Additional: Inline validation works on blur ✓
+  - Additional: Helper text 'Please fix the errors above before submitting' displayed ✓
+  - Console errors: Only favicon 404 (non-critical)
+  - Screenshots: feature-150-step1-form-open.png, feature-150-step3-validation-errors.png, feature-150-inline-validation.png
+  - Regression test completed successfully - no regression found
