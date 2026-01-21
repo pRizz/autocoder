@@ -2,6 +2,57 @@
 
 ## Session: 2026-01-21
 
+### Completed: Feature #80 - Feature modal closes on Escape key
+
+**Description:** Pressing Escape key closes feature modal
+
+**Category:** navigation
+
+**Steps Verified (via Playwright browser automation):**
+1. Step 1: Open feature detail modal
+   - Navigated to http://localhost:3000/kanban
+   - Clicked on "Test Feature 1" in the Done column
+   - Modal opened successfully with feature details displayed
+   - Modal shows: status badge, category, name, ID, priority, description, steps, timestamps
+   - Close button (X) visible in header
+
+2. Step 2: Press Escape key
+   - Pressed Escape key while modal was open
+   - Modal closed immediately (Radix UI Dialog built-in behavior)
+
+3. Step 3: Verify modal closes
+   - Page snapshot confirmed no dialog element present
+   - Kanban board visible again without modal overlay
+   - No JavaScript errors in console
+
+**Implementation Details:**
+- FeatureDetailModal component created using @radix-ui/react-dialog
+- Radix UI Dialog provides built-in Escape key handling
+- Feature cards made clickable with onClick handler
+- Added keyboard accessibility (Enter/Space to open)
+- Added hover effects on feature cards
+
+**Console errors:** Only favicon 404 (non-critical)
+**Connection status:** Connected via WebSocket
+
+**Screenshots:**
+- .playwright-mcp/feature-80-step1-modal-open.png
+- .playwright-mcp/feature-80-step3-modal-closed.png
+
+**Commit:** 92f6162 - feat: Feature modal closes on Escape key - Feature #80
+
+### Current Progress
+- Passing: 60/232 features (~25.9%)
+- Feature #80 marked as passing
+
+### Session Complete
+- Feature #80 verified and marked as passing
+- Feature modal with Escape key close functionality working
+
+---
+
+## Session: 2026-01-21
+
 ### Completed: Feature #75 - Performance validation with 100+ features (Refactor performance test feature 53)
 
 **Description:** Test feature 53 for performance validation with 100+ features in the kanban board
@@ -3024,3 +3075,49 @@ Both were used to verify that circular dependencies are properly detected and re
 ### Session Complete
 - Feature #5 verified and marked as passing
 - Sidebar component fully functional with navigation, agent controls, and stats
+[Testing] 2026-01-21T04:15:54 Feature #1 verified - still passing (App loads without errors)
+  - Step 1: Navigate to root URL ✓ (http://localhost:3000)
+  - Step 2: Page fully loaded ✓ (title: 'Open Autocoder')
+  - Step 3: No JavaScript errors ✓ (only favicon 404 - non-critical)
+  - Step 4: Main content area renders ✓ ('Welcome to Open Autocoder' displayed)
+  - Step 5: Header visible with logo ✓ (sidebar, agent controls, quick stats all visible)
+  - Additional: WebSocket connected ✓
+  - Additional: Quick Stats showing real data (Passing: 7, In Progress: 1)
+  - Console errors: Only favicon 404 (non-critical)
+  - Screenshot: .playwright-mcp/.playwright-mcp/feature-1-regression-test.png
+  - Regression test completed successfully - no regression found
+[Testing] 2026-01-21T04:16:05 Feature #64 verified - still passing (Maximum dependencies limit enforced)
+  - Step 1: feature_set_dependencies with 21 deps → Error: 'Maximum 20 dependencies allowed' ✓
+  - Step 2: feature_set_dependencies with exactly 20 deps → Success ✓
+  - Step 3: feature_add_dependency when at 20 deps → Error: 'Maximum 20 dependencies allowed per feature' ✓
+  - Step 4: Verified implementation in code:
+    - api/dependency_resolver.py: MAX_DEPENDENCIES_PER_FEATURE = 20
+    - Enforcement in feature_add_dependency(), feature_set_dependencies(), feature_create_bulk()
+  - Step 5: Web UI verified operational at http://localhost:3000 ✓
+  - Console errors: Only non-critical WebSocket reconnect warnings
+  - Screenshot: .playwright-mcp/feature-64-regression-verification.png
+  - Regression test completed successfully - no regression found
+[Testing] 2026-01-21T04:17:16 Feature #173 verified - still passing (Timestamps display in local timezone)
+  - Step 1: Viewed temporal features #126 and #145 ✓
+  - Step 2: Server timestamps in UTC: 2026-01-21T03:09:56Z and 2026-01-21T03:53:24Z ✓
+  - Step 3: UI displays relative times: '1h ago' and '22m ago' ✓
+  - Step 4: Verified local timezone conversion (America/Chicago) ✓
+    - UTC 03:09:56Z → 9:09:56 PM CT → '1h ago' (67 min) ✓
+    - UTC 03:53:24Z → 9:53:24 PM CT → '22m ago' (23 min) ✓
+  - Console errors: None critical (favicon 404 non-critical)
+  - Screenshots: 
+    - .playwright-mcp/feature-173-kanban-timestamps.png
+    - .playwright-mcp/feature-173-timestamps-verified.png
+  - Regression test completed successfully - no regression found
+[Testing] 2026-01-21T04:17:44 Feature #62 verified - still passing (API key is not exposed in provider list)
+  - Step 1: Created provider 'regression-test-62-1768969036829' with test API key ✓
+  - Step 2: GET /api/providers returns HTTP 200 with 13 providers ✓
+  - Step 3: API key is masked - returns 'apiKeyMasked: 5504...a2f8' ✓
+  - Step 4: Full key NOT in response (verified 0 occurrences of test key) ✓
+  - Additional: No 'apiKey' field in response (verified) ✓
+  - Additional: No 'apiKeyEncrypted' field in response (verified) ✓
+  - Additional: 'apiKeyMasked' field present for all 13 providers ✓
+  - Console errors: None after page refresh
+  - WebSocket: Connected
+  - Screenshot: .playwright-mcp/feature-62-regression-final.png
+  - Regression test completed successfully - no regression found
