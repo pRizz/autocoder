@@ -1,0 +1,61 @@
+## Session: 2026-01-21 (Parallel Agent - Feature #134)
+
+### Completed: Feature #134 - Deleted feature removed from dependency lists
+
+**Description:** Orphaned dependencies are cleaned up
+
+**Category:** cleanup
+
+**Implementation:** Already implemented in `packages/core/src/repositories/features.ts`
+- `delete()` method (lines 560-575) calls `cleanupOrphanedDependencies(id)` after deleting
+- `cleanupOrphanedDependencies()` method (lines 617-635):
+  - Gets all features in the database
+  - For each feature, parses its dependencies
+  - If the deleted ID is in the dependency list, filters it out
+  - Updates the feature with the cleaned dependency list (or null if empty)
+- `areDependenciesSatisfied()` also handles orphaned dependencies gracefully - if a dependency doesn't exist, it treats it as satisfied
+
+**Steps Verified (via API and Playwright browser automation):**
+
+1. **Step 1: Create feature A and B, B depends on A** ✓
+   - Created Feature A via POST /api/projects/open-autocoder/features
+     - ID: 204, name: TEST_134_FEATURE_A
+   - Created Feature B via POST /api/projects/open-autocoder/features
+     - ID: 205, name: TEST_134_FEATURE_B
+     - dependencies: [204] (depends on A)
+   - Verified B appears in /features/blocked with `blockedBy: [204]`
+
+2. **Step 2: Delete feature A** ✓
+   - DELETE /api/projects/open-autocoder/features/204
+   - Response: HTTP 204 No Content (success)
+
+3. **Step 3: Get feature B** ✓
+   - GET /api/projects/open-autocoder/features/205
+   - Response shows Feature B with updated data
+
+4. **Step 4: Verify B's dependencies no longer include A** ✓
+   - Feature B now has `"dependencies": null` (was `"dependencies": "[204]"`)
+   - The `updatedAt` timestamp changed from 10:15:53 to 10:18:04 showing cleanup occurred
+
+5. **Step 5: Verify B is not stuck as blocked** ✓
+   - GET /features/blocked - Feature B (ID 205) no longer appears in list
+   - Blocked count decreased from 20 to 19
+   - Feature B is now in the "ready" list since it has no blocking dependencies
+   - Screenshot: feature-134-verification-featureB-no-dependencies.png
+
+**UI Verification:**
+- Navigated to http://localhost:3000/kanban?featureId=205
+- Modal shows Feature B with status "To Do" (not blocked)
+- No Dependencies section visible (dependencies were cleaned up)
+- Description still says "Feature B that depends on A" (description unchanged)
+- Timestamps show update time when cleanup occurred
+
+**Console errors:** Only WebSocket reconnection warnings (non-critical)
+
+**Test features cleaned up:** Deleted Feature A (204) and Feature B (205)
+
+### Current Progress
+- Feature #134 marked as passing via MCP tool
+- Stats: 117/244 features passing (48.0%)
+
+---
