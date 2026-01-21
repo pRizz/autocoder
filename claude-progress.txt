@@ -6647,3 +6647,54 @@ Added featureId URL parameter support to KanbanBoard component:
   - Screenshots: feature-148-step2-passing-filter.png, feature-148-step4-pending-filter.png, feature-148-in-progress-filter.png
   - No regression found - feature working correctly
 [Testing] Session complete - verified feature #148
+
+---
+
+## Session: 2026-01-21 (Parallel Agent - Feature #133)
+
+### Completed: Feature #133 - Delete already deleted returns appropriate status
+
+**Description:** Deleting non-existent feature returns 404
+
+**Category:** idempotency
+
+**Steps Verified (via API testing and browser automation):**
+
+1. **Step 1: Create and delete a feature** ✓
+   - Created test feature via POST /api/projects/open-autocoder/features
+     - Feature ID: 203
+     - Name: TEST_DELETE_IDEMPOTENCY_133
+   - Deleted feature via DELETE /api/projects/open-autocoder/features/203
+   - Response: HTTP 204 No Content (success)
+
+2. **Step 2: Try to delete same feature again** ✓
+   - Sent DELETE /api/projects/open-autocoder/features/203 again
+   - Response received with proper error handling
+
+3. **Step 3: Verify 404 response** ✓
+   - Response: HTTP 404 Not Found
+   - Body: {"error":"Feature with ID 203 not found","code":"FEATURE_NOT_FOUND","suggestedAction":"Verify the feature ID exists in the database"}
+   - Proper error structure with error message, code, and suggested action
+
+4. **Step 4: Verify no error in UI** ✓
+   - Navigated to Kanban board at http://localhost:3000/kanban
+   - UI functioning normally with no JavaScript errors
+   - Only non-critical error: favicon.ico 404 (unrelated)
+   - Screenshot: feature-133-ui-no-errors.png
+
+**Implementation Details:**
+- API endpoint: DELETE /api/projects/:name/features/:id (packages/server/src/routes/features.ts)
+- Repository method: FeatureRepository.delete() throws FeatureNotFoundError when feature doesn't exist
+- Error handling: handleError() function maps FeatureNotFoundError to HTTP 404 with proper error structure
+- The implementation was already correct - this verification confirms it works as expected
+
+**Console errors:** None (only favicon 404)
+
+### Current Progress
+- Feature #133 marked as passing via MCP tool
+- Stats: 115/244 features passing (47.1%)
+
+### Session Complete
+- Feature #133 verified and marked as passing
+- All 4 verification steps completed successfully
+
