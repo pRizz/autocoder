@@ -6698,3 +6698,98 @@ Added featureId URL parameter support to KanbanBoard component:
 - Feature #133 verified and marked as passing
 - All 4 verification steps completed successfully
 
+[Testing] 2026-01-21T10:12:40Z Feature #97 verified - still passing (Agent workflow from start to stop)
+  - Category: workflow
+  - Description: Start agents, watch progress, stop agents
+  - All 7 verification steps confirmed:
+    1. Project with features exists ✓ (open-autocoder with 244 features)
+    2. Click Start button ✓ (Play button with aria-label='Start agent')
+    3. Status shows Running ✓ (API confirmed status='running')
+    4. Progress updates ✓ (QUICK STATS section displays feature counts)
+    5. Click Stop button ✓ (Stop button accessible during running state)
+    6. Status shows Stopped ✓ (API confirmed status='stopped')
+    7. Features released ✓ (activeAgents=0 after stop)
+  - Console errors: None (6 warnings - non-critical)
+  - Screenshots: .playwright-mcp/feature-97-regression-*.png
+  - No regression found - feature working correctly
+[Testing] Session complete - verified feature #97
+[Testing] 2026-01-21T10:16:48Z Feature #60 verified - still passing (API validates required fields on project creation)
+  - Category: security
+  - Description: Missing required fields return validation error
+  - All 5 verification steps PASSED:
+    1. Send POST to /api/projects without name ✓ (HTTP 400)
+    2. Verify response status is 400 ✓
+    3. Verify error mentions missing field ✓ ("name: Required")
+    4. Send POST without path ✓ (HTTP 400)
+    5. Verify response status is 400 ✓ ("path: Required")
+  - API correctly returns validation error with VALIDATION_ERROR code
+  - Note: Initial tests returned 500 (server instability during startup), retests confirmed 400
+  - No regression found - feature working correctly
+[Testing] Session complete - verified feature #60
+
+---
+
+## Session: 2026-01-21 (Parallel Agent - Feature #132)
+
+### Completed: Feature #132 - Write integration tests
+
+**Description:** Write unit tests and integration tests for feature management
+
+**Category:** testing
+
+**Implementation:**
+
+1. **Unit Tests for FeatureRepository (packages/core/src/repositories/features.test.ts)**
+   - 46 tests covering all repository methods
+   - Tests for create, createBulk, getById, list, search
+   - Tests for markPassing, markFailing, claim, clearInProgress, skip
+   - Tests for getNext, getReady, getBlocked, getForRegression
+   - Tests for getStats, getGraph, delete, count
+   - Dependency handling tests (depends_on_indices, validation)
+   - Error handling tests (FeatureNotFoundError, FeatureAlreadyClaimedError, ValidationError)
+
+2. **Integration Tests for Features API (packages/server/src/routes/features.test.ts)**
+   - 29 tests covering all REST endpoints
+   - POST /api/projects/:name/features - create single feature
+   - POST /api/projects/:name/features/bulk - create features in bulk
+   - GET /api/projects/:name/features - list with filtering/pagination
+   - GET /api/projects/:name/features/:id - get by ID
+   - POST /api/projects/:name/features/:id/claim - atomic claim
+   - POST /api/projects/:name/features/:id/pass - mark passing
+   - POST /api/projects/:name/features/:id/fail - mark failing
+   - POST /api/projects/:name/features/:id/skip - skip feature
+   - DELETE /api/projects/:name/features/:id - delete feature
+   - GET /api/projects/:name/features/stats - statistics
+   - GET /api/projects/:name/features/next - get next ready
+   - GET /api/projects/:name/features/ready - get all ready
+   - GET /api/projects/:name/features/blocked - get blocked
+   - GET /api/projects/:name/features/regression - get for regression
+   - GET /api/projects/:name/features/graph - dependency graph
+   - GET /api/projects/:name/features/search - search by name
+
+3. **Test Infrastructure**
+   - vitest.config.ts added for both core and server packages
+   - In-memory SQLite for unit tests (fast, isolated)
+   - Temporary directory with real SQLite for integration tests
+   - Test cleanup between tests using API delete
+
+**Test Results:**
+- Core package: 46 tests passed
+- Server package: 29 tests passed
+- Total: 75 tests passing
+
+**Commands to run tests:**
+```bash
+pnpm --filter @open-autocoder/core test -- --run
+pnpm --filter @open-autocoder/server test -- --run
+```
+
+### Current Progress
+- Feature #132 marked as passing via MCP tool
+- Stats: 114/244 features passing (46.7%)
+
+### Session Complete
+- Feature #132 implemented and verified
+- 75 new tests added to the codebase
+- Commit: a7e5111
+
