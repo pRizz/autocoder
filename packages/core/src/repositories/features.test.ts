@@ -858,6 +858,71 @@ describe("FeatureRepository", () => {
     });
   });
 
+  describe("deleteAll", () => {
+    it("should delete all features and return count", async () => {
+      await repo.createBulk([
+        {
+          category: "functional",
+          name: "Feature 1",
+          description: "First feature",
+          steps: ["Step 1"],
+        },
+        {
+          category: "functional",
+          name: "Feature 2",
+          description: "Second feature",
+          steps: ["Step 1"],
+        },
+        {
+          category: "security",
+          name: "Feature 3",
+          description: "Third feature",
+          steps: ["Step 1"],
+        },
+      ]);
+
+      const count = await repo.deleteAll();
+
+      expect(count).toBe(3);
+
+      // Verify all features are deleted
+      const remaining = await repo.list();
+      expect(remaining.length).toBe(0);
+    });
+
+    it("should return 0 when no features exist", async () => {
+      const count = await repo.deleteAll();
+
+      expect(count).toBe(0);
+    });
+
+    it("should handle features with dependencies", async () => {
+      await repo.createBulk([
+        {
+          category: "functional",
+          name: "Feature 1",
+          description: "First feature",
+          steps: ["Step 1"],
+        },
+        {
+          category: "functional",
+          name: "Feature 2",
+          description: "Second feature with deps",
+          steps: ["Step 1"],
+          depends_on_indices: [0],
+        },
+      ]);
+
+      const count = await repo.deleteAll();
+
+      expect(count).toBe(2);
+
+      // Verify all features including those with dependencies are deleted
+      const remaining = await repo.list();
+      expect(remaining.length).toBe(0);
+    });
+  });
+
   describe("count", () => {
     beforeEach(async () => {
       await repo.createBulk([

@@ -574,6 +574,54 @@ export class FeatureRepository {
     logger.info("Feature deleted", { featureId: id });
   }
 
+  /**
+   * Delete all features in the database
+   * Used when deleting a project to cascade the deletion to all its features
+   * Returns the number of features deleted
+   */
+  async deleteAll(): Promise<number> {
+    const count = this.db.select().from(features).all().length;
+
+    this.db.delete(features).run();
+
+    logger.info("All features deleted", { count });
+    return count;
+  }
+
+  /**
+   * Clear in_progress status from ALL features
+   * Used when stopping the orchestrator to release all claimed features
+   * Returns the number of features that had in_progress cleared
+   */
+  async clearAllInProgress(): Promise<number> {
+    const now = new Date().toISOString();
+
+    // Count features that are currently in progress
+    const inProgressFeatures = this.db
+      .select()
+      .from(features)
+      .where(eq(features.inProgress, 1))
+      .all();
+
+    const count = inProgressFeatures.length;
+
+    if (count > 0) {
+      // Clear in_progress for all features that have it set
+      this.db
+        .update(features)
+        .set({ inProgress: 0, updatedAt: now })
+        .where(eq(features.inProgress, 1))
+        .run();
+
+      logger.info("All in_progress flags cleared", {
+        clearedCount: count,
+        featureIds: inProgressFeatures.map((f) => f.id),
+      });
+    }
+
+    return count;
+  }
+
   // Private helper methods
 
   private parseDependencies(deps: string | null): number[] {

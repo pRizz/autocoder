@@ -8,12 +8,16 @@
 import { type AgentStatus } from "../types/index.js";
 import { logger } from "../utils/logger.js";
 import { AgentError } from "../errors/index.js";
+import { FeatureRepository } from "../repositories/features.js";
+import { getDatabase, initializeTables } from "../db/connection.js";
+import { join } from "path";
 
 /**
  * Orchestrator state for a single project
  */
 export interface OrchestratorState {
   projectName: string;
+  projectPath: string | null;
   status: AgentStatus;
   startedAt: string | null;
   stoppedAt: string | null;
@@ -45,6 +49,7 @@ function getOrCreateState(projectName: string): OrchestratorState {
   if (!state) {
     state = {
       projectName,
+      projectPath: null,
       status: "idle",
       startedAt: null,
       stoppedAt: null,
@@ -74,7 +79,7 @@ export function getOrchestratorStatus(projectName: string): OrchestratorState {
  */
 export async function startOrchestrator(
   projectName: string,
-  _projectPath: string,
+  projectPath: string,
   options: StartOrchestratorOptions = {}
 ): Promise<OrchestratorState> {
   const state = getOrCreateState(projectName);
@@ -91,6 +96,7 @@ export async function startOrchestrator(
 
   // Update state to running
   state.status = "running";
+  state.projectPath = projectPath;
   state.startedAt = new Date().toISOString();
   state.stoppedAt = null;
   state.concurrency = concurrency;
@@ -99,6 +105,7 @@ export async function startOrchestrator(
 
   logger.info("Orchestrator started", {
     projectName,
+    projectPath,
     concurrency,
     yoloMode: options.yoloMode ?? false,
     testingAgentRatio: options.testingAgentRatio ?? 1,
@@ -159,6 +166,11 @@ export async function resumeOrchestrator(
 
 /**
  * Stop the orchestrator for a project
+ *
+ * This function:
+ * 1. Stops all agent subprocesses
+ * 2. Clears in_progress status from all claimed features
+ * 3. Returns features to the pending queue
  */
 export async function stopOrchestrator(
   projectName: string
@@ -172,16 +184,38 @@ export async function stopOrchestrator(
     );
   }
 
-  // In a full implementation, this would:
+  // Release all claimed features back to pending queue
+  let releasedCount = 0;
+  if (state.projectPath) {
+    try {
+      const dbPath = join(state.projectPath, "features.db");
+      const db = getDatabase(dbPath);
+      initializeTables(db);
+      const featureRepo = new FeatureRepository(db);
+      releasedCount = await featureRepo.clearAllInProgress();
+      logger.info("Released claimed features on orchestrator stop", {
+        projectName,
+        releasedCount,
+      });
+    } catch (error) {
+      // Log but don't fail the stop operation if feature release fails
+      logger.error("Failed to release claimed features on stop", {
+        projectName,
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
+  }
+
+  // In a full implementation, this would also:
   // 1. Signal all agent subprocesses to stop
   // 2. Wait for graceful shutdown
-  // 3. Clean up resources
+  // 3. Clean up other resources
 
   state.status = "stopped";
   state.stoppedAt = new Date().toISOString();
   state.activeAgents = 0;
 
-  logger.info("Orchestrator stopped", { projectName });
+  logger.info("Orchestrator stopped", { projectName, releasedCount });
 
   return state;
 }

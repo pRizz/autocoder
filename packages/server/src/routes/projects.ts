@@ -8,6 +8,7 @@ import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { z } from "zod";
 import {
   ProjectRepository,
+  FeatureRepository,
   getDatabase,
   initializeTables,
   logger,
@@ -281,6 +282,7 @@ export async function registerProjectRoutes(
 
   /**
    * DELETE /api/projects/:name - Delete a project
+   * Also deletes all features associated with the project (cascade delete)
    */
   fastify.delete(
     "/api/projects/:name",
@@ -290,6 +292,33 @@ export async function registerProjectRoutes(
     ) => {
       try {
         const repo = getProjectRepository();
+
+        // Get project path before deleting so we can delete features too
+        const project = await repo.getByName(request.params.name);
+        const projectPath = project.path;
+
+        // Delete all features in the project's database first
+        const featuresDbPath = join(projectPath, "features.db");
+        if (existsSync(featuresDbPath)) {
+          try {
+            const featuresDb = getDatabase(featuresDbPath);
+            initializeTables(featuresDb);
+            const featuresRepo = new FeatureRepository(featuresDb);
+            const deletedCount = await featuresRepo.deleteAll();
+            logger.info("Features deleted during project deletion", {
+              projectName: request.params.name,
+              deletedFeatures: deletedCount,
+            });
+          } catch (err) {
+            // Log but don't fail - feature cleanup is best-effort
+            logger.warn("Failed to delete features during project deletion", {
+              projectName: request.params.name,
+              error: err instanceof Error ? err.message : String(err),
+            });
+          }
+        }
+
+        // Now delete the project from the registry
         await repo.delete(request.params.name);
 
         logger.info("Project deleted via API", {
