@@ -225,6 +225,43 @@ export function KanbanBoard({
   const [selectedFeature, setSelectedFeature] = useState<Feature | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  // Handle featureId URL parameter - opens feature detail modal directly from URL
+  const featureIdFromUrl = searchParams.get("featureId");
+
+  // Fetch and open feature detail when featureId is in URL
+  useEffect(() => {
+    if (!featureIdFromUrl) return;
+
+    const featureId = parseInt(featureIdFromUrl, 10);
+    if (isNaN(featureId)) return;
+
+    // Check if the feature is already loaded in our features list
+    const existingFeature = features.find((f) => f.id === featureId);
+    if (existingFeature) {
+      setSelectedFeature(existingFeature);
+      setIsModalOpen(true);
+      return;
+    }
+
+    // Fetch the feature from API if not in current page
+    const fetchFeature = async () => {
+      try {
+        const response = await fetch(
+          `${apiBaseUrl}/projects/${encodeURIComponent(projectName)}/features/${featureId}`
+        );
+        if (response.ok) {
+          const feature = await response.json();
+          setSelectedFeature(feature);
+          setIsModalOpen(true);
+        }
+      } catch (err) {
+        console.error("Failed to fetch feature from URL:", err);
+      }
+    };
+
+    fetchFeature();
+  }, [featureIdFromUrl, features, apiBaseUrl, projectName]);
+
   // Calculate total pages based on total features
   const totalPages = Math.max(1, Math.ceil(totalFeatures / FEATURES_PER_PAGE));
 
@@ -382,18 +419,32 @@ export function KanbanBoard({
   );
 
   // Handle feature card click to open detail modal
+  // Also updates URL with featureId for direct linking
   const handleFeatureClick = useCallback((feature: Feature) => {
     setSelectedFeature(feature);
     setIsModalOpen(true);
-  }, []);
+    // Add featureId to URL for direct linking
+    setSearchParams((prev) => {
+      const newParams = new URLSearchParams(prev);
+      newParams.set("featureId", String(feature.id));
+      return newParams;
+    }, { replace: true });
+  }, [setSearchParams]);
 
   // Handle modal open/close state change
+  // Removes featureId from URL when modal closes
   const handleModalOpenChange = useCallback((open: boolean) => {
     setIsModalOpen(open);
     if (!open) {
       setSelectedFeature(null);
+      // Remove featureId from URL when closing modal
+      setSearchParams((prev) => {
+        const newParams = new URLSearchParams(prev);
+        newParams.delete("featureId");
+        return newParams;
+      }, { replace: true });
     }
-  }, []);
+  }, [setSearchParams]);
 
   // Export features to JSON file
   const handleExportToJson = useCallback(() => {
