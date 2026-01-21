@@ -2,6 +2,64 @@
 
 ## Session: 2026-01-21
 
+### Completed: Feature #92 - Statistics reflect actual data counts
+
+**Description:** Dashboard stats match actual feature counts
+
+**Category:** data
+
+**Steps Verified (via Playwright browser automation):**
+1. Step 1: Create 5 features ✓
+   - Created 5 test features via POST /api/projects/open-autocoder/features
+   - Feature IDs: 158-162 with category "stats-test-92"
+   - Names: STATS_TEST_92_FEATURE_1 through STATS_TEST_92_FEATURE_5
+   - Total increased from 155 to 160
+
+2. Step 2: Mark 2 as passing ✓
+   - Marked features #158 and #159 as passing via POST .../features/{id}/pass
+   - Both returned passes: 1
+
+3. Step 3: Refresh page ✓
+   - Navigated to http://localhost:3000/kanban
+   - Page loaded with updated data
+
+4. Step 4: Verify stats updated correctly ✓
+   - Quick Stats showed: Passing: 11, In Progress: 1, Total: 160
+   - Features #158 and #159 appeared in Done column
+   - Features #160, #161, #162 appeared in To Do column
+   - "stats-test-92" category appeared in filter dropdown
+
+5. Step 5: Mark 1 more as passing ✓
+   - Marked feature #160 (STATS_TEST_92_FEATURE_3) as passing
+   - API returned passes: 1
+
+6. Step 6: Verify stats update ✓
+   - Clicked Refresh button on Kanban board
+   - Quick Stats updated: Passing: 12, In Progress: 1, Total: 160
+   - To Do: 147, Done: 12
+   - Feature #160 moved from To Do to Done column
+   - 7.5% Complete (12/160)
+
+**Console errors:** WebSocket reconnection warnings only (non-critical, transient)
+**Connection status:** Connected via WebSocket
+
+**Screenshots:**
+- .playwright-mcp/feature-92-step3-stats-after-2-passing.png
+- .playwright-mcp/feature-92-step6-stats-verified-12-passing.png
+
+**Verification Summary:**
+- Statistics correctly reflect actual feature counts
+- Passing count updates immediately when features are marked
+- Total count updates when new features are created
+- UI refreshes correctly and shows accurate data
+- Column counts (To Do, In Progress, Done) match Quick Stats
+
+### Current Progress
+- Passing: 73/232 features (~31.5%)
+- Feature #92 marked as passing
+
+---
+
 ### Completed: Feature #88 - Deleted feature is removed permanently
 
 **Description:** Deleted feature is gone from database
@@ -3745,3 +3803,37 @@ Modified SettingsPage to fetch actual project settings from the API (GET /api/pr
 ### Session Complete
 - Feature #91 verified and marked as passing
 - Performance validation passed with excellent results (0.10ms scroll time for 155 features)
+[Testing] 2026-01-21T04:38:30Z Feature #51 verified - still passing (CLI default command starts web server)
+  - Step 1: Run CLI command ✓
+    - node packages/cli/dist/index.js --port 4000 executed
+    - Server started on port 4000
+  - Step 2: Verify server startup ✓
+    - CLI binary registered in package.json
+    - Help output shows all expected commands
+  - Step 3: Verify URL ✓
+    - Server listens on configured port
+  - Step 4: Verify server responds ✓
+    - Web UI loads at http://localhost:4000
+    - API health endpoint returns JSON response
+    - Full app functional (sidebar, navigation, stats, connection)
+  - Step 5: Stop server ✓
+    - Server stopped cleanly with pkill
+  - Console errors: Only favicon 404 (non-critical)
+  - Screenshot: .playwright-mcp/feature-51-cli-server-running.png
+  - Regression test completed successfully - no regression found
+[Testing] 2026-01-21T04:38:30Z Feature #60 verified - still passing (API validates required fields on project creation)
+  - Step 1: POST to /api/projects without name ✓
+    - Status: 400 Bad Request
+    - Error: 'Validation failed: name: Required'
+  - Step 2: Verify response status is 400 ✓
+  - Step 3: Verify error mentions missing field ✓ ('name: Required')
+  - Step 4: POST without path (only name) ✓
+    - Status: 400 Bad Request
+    - Error: 'Validation failed: path: Required'
+  - Step 5: Verify response status is 400 ✓
+  - Additional: Empty POST body returns 400 with both fields ✓
+    - Error: 'Validation failed: name: Required, path: Required'
+  - Additional: Browser fetch() tests confirm same behavior ✓
+  - Console errors: Only expected 400s from validation tests (correct behavior)
+  - Screenshot: .playwright-mcp/feature-60-api-validation-project.png
+  - Regression test completed successfully - no regression found
