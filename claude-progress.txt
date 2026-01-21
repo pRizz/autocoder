@@ -2,6 +2,63 @@
 
 ## Session: 2026-01-21
 
+### Completed: Feature #48 - Dark mode toggle works
+
+**Description:** Theme toggle switches between light and dark mode
+
+**Implementation:**
+- Created useTheme hook (packages/web/src/hooks/useTheme.tsx)
+  - React Context for shared theme state across all components
+  - ThemeProvider wraps app in main.tsx
+  - localStorage persistence with key 'open-autocoder-theme'
+  - System preference fallback when no user preference
+  - Adds/removes 'dark' class on document.documentElement
+- Added theme toggle button to Sidebar
+  - Moon icon shows when in light mode (click for dark)
+  - Sun icon shows when in dark mode (click for light)
+  - Proper aria-label for accessibility
+- Updated inline styles in App.tsx, Sidebar.tsx to respond to isDark state
+  - Background colors change (#111827 dark vs #f9fafb light)
+  - Text colors change (white vs dark gray)
+  - Border colors change
+
+**Testing Results (verified via Playwright browser automation):**
+- Step 1: Open main page in light mode ✓
+  - Light background, dark text, "Dark Mode" button with moon icon
+- Step 2: Click theme toggle button ✓
+- Step 3: Verify background changes to dark color ✓
+  - Main area changed to #111827
+  - Sidebar changed to #1f2937
+- Step 4: Verify text changes to light color ✓
+  - All text now white/light gray
+  - "Light Mode" button with sun icon
+- Step 5: Click toggle again ✓
+- Step 6: Verify returns to light mode ✓
+  - All colors return to light theme
+- Step 7: Verify preference persists after refresh ✓
+  - localStorage shows "dark"
+  - Page reload maintains dark theme
+
+**Screenshots captured:**
+- .playwright-mcp/feature-48-step1-light-mode-fresh.png
+- .playwright-mcp/feature-48-step2-dark-mode.png
+- .playwright-mcp/feature-48-step3-back-to-light.png
+- .playwright-mcp/feature-48-step4-dark-persisted.png
+
+**Console errors:** WebSocket connection errors (expected - API server not running)
+
+**Commit:** 9ef519d - feat: implement dark mode toggle with localStorage persistence
+
+### Current Progress
+- Passing: 39/230 features (~17.0%)
+- Feature #48 marked as passing
+
+### Next Steps
+- Session complete for Feature #48
+- Dark mode toggle fully functional with localStorage persistence
+
+---
+
 ### Completed: Feature #50 - Keyboard shortcut ? shows help (Performance Test)
 
 **Description:** Pressing ? key opens keyboard shortcuts modal (also verified Kanban performance with 100+ features)
