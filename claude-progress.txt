@@ -996,3 +996,43 @@ Feature #2 marked as passing
 ### Next Steps
 - Feature #207 (Typing indicator shows during AI response) is now unblocked
 - Continue with other pending features
+[Testing] 2026-01-21T03:18:30 Feature #12 verified - still passing (List all projects via API)
+  - Step 1: Created 2 test projects (test-regression-12-a, test-regression-12-b) ✓
+  - Step 2: Sent GET request to /api/projects ✓
+  - Step 3: Response status is 200 ✓
+  - Step 4: Response contains array of 13 projects ✓
+  - Step 5: Each project has name, path, createdAt fields ✓
+  - Cleaned up test projects after verification
+  - Console errors: Only favicon 404 (non-critical)
+  - Screenshot: .playwright-mcp/feature-12-regression-api-projects.png
+  - Regression test completed successfully - no regression found
+
+### Session: 2026-01-21T03:19 - Feature #22 Skipped (Blocked by Dependencies)
+
+**Assigned Feature:** #22 - Claim feature atomically via API
+
+**Description:** POST /api/projects/:name/features/:id/claim atomically marks in_progress
+
+**Steps:**
+1. Create a feature that is not in progress
+2. Send POST request to claim
+3. Verify response shows in_progress=true
+4. Try to claim same feature again
+5. Verify second claim returns error (already claimed)
+
+**Dependencies:** [16]
+
+**Status:** SKIPPED - Feature #22 depends on Feature #16, which is not yet passing.
+
+**Action Taken:**
+- Used `feature_skip` to move feature to end of queue (priority changed from 22 to 231)
+- Feature will be available for implementation once its dependency (Feature #16: Create single feature via API) is marked as passing
+
+**Note:** Feature #16 was implemented but may not have been marked as passing in the MCP database. There appears to be database inconsistency between the REST API server (port 3001) and the MCP feature server.
+
+**Current Progress:** 25/230 features passing (10.9%)
+
+### Next Steps
+- Feature #22 is now at priority 231 (end of queue)
+- Other agents should work on features without blocking dependencies
+- Feature #16 (dependency) may need to be verified as passing before #22 can proceed
