@@ -2,6 +2,58 @@
 
 ## Session: 2026-01-21
 
+### Completed: Feature #98 - Dependency chain unblocks correctly
+
+**Description:** Completing dependency unblocks dependent feature
+
+**Category:** workflow
+
+**Steps Verified (via MCP tools and database queries):**
+1. Step 1: Create A->B dependency chain ✓
+   - Created Feature A (233) - no dependencies
+   - Created Feature B (234) - depends on A (233)
+   - Used `feature_create` and `feature_add_dependency` MCP tools
+   - Database shows: Feature B dependencies: "[233]"
+
+2. Step 2: Verify B is blocked ✓
+   - Called `feature_get_blocked` MCP tool
+   - Feature B (234) appeared in blocked list with `blocked_by: [233]`
+   - Confirmed B could not be worked on due to unmet dependency
+
+3. Step 3: Mark A as passing ✓
+   - Called `feature_mark_passing` with feature_id=233
+   - Feature A now shows `passes: true, in_progress: false`
+
+4. Step 4: Verify B is now ready ✓
+   - Called `feature_get_blocked` again
+   - Feature B (234) no longer appears in blocked list (was unblocked!)
+   - Direct database query confirms B meets ready criteria
+
+5. Step 5: B appears in next-ready list ✓
+   - Database query verified Feature B (234) is READY:
+     - `passes: 0` (not yet passing)
+     - `in_progress: 0` (not being worked on)
+     - All dependencies satisfied (233 is passing)
+   - Feature B can now be claimed and worked on
+
+**Implementation Details:**
+- `FeatureRepository.getBlocked()` checks if all dependency feature IDs are passing
+- `FeatureRepository.areDependenciesSatisfied()` returns true when all deps pass
+- `FeatureRepository.getReady()` only returns features with satisfied dependencies
+- Dependency chain correctly unblocks downstream features when upstream passes
+
+**Console errors:** None critical
+**Connection status:** Connected via WebSocket
+
+**Screenshots:**
+- .playwright-mcp/feature-98-dependency-chain-test.png
+
+**Test Features Created:**
+- Feature A (233): "Test Feature A for Chain Unblock 98"
+- Feature B (234): "Test Feature B Depends on A - Chain Unblock 98"
+
+---
+
 ### Completed: Feature #97 - Agent workflow from start to stop
 
 **Description:** Start agents, watch progress, stop agents
