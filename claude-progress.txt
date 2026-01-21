@@ -2,6 +2,45 @@
 
 ## Session: 2026-01-21
 
+### Completed: Feature #22 - Claim feature atomically via API
+
+**Description:** POST /api/projects/:name/features/:id/claim atomically marks in_progress
+
+**Implementation:**
+- Added POST `/api/projects/:name/features/:id/claim` endpoint to packages/server/src/routes/features.ts
+- Endpoint calls `repo.claim(featureId)` which was already implemented in FeatureRepository
+- Returns updated feature with `in_progress=true` on success (HTTP 200)
+- Returns HTTP 409 Conflict with error code `FEATURE_ALREADY_CLAIMED` if already claimed
+- Proper error handling for invalid feature ID (HTTP 400) and not found (HTTP 404)
+
+**Testing Results (verified via Playwright browser automation):**
+- Step 1: Created test feature via POST /api/projects/open-autocoder/features ✓
+  - Feature #127 created with `inProgress: 0`
+- Step 2: Sent POST request to /api/projects/open-autocoder/features/127/claim ✓
+- Step 3: Verified response shows `inProgress: 1` (HTTP 200) ✓
+- Step 4: Tried to claim same feature again ✓
+- Step 5: Verified second claim returns HTTP 409 with error:
+  - `"error": "Feature 127 is already claimed by another agent"`
+  - `"code": "FEATURE_ALREADY_CLAIMED"`
+  - `"suggestedAction": "Wait for the feature to be released or claim a different feature"` ✓
+
+**Screenshots captured:**
+- .playwright-mcp/.playwright-mcp/feature-22-claim-endpoint-test.png
+
+**Console errors:** Only favicon 404 (non-critical) and expected 409 from atomic claim test
+
+**Commit:** a09f433 - feat: implement POST /api/projects/:name/features/:id/claim endpoint
+
+### Current Progress
+- Passing: 28/230 features (12.2%)
+- Feature #22 marked as passing
+
+### Next Steps
+- Session complete for Feature #22
+- Atomic claim endpoint is now available for parallel agent execution
+
+---
+
 ### Completed: Feature #3 - Version endpoint returns version info
 
 **Description:** GET /api/version returns version number and build info
@@ -1074,4 +1113,22 @@ Feature #2 marked as passing
   - Additional: FAB toggles between Open/Close states ✓
   - Console errors: Only favicon 404 (non-critical)
   - Screenshots: feature-206-regression-step*.png
+  - Regression test completed successfully - no regression found
+[Testing] 2026-01-21T03:21:01 Feature #147 verified - still passing (Filter by category works)
+  - Step 1: Features with multiple categories exist (functional, ui, api, security, testing, etc.) ✓
+  - Step 2: Filtered by 'functional' - shows '6 features in functional' ✓
+  - Step 3: Only functional features visible - all 6 have functional badge ✓
+  - Step 4: Filtered by 'ui' - shows '15 features in ui' ✓
+  - Step 5: Only ui features visible - all 15 have ui badge ✓
+  - Additional: Resetting to 'All Categories' restores all 126 features ✓
+  - Console errors: None (only favicon 404 non-critical)
+  - Screenshots: feature-147-regression-step1-all-categories.png, feature-147-regression-step2-functional-filter.png, feature-147-regression-step4-ui-filter.png
+  - Regression test completed successfully - no regression found
+[Testing] 2026-01-21T03:21:07 Feature #72 verified - still passing (Sidebar navigation to Graph works)
+  - Step 1: Navigated to home page (dashboard equivalent) ✓
+  - Step 2: Clicked Graph link in sidebar ✓
+  - Step 3: URL changed to /graph ✓
+  - Step 4: Dependency Graph view displayed with heading and description ✓
+  - Console errors: Only favicon 404 (non-critical)
+  - Screenshot: .playwright-mcp/.playwright-mcp/feature-72-regression-graph-view.png
   - Regression test completed successfully - no regression found
