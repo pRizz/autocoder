@@ -9,6 +9,7 @@ import { NewFeatureForm } from "./components/NewFeatureForm";
 import { Sidebar } from "./components/Sidebar";
 import { KanbanBoard } from "./components/KanbanBoard";
 import { SettingsForm } from "./components/SettingsForm";
+import { Terminal } from "./components/Terminal";
 
 export function App(): JSX.Element {
   return (
@@ -20,6 +21,7 @@ export function App(): JSX.Element {
           <Route path="/dashboard" element={<HomePage />} />
           <Route path="/kanban" element={<KanbanPage />} />
           <Route path="/graph" element={<GraphPage />} />
+          <Route path="/terminal" element={<TerminalPage />} />
           <Route path="/projects" element={<ProjectsPage />} />
           <Route path="/projects/:name" element={<ProjectDetailPage />} />
           <Route path="/settings" element={<SettingsPage />} />
@@ -164,6 +166,26 @@ function ProjectDetailPage(): JSX.Element {
           <p className="text-gray-500">No project selected</p>
         )}
       </section>
+    </div>
+  );
+}
+
+function TerminalPage(): JSX.Element {
+  return (
+    <div className="p-8 h-screen">
+      <div className="h-full flex flex-col">
+        <div className="mb-4">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+            Terminal
+          </h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            Real-time agent output and logs
+          </p>
+        </div>
+        <div className="flex-1 min-h-0">
+          <Terminal projectName="open-autocoder" maxLogEntries={1000} />
+        </div>
+      </div>
     </div>
   );
 }
