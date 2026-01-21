@@ -2049,3 +2049,61 @@ Feature #2 marked as passing
   - Console errors: None (only non-critical warnings)
   - Screenshots: feature-48-step1-light-mode.png, feature-48-step3-dark-mode.png, feature-48-step6-light-mode-again.png, feature-48-step7-persistence-after-refresh.png
   - Regression test completed successfully - no regression found
+
+### Completed: Feature #50 - Keyboard shortcut ? shows help
+
+**Description:** Pressing ? key opens keyboard shortcuts modal
+
+**Category:** functional
+
+**Implementation Status:** Feature was already fully implemented. This session verified it.
+
+**Verification Results (via Playwright browser automation):**
+- Step 1: Navigate to main page ✓
+  - Navigated to http://localhost:3000
+  - Page loaded with "Welcome to Open Autocoder" heading
+- Step 2: Press ? key ✓
+  - Pressed ? key on keyboard
+  - Modal opened successfully
+- Step 3: Verify keyboard shortcuts modal appears ✓
+  - Dialog with role="dialog" appeared
+  - Title "Keyboard Shortcuts" displayed in header
+  - Proper modal styling with backdrop
+- Step 4: Verify common shortcuts are listed ✓
+  - 8 shortcuts displayed:
+    - ? - Show this help modal
+    - A - Toggle AI assistant panel
+    - D - Toggle debug panel
+    - G - Navigate to Graph view
+    - K - Navigate to Kanban view
+    - N - Add new feature
+    - , - Open settings
+    - Esc - Close modals
+- Step 5: Press Escape to close modal ✓
+  - Pressed Escape key
+  - Modal closed successfully
+  - Dialog element removed from DOM
+
+**Additional Verifications:**
+- X button closes modal correctly ✓
+- Footer text "Press ? anytime to see this help" displayed ✓
+- Modal has proper ARIA attributes (role="dialog", aria-modal="true") ✓
+- No JavaScript errors related to feature ✓
+
+**Screenshots captured:**
+- .playwright-mcp/.playwright-mcp/feature-50-step1-main-page.png
+- .playwright-mcp/.playwright-mcp/feature-50-step3-modal-open.png
+- .playwright-mcp/.playwright-mcp/feature-50-step5-modal-closed.png
+- .playwright-mcp/.playwright-mcp/feature-50-final-verified.png
+
+**Existing Implementation:**
+- Component: packages/web/src/components/KeyboardShortcutsModal.tsx
+- Integration: packages/web/src/App.tsx (global keydown handler + modal state)
+
+### Current Progress
+- Passing: 42/230 features (~18.3%)
+- Feature #50 marked as passing
+
+### Session Complete
+- Feature #50 verified and marked as passing
+- No code changes needed (feature was already implemented)
