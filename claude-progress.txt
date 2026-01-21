@@ -867,3 +867,81 @@ These features can now be worked on by other agents.
   - Console errors: Only favicon 404 (non-critical)
   - Screenshots: .playwright-mcp/feature-147-step1-all-categories.png, feature-147-step2-functional-filter.png, feature-147-step4-ui-filter.png
   - Regression test completed successfully - no regression found
+
+### Completed: Feature #202 - Debug log viewer filters work
+
+**Description:** Log viewer supports filtering by level
+
+**Implementation:**
+- Updated Terminal.tsx filter logic to use severity level hierarchy instead of exact match
+- Filter hierarchy: debug (0) < info (1) < warn (2) < error (3)
+- DEBUG filter shows all logs (debug + info + warn + error)
+- INFO filter shows info + warn + error
+- WARN filter shows warn + error
+- ERROR filter shows only error logs
+- Added "Test Logs" button to generate sample logs at all severity levels for testing
+
+**Testing Results (verified via Playwright browser automation):**
+- Step 1: Generated logs at different levels using "Test Logs" button ✓
+  - 2 DEBUG, 3 INFO, 2 WARN, 2 ERROR logs generated
+- Step 2: Opened debug log viewer at /terminal ✓
+- Step 3: Filtered by ERROR level ✓
+- Step 4: Verified only 2 error logs shown (out of 9 total) ✓
+- Step 5: Filtered by DEBUG level ✓
+- Step 6: Verified all 9 logs shown (all levels visible) ✓
+- Additional: Verified INFO filter shows 7 logs, WARN filter shows 4 logs ✓
+- No JavaScript console errors detected
+
+**Screenshots captured:**
+- .playwright-mcp/feature-202-step1-all-logs.png
+- .playwright-mcp/feature-202-step3-filter-error.png
+- .playwright-mcp/feature-202-step5-filter-debug.png
+- .playwright-mcp/feature-202-filter-warn.png
+
+**Commit:** b5a20fb - feat: implement log level filtering with severity hierarchy
+
+### Current Progress
+- Passing: 22/230 features (9.6%)
+- Feature #202 marked as passing
+
+### Next Steps
+- Session complete for Feature #202
+- Debug log viewer now has working filter by severity level
+[Testing] 2026-01-21T03:17:15 Feature #154 verified - still passing (Numeric fields reject letters)
+  - Step 1: Opened settings form at /settings ✓
+  - Step 2: Tried to enter letters 'abc' in concurrency field ✓
+  - Step 3: Input rejected - field remained '3' (no letters accepted) ✓
+  - Step 4: Verified only numbers accepted:
+    - Entered '5' - accepted, field shows '5' ✓
+    - Entered 'a2b3c' - letters filtered, only '23' accepted (then '5' from previous, making '235') ✓
+    - Range validation showed error 'Concurrency must be between 1 and 5' ✓
+    - Entered '3' - valid, error cleared ✓
+  - Console errors: Only favicon 404 (non-critical)
+  - Screenshots: .playwright-mcp/.playwright-mcp/feature-154-regression-letters-filtered.png, feature-154-regression-valid-number.png
+  - Regression test completed successfully - no regression found
+
+### Completed: Feature #2 - Health check endpoint returns 200
+
+**Description:** GET /api/health returns 200 OK with status information
+
+**Verification Results (Feature was already implemented):**
+- Step 1: Sent GET request to /api/health ✓
+- Step 2: Verified response status is HTTP 200 ✓
+- Step 3: Verified response body contains status field (`"status":"ok"`) ✓
+- Step 4: Verified response body contains timestamp (`"timestamp":"2026-01-21T03:17:33.113Z"`) ✓
+
+**Implementation Location:** packages/server/src/index.ts (lines 59-66)
+
+**Response Format:**
+```json
+{
+  "status": "ok",
+  "timestamp": "2026-01-21T03:17:33.113Z",
+  "version": "0.1.0"
+}
+```
+
+**Browser Verification:** Screenshot captured at .playwright-mcp/feature-2-health-endpoint.png
+
+**Current Progress:** 24/230 features (~10.4%)
+Feature #2 marked as passing
