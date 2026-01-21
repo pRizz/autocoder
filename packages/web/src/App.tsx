@@ -2,7 +2,8 @@
  * Main application component
  */
 
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useParams } from "react-router-dom";
+import { FeatureSearch } from "./components/FeatureSearch";
 
 export function App(): JSX.Element {
   return (
@@ -39,11 +40,31 @@ function ProjectsPage(): JSX.Element {
 }
 
 function ProjectDetailPage(): JSX.Element {
+  const { name } = useParams<{ name: string }>();
+
   return (
     <div className="p-8">
-      <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-        Project Detail
+      <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+        Project: {name}
       </h1>
+
+      {/* Feature Search Section */}
+      <section className="mb-8">
+        <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4">
+          Search Features
+        </h2>
+        {name ? (
+          <FeatureSearch
+            projectName={name}
+            apiBaseUrl="http://localhost:3001/api"
+            onSearchResults={(features, query) => {
+              console.log(`Search for "${query}" returned ${features.length} results`);
+            }}
+          />
+        ) : (
+          <p className="text-gray-500">No project selected</p>
+        )}
+      </section>
     </div>
   );
 }

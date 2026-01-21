@@ -2,15 +2,13 @@
  * Feature repository - handles all feature database operations
  */
 
-import { eq, and, desc, asc, sql, lt } from "drizzle-orm";
+import { eq, and, asc, sql, like } from "drizzle-orm";
 import type { DatabaseConnection } from "../db/connection.js";
-import { features, type Feature, type NewFeature } from "../db/schema.js";
+import { features, type Feature } from "../db/schema.js";
 import {
   FeatureNotFoundError,
   FeatureAlreadyClaimedError,
-  CircularDependencyError,
   ValidationError,
-  DatabaseError,
 } from "../errors/index.js";
 import type { FeatureStats, DependencyGraph, FeatureStatus } from "../types/index.js";
 import { logger } from "../utils/logger.js";
@@ -207,6 +205,49 @@ export class FeatureRepository {
     }
 
     return query.all();
+  }
+
+  /**
+   * Search features by name (case-insensitive)
+   */
+  async search(query: string, options?: {
+    passes?: boolean;
+    inProgress?: boolean;
+    category?: string;
+    limit?: number;
+    offset?: number;
+  }): Promise<Feature[]> {
+    // Use SQLite LIKE with % wildcards for case-insensitive search
+    // Note: SQLite LIKE is case-insensitive for ASCII by default
+    const searchPattern = `%${query}%`;
+
+    let dbQuery = this.db.select().from(features);
+
+    const conditions = [
+      like(features.name, searchPattern),
+    ];
+
+    if (options?.passes !== undefined) {
+      conditions.push(eq(features.passes, options.passes ? 1 : 0));
+    }
+    if (options?.inProgress !== undefined) {
+      conditions.push(eq(features.inProgress, options.inProgress ? 1 : 0));
+    }
+    if (options?.category) {
+      conditions.push(eq(features.category, options.category));
+    }
+
+    dbQuery = dbQuery.where(and(...conditions)) as typeof dbQuery;
+    dbQuery = dbQuery.orderBy(asc(features.priority)) as typeof dbQuery;
+
+    if (options?.limit) {
+      dbQuery = dbQuery.limit(options.limit) as typeof dbQuery;
+    }
+    if (options?.offset) {
+      dbQuery = dbQuery.offset(options.offset) as typeof dbQuery;
+    }
+
+    return dbQuery.all();
   }
 
   /**
