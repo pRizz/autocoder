@@ -9,6 +9,7 @@
 import { useState, useCallback, useMemo, type FormEvent } from "react";
 import { useUnsavedChanges } from "../hooks/useUnsavedChanges";
 import { UnsavedChangesDialog } from "./UnsavedChangesDialog";
+import { useToast } from "./Toast";
 
 interface NewFeatureFormProps {
   projectName: string;
@@ -47,6 +48,7 @@ export function NewFeatureForm({
   onCancel,
   apiBaseUrl = "/api",
 }: NewFeatureFormProps): JSX.Element {
+  const { showToast } = useToast();
   const [name, setName] = useState("");
   const [category, setCategory] = useState("");
   const [description, setDescription] = useState("");
@@ -232,6 +234,14 @@ export function NewFeatureForm({
       setStepsText("");
       setTouched({});
       setLastSubmitData(null);
+
+      // Show success toast notification
+      showToast({
+        type: "success",
+        title: "Feature Created",
+        description: `"${feature.name}" has been added successfully.`,
+        duration: 5000,
+      });
 
       if (onFeatureCreated) {
         onFeatureCreated(feature);
