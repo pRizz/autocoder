@@ -2,6 +2,46 @@
 
 ## Session: 2026-01-21
 
+### Completed: Feature #85 - Breadcrumbs show correct path / Performance Test
+
+**Description:** Test feature 85 for performance validation with 100+ features in the kanban board
+
+**Category:** navigation / ui
+
+**Steps Verified (via Playwright browser automation):**
+1. Step 1: Verify feature renders ✓
+   - Navigated to http://localhost:3000/kanban
+   - Kanban board loaded with 149 features (141 To Do, 1 In Progress, 7 Done)
+   - All features displayed correctly with category badges, names, IDs, priorities, and timestamps
+   - Header shows "Track feature progress across development stages (149 features)"
+
+2. Step 2: Check no lag ✓
+   - Scroll performance measured at 0.00ms to bottom (well under 100ms threshold)
+   - JavaScript evaluation confirmed noLag: true
+   - No UI stuttering or freezing observed
+   - Scrollable container height: 18,146px
+
+3. Step 3: Test scrolling ✓
+   - Smooth scrolling from top to bottom of To Do column (17,710px scroll position)
+   - Scrolled back to top (position 0) in 0.10ms
+   - Features at bottom (#147-#149) visible, then top features (#3, #5, #6) visible after scroll back
+
+**Console errors:** None (no JavaScript errors)
+**Connection status:** Connected via WebSocket
+
+**Screenshots:**
+- .playwright-mcp/.playwright-mcp/feature-85-step1-kanban-renders.png
+- .playwright-mcp/.playwright-mcp/feature-85-step2-scrolled-performance.png
+- .playwright-mcp/.playwright-mcp/feature-85-step3-scrolled-back-to-top.png
+
+**Note:** Fixed Sidebar.tsx JSX error (missing closing `)}` for conditional) that was causing Vite compilation error.
+
+### Current Progress
+- Passing: 65/232 features (~28.0%)
+- Feature #85 marked as passing
+
+---
+
 ### Completed: Feature #84 - Update performance test feature 62
 
 **Description:** Test feature 62 for performance validation with 100+ features in the kanban board
@@ -3232,4 +3272,38 @@ Both were used to verify that circular dependencies are properly detected and re
     - Save button disabled when validation fails
   - Console errors: Only favicon 404 (non-critical)
   - Screenshot: .playwright-mcp/feature-154-numeric-validation.png
+  - Regression test completed successfully - no regression found
+[Testing] 2026-01-21T04:24:08Z Feature #52 verified - still passing (CLI --help shows usage information)
+  - Step 1: Run open-autocoder --help ✓
+    - Command executed successfully via node packages/cli/dist/index.js --help
+  - Step 2: Usage information displayed ✓
+    - Shows 'Usage: open-autocoder [options] [command]'
+    - Shows description 'Autonomous coding agent system'
+  - Step 3: All commands listed ✓
+    - 10 commands: serve, web, init, start, status, features, provider, projects, service, config
+    - Each command has description
+  - Step 4: Options documented ✓
+    - -V, --version (output version number)
+    - -p, --port <port> (with default: 3001)
+    - -H, --host <host> (with default: localhost)
+    - -h, --help (display help for command)
+  - Additional: Subcommand help verified ✓
+    - provider --help shows add, list subcommands
+    - projects --help shows list, create, delete subcommands
+    - service --help shows install, uninstall, start, stop, status subcommands
+  - Additional: --version returns '0.1.0' ✓
+  - Regression test completed successfully - no regression found
+[Testing] 2026-01-21T04:25:30Z Feature #150 verified - still passing (Required fields prevent submission)
+  - Step 1: Opened new feature form via Projects > open-autocoder > Add New Feature ✓
+  - Step 2: Left all fields empty (Name, Category, Description, Steps) ✓
+  - Step 3: Clicked 'Create Feature' button ✓
+  - Step 4: Submission blocked - form did NOT submit ✓
+  - Step 5: Validation errors displayed for all required fields ✓
+    - 'Name is required'
+    - 'Category is required'
+    - 'Description is required'
+    - 'At least one step is required'
+    - Summary: 'Please fix the errors above before submitting.'
+  - Screenshot: .playwright-mcp/feature-150-form-validation-errors.png
+  - Console errors: None critical (only WebSocket reconnect warnings)
   - Regression test completed successfully - no regression found
