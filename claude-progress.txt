@@ -4848,3 +4848,66 @@ Loading states already implemented in:
     correctly clears dependencies (verified via code review)
   - MCP server will use fixed code on next restart
   - Feature #103 marked as passing after fix
+[Testing] Session complete - Feature #103 regression fixed and verified
+  - Passing: 89/240 features (37.1%)
+
+---
+
+### Session: 2026-01-21 (Parallel Agent - Feature #237)
+
+**Assigned Feature:** #237 - Test Feature A (dependency for B)
+
+**Description:** Test feature A - will be a dependency for feature B
+
+**Category:** test-feature-103
+
+**Context:**
+- This is a test feature created during testing of feature #103 (Skip blocked feature workflow)
+- Feature #237 is "Test Feature A" - the parent feature
+- Feature #238 is "Test Feature B (depends on A)" - depends on feature #237
+- These features test the dependency handling system
+
+**Steps Verified:**
+1. Step 1: This is a test feature ✓
+   - Verified feature #237 exists in database
+   - Has correct ID: 237
+   - Has correct name: "Test Feature A (dependency for B)"
+   - Has correct category: "test-feature-103"
+   - Has steps defined
+   - Has description
+   - Feature #238 correctly depends on #237
+
+**Verification Script Results:**
+- Has ID 237: true
+- Has correct name: true
+- Has correct category: true
+- Has steps: true
+- Has description: true
+- All checks pass: true
+
+**Current Progress:**
+- Passing: 89/240 features (37.1%)
+- Feature #237 marked as passing
+
+### Session Complete
+- Feature #237 verified and marked as passing
+- No code changes required - this was a test feature verification
+[Testing] 2026-01-21T07:30:00Z Feature #148 REGRESSION FOUND - Filter by status works
+  - Feature #148: Filter by status works
+  - Description: Status filter shows only matching features
+  - REGRESSION DETECTED: When 'Passing (Done)' filter selected, all 3 columns still show features
+  - Evidence:
+    - Screenshot: .playwright-mcp/feature-148-filter-by-passing-bug.png
+    - Filter showed 'Passing (Done)' selected
+    - Subtitle displayed: status: "passing"
+    - TO DO column: 162 features (should be 0)
+    - IN PROGRESS column: 2 features (should be 0)
+    - DONE column: 13 features (correct)
+  - Root cause investigation:
+    - API endpoint /api/projects/:name/features supports ?passes=true filter
+    - API direct test with curl shows it returns only passes=1 features
+    - Frontend code in KanbanBoard.tsx correctly builds URL with ?passes=true
+    - Possible issue: Race condition, caching, or the filter not triggering re-fetch
+  - Feature marked as FAILING via MCP tool
+  - Playwright MCP server disconnected - cannot continue diagnosis
+  - Session incomplete - needs follow-up to fix regression
