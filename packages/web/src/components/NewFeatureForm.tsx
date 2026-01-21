@@ -33,6 +33,11 @@ interface FormErrors {
   submit?: string;
 }
 
+interface NetworkError {
+  message: string;
+  isNetworkError: boolean;
+}
+
 export function NewFeatureForm({
   projectName,
   onFeatureCreated,
@@ -46,6 +51,13 @@ export function NewFeatureForm({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [networkError, setNetworkError] = useState<NetworkError | null>(null);
+  const [lastSubmitData, setLastSubmitData] = useState<{
+    name: string;
+    category: string;
+    description: string;
+    steps: string[];
+  } | null>(null);
 
   /**
    * Validates all form fields and returns validation errors
@@ -112,6 +124,112 @@ export function NewFeatureForm({
   };
 
   /**
+   * Determines if an error is a network-related error
+   */
+  const isNetworkRelatedError = (error: unknown): boolean => {
+    if (error instanceof TypeError && error.message.includes("Failed to fetch")) {
+      return true;
+    }
+    if (error instanceof Error) {
+      const msg = error.message.toLowerCase();
+      return (
+        msg.includes("network") ||
+        msg.includes("connection") ||
+        msg.includes("timeout") ||
+        msg.includes("failed to fetch") ||
+        msg.includes("net::") ||
+        msg.includes("econnrefused")
+      );
+    }
+    return false;
+  };
+
+  /**
+   * Gets a user-friendly error message without technical details
+   */
+  const getFriendlyErrorMessage = (error: unknown): string => {
+    if (isNetworkRelatedError(error)) {
+      return "Unable to connect to the server. Please check your internet connection and try again.";
+    }
+
+    // For other errors, return a generic message
+    // This hides technical details like status codes, stack traces, etc.
+    return "Something went wrong while creating the feature. Please try again.";
+  };
+
+  /**
+   * Submits the feature data to the API
+   */
+  const submitFeature = async (featureData: {
+    name: string;
+    category: string;
+    description: string;
+    steps: string[];
+  }) => {
+    setIsSubmitting(true);
+    setErrors({});
+    setNetworkError(null);
+
+    try {
+      const response = await fetch(
+        `${apiBaseUrl}/projects/${encodeURIComponent(projectName)}/features`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(featureData),
+        }
+      );
+
+      if (!response.ok) {
+        // Server returned an error status - this is not a network error
+        const errorData = await response.json().catch(() => ({}));
+        // Still show a friendly message, hiding status codes
+        const serverMessage = errorData.error;
+        if (serverMessage && typeof serverMessage === "string" && !serverMessage.includes("HTTP")) {
+          // Show server message if it's user-friendly
+          setErrors({ submit: serverMessage });
+        } else {
+          setErrors({ submit: "Unable to create the feature. Please check your inputs and try again." });
+        }
+        return;
+      }
+
+      const feature = await response.json();
+
+      // Clear form
+      setName("");
+      setCategory("");
+      setDescription("");
+      setStepsText("");
+      setTouched({});
+      setLastSubmitData(null);
+
+      if (onFeatureCreated) {
+        onFeatureCreated(feature);
+      }
+    } catch (err) {
+      // Check if this is a network error
+      const isNetwork = isNetworkRelatedError(err);
+      const friendlyMessage = getFriendlyErrorMessage(err);
+
+      if (isNetwork) {
+        // Store the data for retry and show network error UI
+        setLastSubmitData(featureData);
+        setNetworkError({
+          message: friendlyMessage,
+          isNetworkError: true,
+        });
+      } else {
+        setErrors({ submit: friendlyMessage });
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  /**
    * Handles form submission
    */
   const handleSubmit = async (e: FormEvent) => {
@@ -134,54 +252,36 @@ export function NewFeatureForm({
       return;
     }
 
-    setIsSubmitting(true);
-    setErrors({});
+    const steps = stepsText
+      .split("\n")
+      .map((s) => s.trim())
+      .filter((s) => s.length > 0);
 
-    try {
-      const steps = stepsText
-        .split("\n")
-        .map((s) => s.trim())
-        .filter((s) => s.length > 0);
+    const featureData = {
+      name: name.trim(),
+      category: category.trim(),
+      description: description.trim(),
+      steps,
+    };
 
-      const response = await fetch(
-        `${apiBaseUrl}/projects/${encodeURIComponent(projectName)}/features`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            name: name.trim(),
-            category: category.trim(),
-            description: description.trim(),
-            steps,
-          }),
-        }
-      );
+    await submitFeature(featureData);
+  };
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error ?? `Failed to create feature: ${response.statusText}`);
-      }
-
-      const feature = await response.json();
-
-      // Clear form
-      setName("");
-      setCategory("");
-      setDescription("");
-      setStepsText("");
-      setTouched({});
-
-      if (onFeatureCreated) {
-        onFeatureCreated(feature);
-      }
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to create feature";
-      setErrors({ submit: message });
-    } finally {
-      setIsSubmitting(false);
+  /**
+   * Handles retry after a network error
+   */
+  const handleRetry = async () => {
+    if (lastSubmitData) {
+      await submitFeature(lastSubmitData);
     }
+  };
+
+  /**
+   * Dismisses the network error and resets state
+   */
+  const dismissNetworkError = () => {
+    setNetworkError(null);
+    setLastSubmitData(null);
   };
 
   const hasErrors = Object.keys(errors).some(
@@ -357,8 +457,59 @@ export function NewFeatureForm({
         )}
       </div>
 
-      {/* Submit error */}
-      {errors.submit && (
+      {/* Network error with retry option */}
+      {networkError && (
+        <div
+          className="p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg"
+          role="alert"
+        >
+          <div className="flex items-start gap-3">
+            <svg
+              className="w-5 h-5 text-amber-500 mt-0.5 flex-shrink-0"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+              />
+            </svg>
+            <div className="flex-1">
+              <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
+                Connection Error
+              </p>
+              <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
+                {networkError.message}
+              </p>
+              <div className="flex gap-2 mt-3">
+                <button
+                  type="button"
+                  onClick={handleRetry}
+                  disabled={isSubmitting}
+                  className="px-3 py-1.5 text-sm font-medium text-white bg-amber-600 hover:bg-amber-700 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isSubmitting ? "Retrying..." : "Try Again"}
+                </button>
+                <button
+                  type="button"
+                  onClick={dismissNetworkError}
+                  disabled={isSubmitting}
+                  className="px-3 py-1.5 text-sm font-medium text-amber-700 dark:text-amber-300 hover:text-amber-800 dark:hover:text-amber-200 focus:outline-none"
+                >
+                  Dismiss
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Submit error (non-network) */}
+      {errors.submit && !networkError && (
         <div
           className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg"
           role="alert"
