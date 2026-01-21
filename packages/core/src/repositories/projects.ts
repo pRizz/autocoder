@@ -4,7 +4,7 @@
 
 import { eq } from "drizzle-orm";
 import type { DatabaseConnection } from "../db/connection.js";
-import { projects, type Project, type NewProject } from "../db/schema.js";
+import { projects, sessions, type Project, type NewProject } from "../db/schema.js";
 import { ProjectNotFoundError, ValidationError } from "../errors/index.js";
 import { logger } from "../utils/logger.js";
 
@@ -139,9 +139,24 @@ export class ProjectRepository {
   }
 
   /**
-   * Delete a project
+   * Delete a project and its associated sessions
    */
   async delete(name: string): Promise<void> {
+    // First, delete associated sessions
+    const deletedSessions = this.db
+      .delete(sessions)
+      .where(eq(sessions.projectName, name))
+      .returning()
+      .all();
+
+    if (deletedSessions.length > 0) {
+      logger.info("Project sessions deleted", {
+        projectName: name,
+        sessionCount: deletedSessions.length,
+      });
+    }
+
+    // Then delete the project
     const result = this.db
       .delete(projects)
       .where(eq(projects.name, name))
