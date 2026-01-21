@@ -6793,3 +6793,130 @@ pnpm --filter @open-autocoder/server test -- --run
 - 75 new tests added to the codebase
 - Commit: a7e5111
 
+[Testing] 2026-01-21T10:22:50Z Feature #125 verified - still passing (Sidebar collapse state preserved)
+  - Category: state
+  - Description: Sidebar state persists across navigation
+  - All 5 verification steps PASSED:
+    1. Collapse sidebar ✓ (button changed to 'Expand sidebar', icons only shown)
+    2. Navigate to different view ✓ (home -> /kanban)
+    3. Verify sidebar still collapsed ✓ (sidebar remained collapsed on Kanban page)
+    4. Refresh page ✓ (page reloaded at /kanban URL)
+    5. Verify sidebar still collapsed ✓ (sidebar remained collapsed after refresh)
+  - Additional verifications:
+    - Expanded state also persists: tested expand -> navigate to /graph -> refresh -> still expanded
+    - State persistence likely uses localStorage or similar browser storage
+  - Console errors: None
+  - Screenshots: feature-125-step1-sidebar-expanded.png, feature-125-step1-sidebar-collapsed.png, feature-125-step3-sidebar-still-collapsed.png, feature-125-step5-sidebar-collapsed-after-refresh.png, feature-125-final-expanded-persisted.png
+  - No regression found - feature working correctly
+[Testing] Session complete - verified feature #125
+[Testing] 2026-01-21T10:30:00Z Feature #110 verified - still passing (Duplicate project name rejected)
+  - Category: error
+  - Description: Creating project with existing name shows error
+  - All 4 verification steps PASSED:
+    1. Create project named 'test-project' - Used existing "open-autocoder" project ✓
+    2. Try to create another project named 'test-project' - Attempted to create "open-autocoder" ✓
+    3. Verify error message about duplicate name - Error "Project with name 'open-autocoder' already exists" shown ✓
+    4. Verify original project is unchanged - Original project path and settings intact ✓
+  - Implementation details:
+    - API returns 400 with VALIDATION_ERROR code when duplicate name detected
+    - NewProjectWizard catches error in handleCreate() and displays alert
+    - Wizard returns to Settings step allowing user to go back and change name
+  - Note: Initial test appeared to fail due to server connection issues (too many concurrent stats requests)
+    Once server stabilized, feature worked correctly
+  - Screenshots: feature-110-duplicate-error-shown.png
+  - No regression found - feature working correctly
+[Testing] Session complete - verified feature #110
+[Testing] 2026-01-21T10:25:58Z Feature #123 verified - still passing (Filter state preserved on back navigation)
+  - Category: state
+  - Description: Filters remain applied after viewing detail
+  - All 4 verification steps PASSED:
+    1. Apply filters to feature list ✓ (Applied 'API' category filter)
+    2. Click on a feature to view details ✓ (Clicked Feature C, modal opened)
+    3. Click back ✓ (Pressed Escape to close modal)
+    4. Verify filters still applied ✓ (API filter still selected, URL preserved, only API features shown)
+  - Additional verifications:
+    - URL before modal: /kanban?category=API
+    - URL during modal: /kanban?category=API&featureId=13
+    - URL after modal: /kanban?category=API (featureId removed, category preserved)
+    - Category dropdown correctly shows 'API' selected
+    - Page shows '3 features in API'
+  - Console errors: None critical (only historical WebSocket/API errors from server restart)
+  - Screenshot: feature-123-filter-preserved.png
+  - No regression found - feature working correctly
+[Testing] Session complete - verified feature #123
+
+---
+
+## Session: 2026-01-21 (Parallel Agent - Feature #136)
+
+### Completed: Feature #136 - Sessions cleaned up on project delete
+
+**Description:** Project deletion removes associated sessions
+
+**Category:** cleanup
+
+**Implementation:**
+
+Modified `packages/core/src/repositories/projects.ts` to delete associated sessions before deleting the project:
+
+1. **Import sessions schema** - Added `sessions` to imports from schema
+2. **Delete sessions first** - In the `delete()` method, sessions with matching `projectName` are deleted before the project
+3. **Logging** - Added info log showing how many sessions were deleted
+
+**Code changes:**
+```typescript
+// In delete() method:
+// First, delete associated sessions
+const deletedSessions = this.db
+  .delete(sessions)
+  .where(eq(sessions.projectName, name))
+  .returning()
+  .all();
+
+if (deletedSessions.length > 0) {
+  logger.info("Project sessions deleted", {
+    projectName: name,
+    sessionCount: deletedSessions.length,
+  });
+}
+```
+
+**Tests Added:**
+- `packages/core/src/repositories/projects.test.ts` - 9 new tests
+- Key tests for Feature #136:
+  - `should delete associated sessions when project is deleted (Feature #136)` - PASSED
+  - `should not affect sessions of other projects when deleting a project` - PASSED
+
+**Steps Verified (via unit tests):**
+
+1. **Step 1: Create project** ✓
+   - Created test project via ProjectRepository.create()
+
+2. **Step 2: Run agent briefly (creates sessions)** ✓
+   - Inserted 3 test sessions directly into database
+   - Sessions had different agent types (initializer, coding, testing)
+
+3. **Step 3: Delete project** ✓
+   - Called ProjectRepository.delete()
+   - Log shows: "Project sessions deleted {"projectName":"test-project","sessionCount":3}"
+
+4. **Step 4: Verify sessions are removed** ✓
+   - Query for sessions with deleted project name returns 0 results
+   - Other projects' sessions remain intact
+
+**Test Results:**
+- All 55 core tests passing (46 feature tests + 9 new project tests)
+- Session cleanup tests specifically passing
+
+**Console errors:** None
+
+**Commit:** 4b5df3f - feat: Add cascading session delete on project deletion - Feature #136
+
+### Current Progress
+- Feature #136 marked as passing via MCP tool
+- Stats: 119/244 features passing (48.8%)
+
+### Session Complete
+- Feature #136 implemented and verified
+- Unit tests added for session cascade delete
+- All verification steps completed successfully
