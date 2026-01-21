@@ -2,6 +2,50 @@
 
 ## Session: 2026-01-21
 
+### Completed: Feature #63 - Circular dependency is rejected
+
+**Description:** Creating circular dependencies returns error
+
+**Category:** security
+
+**Steps Verified:**
+1. Step 1: Create feature A ✓
+   - Created Feature A (ID 231) via `feature_create` MCP tool
+   - Feature A has no dependencies
+
+2. Step 2: Create feature B depending on A ✓
+   - Created Feature B (ID 232) via `feature_create` MCP tool
+   - Added dependency via `feature_add_dependency(feature_id=232, dependency_id=231)`
+   - Response confirmed: `{"success": true, "feature_id": 232, "dependencies": [231]}`
+
+3. Step 3: Try to add A depending on B ✓
+   - Attempted `feature_add_dependency(feature_id=231, dependency_id=232)`
+   - This would create a circular dependency: A ← B ← A
+
+4. Step 4: Verify error about circular dependency ✓
+   - Response: `{"error": "Cannot add: would create circular dependency"}`
+   - Error message is clear and actionable
+
+5. Step 5: Verify no partial update occurred ✓
+   - Verified via `feature_get_graph` that Feature A (ID 231) has `dependencies: []`
+   - The failed operation did not modify Feature A's dependencies
+   - The dependency graph shows only edge `231 → 232` (B depends on A), not a reverse edge
+
+**Implementation Details:**
+- The `would_create_circular_dependency()` function in `api/dependency_resolver.py` uses DFS to detect cycles
+- The `feature_add_dependency` tool in `mcp_server/feature_mcp.py` calls this function before adding dependencies
+- Self-reference is also correctly rejected
+- Maximum dependencies limit (20) is enforced
+
+**Screenshots captured:**
+- .playwright-mcp/feature-63-graph-view.png
+
+### Current Progress
+- Passing: 46/230 features (~20%)
+- Feature #63 marked as passing
+
+---
+
 ### Completed: Feature #62 - API key is not exposed in provider list
 
 **Description:** GET /api/providers masks API keys
