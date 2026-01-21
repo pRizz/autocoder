@@ -6237,3 +6237,74 @@ The KanbanBoard component now persists filter state in URL search params using R
   - Screenshot: .playwright-mcp/feature-102-kanban-board.png
   - No regression found - feature working correctly
 [Testing] Session complete - verified feature #102
+[Testing] 2026-01-21T09:26:42Z Feature #70 verified - still passing (Sidebar navigation to Dashboard works)
+  - Category: navigation
+  - Description: Clicking Dashboard link navigates to dashboard view
+  - All 4 verification steps PASSED:
+    1. Navigate to any other view (/kanban) ✓
+    2. Click Dashboard link in sidebar ✓
+    3. Verify URL changes to /dashboard ✓
+    4. Verify dashboard content is displayed ✓
+  - Dashboard shows: 'Welcome to Open Autocoder' header with sidebar navigation
+  - Console errors: None
+  - Screenshot: .playwright-mcp/feature-70-dashboard-verified.png
+  - No regression found - feature working correctly
+[Testing] Session complete - verified feature #70
+[Testing] 2026-01-21T09:45:29Z Feature #86 verified - still passing (Created feature persists after page refresh)
+  - Category: data
+  - Description: Feature data persists in database after refresh
+  - All 5 verification steps PASSED:
+    1. Created feature TEST_PERSIST_12345 (ID: 195) ✓
+    2. Verified feature appeared in list via API ✓
+    3. Restarted server (simulating page refresh) ✓
+    4. Verified feature still appears after restart ✓
+    5. All feature data intact (name, category, description, steps) ✓
+  - Test feature cleaned up (deleted ID: 195)
+  - No regression found - feature working correctly
+[Testing] Session complete - verified feature #86
+
+---
+
+## Session: 2026-01-21 (Parallel Agent - Feature #126)
+
+### Completed: Feature #126 - Filter parameters in URL
+
+**Description:** Filters are reflected in URL query params
+
+**Category:** url
+
+**Steps Verified (via Playwright browser automation):**
+
+1. **Step 1: Apply category filter** ✓
+   - Navigated to http://localhost:3000/kanban
+   - Selected "API" from the category dropdown
+   - Screenshot: feature-126-step1-initial-state.png
+
+2. **Step 2: Verify URL contains ?category=...** ✓
+   - URL updated to: http://localhost:3000/kanban?category=API
+   - Category parameter correctly included in URL
+
+3. **Step 3: Copy URL and open in new tab** ✓
+   - Opened new tab with URL http://localhost:3000/kanban?category=API
+   - Page loaded with filter state from URL
+
+4. **Step 4: Verify filters applied in new tab** ✓
+   - Category dropdown shows "API" selected in new tab
+   - Filter state correctly initialized from URL params
+   - Screenshot: feature-126-step5-new-tab-filter-applied.png
+
+**Implementation Details:**
+- KanbanBoard.tsx uses `useSearchParams` from react-router-dom
+- Filter state initialized from URL on component mount (lines 213-218)
+- URL updated with `replace: true` when filters change (lines 304, 322)
+- Also supports status and page parameters
+
+**Console errors:** None critical (only WebSocket reconnection during tab switch)
+
+### Current Progress
+- Feature #126 marked as passing via MCP tool
+- Stats: 110/244 features passing (45.1%)
+
+### Session Complete
+- Feature #126 verified and marked as passing
+- All 4 verification steps completed successfully

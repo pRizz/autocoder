@@ -249,6 +249,28 @@ export async function registerProviderRoutes(
   );
 
   /**
+   * DELETE /api/providers/:id - Delete a provider
+   *
+   * Permanently removes a provider from the database.
+   */
+  fastify.delete(
+    "/api/providers/:id",
+    async (
+      request: FastifyRequest<{ Params: { id: string } }>,
+      reply: FastifyReply
+    ) => {
+      try {
+        const repo = getProviderRepository();
+        await repo.delete(request.params.id);
+        logger.info("Provider deleted via API", { providerId: request.params.id });
+        return reply.status(204).send();
+      } catch (error) {
+        return handleError(error, reply);
+      }
+    }
+  );
+
+  /**
    * POST /api/providers/:id/test - Test provider connection
    *
    * Tests the provider's API key by making a simple API call.
