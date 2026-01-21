@@ -44,9 +44,11 @@ function HomePage(): JSX.Element {
 }
 
 function KanbanPage(): JSX.Element {
+  // Default to open-autocoder project for now
+  // TODO: Get selected project from context/state
   return (
     <div className="p-8 h-screen">
-      <KanbanBoard />
+      <KanbanBoard projectName="open-autocoder" apiBaseUrl="http://localhost:3001/api" />
     </div>
   );
 }

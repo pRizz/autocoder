@@ -1,6 +1,21 @@
 /**
  * KanbanBoard component - displays features in three columns: To Do, In Progress, Done
+ *
+ * Fetches features from the API and renders them in appropriate columns based on status.
+ * Optimized for performance with many features using virtualization-ready patterns.
  */
+
+import { useState, useEffect, useMemo, useCallback, memo } from "react";
+
+interface Feature {
+  id: number;
+  name: string;
+  description: string;
+  category: string;
+  passes: number;
+  inProgress: number;
+  priority: number;
+}
 
 interface KanbanColumn {
   id: string;
@@ -14,75 +29,235 @@ const columns: KanbanColumn[] = [
   { id: "done", title: "Done", color: "border-green-400" },
 ];
 
-// Placeholder feature card for demonstration
 interface FeatureCardProps {
-  title: string;
-  category: string;
+  feature: Feature;
 }
 
-function FeatureCard({ title, category }: FeatureCardProps): JSX.Element {
+/**
+ * Memoized FeatureCard to prevent unnecessary re-renders
+ */
+const FeatureCard = memo(function FeatureCard({
+  feature,
+}: FeatureCardProps): JSX.Element {
   return (
     <div className="bg-white dark:bg-gray-700 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-3">
       <span className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-        {category}
+        {feature.category}
       </span>
       <h4 className="text-sm font-medium text-gray-900 dark:text-white mt-1">
-        {title}
+        {feature.name}
       </h4>
+      <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+        #{feature.id} &middot; Priority: {feature.priority}
+      </p>
     </div>
   );
+});
+
+interface KanbanColumnProps {
+  column: KanbanColumn;
+  features: Feature[];
+  isLoading: boolean;
 }
 
-export function KanbanBoard(): JSX.Element {
+/**
+ * Memoized KanbanColumn component
+ */
+const KanbanColumnComponent = memo(function KanbanColumnComponent({
+  column,
+  features,
+  isLoading,
+}: KanbanColumnProps): JSX.Element {
   return (
-    <div className="h-full">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-          Kanban Board
-        </h1>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-          Track feature progress across development stages
-        </p>
+    <div
+      className={`bg-gray-50 dark:bg-gray-800 rounded-lg border-t-4 ${column.color} flex flex-col min-h-0`}
+    >
+      {/* Column Header */}
+      <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
+        <div className="flex items-center justify-between">
+          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">
+            {column.title}
+          </h3>
+          <span className="inline-flex items-center justify-center w-6 h-6 text-xs font-medium text-gray-600 dark:text-gray-400 bg-gray-200 dark:bg-gray-700 rounded-full">
+            {features.length}
+          </span>
+        </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-6 h-[calc(100%-5rem)]">
-        {columns.map((column) => (
-          <div
-            key={column.id}
-            className={`bg-gray-50 dark:bg-gray-800 rounded-lg border-t-4 ${column.color} flex flex-col`}
-          >
-            {/* Column Header */}
-            <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-              <div className="flex items-center justify-between">
-                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">
-                  {column.title}
-                </h3>
-                <span className="inline-flex items-center justify-center w-6 h-6 text-xs font-medium text-gray-600 dark:text-gray-400 bg-gray-200 dark:bg-gray-700 rounded-full">
-                  {column.id === "todo" ? 3 : column.id === "in-progress" ? 1 : 2}
-                </span>
-              </div>
-            </div>
-
-            {/* Column Content */}
-            <div className="flex-1 p-4 space-y-3 overflow-y-auto">
-              {column.id === "todo" && (
-                <>
-                  <FeatureCard title="User authentication flow" category="security" />
-                  <FeatureCard title="Dashboard layout" category="ui" />
-                  <FeatureCard title="API error handling" category="core" />
-                </>
-              )}
-              {column.id === "in-progress" && (
-                <FeatureCard title="Sidebar navigation" category="navigation" />
-              )}
-              {column.id === "done" && (
-                <>
-                  <FeatureCard title="Project setup" category="infrastructure" />
-                  <FeatureCard title="Initial routing" category="navigation" />
-                </>
-              )}
-            </div>
+      {/* Column Content - scrollable */}
+      <div className="flex-1 p-4 space-y-3 overflow-y-auto min-h-0">
+        {isLoading ? (
+          <div className="flex items-center justify-center py-8">
+            <svg
+              className="animate-spin h-6 w-6 text-blue-500"
+              fill="none"
+              viewBox="0 0 24 24"
+              aria-label="Loading features"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              />
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              />
+            </svg>
           </div>
+        ) : features.length === 0 ? (
+          <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-4">
+            No features
+          </p>
+        ) : (
+          features.map((feature) => (
+            <FeatureCard key={feature.id} feature={feature} />
+          ))
+        )}
+      </div>
+    </div>
+  );
+});
+
+interface KanbanBoardProps {
+  projectName?: string;
+  apiBaseUrl?: string;
+}
+
+export function KanbanBoard({
+  projectName = "open-autocoder",
+  apiBaseUrl = "http://localhost:3001/api",
+}: KanbanBoardProps): JSX.Element {
+  const [features, setFeatures] = useState<Feature[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch features from API
+  const fetchFeatures = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const url = `${apiBaseUrl}/projects/${encodeURIComponent(projectName)}/features`;
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(
+          errorData.error ?? `Failed to fetch features: ${response.statusText}`
+        );
+      }
+
+      const data = await response.json();
+      setFeatures(data.features ?? []);
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Failed to fetch features";
+      setError(message);
+      setFeatures([]);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [projectName, apiBaseUrl]);
+
+  // Fetch on mount and when project changes
+  useEffect(() => {
+    fetchFeatures();
+  }, [fetchFeatures]);
+
+  // Memoize filtered features for each column
+  const todoFeatures = useMemo(
+    () =>
+      features
+        .filter((f) => f.passes === 0 && f.inProgress === 0)
+        .sort((a, b) => a.priority - b.priority),
+    [features]
+  );
+
+  const inProgressFeatures = useMemo(
+    () =>
+      features
+        .filter((f) => f.inProgress === 1)
+        .sort((a, b) => a.priority - b.priority),
+    [features]
+  );
+
+  const doneFeatures = useMemo(
+    () =>
+      features
+        .filter((f) => f.passes === 1)
+        .sort((a, b) => a.priority - b.priority),
+    [features]
+  );
+
+  // Map column IDs to feature arrays
+  const getColumnFeatures = useCallback(
+    (columnId: string): Feature[] => {
+      switch (columnId) {
+        case "todo":
+          return todoFeatures;
+        case "in-progress":
+          return inProgressFeatures;
+        case "done":
+          return doneFeatures;
+        default:
+          return [];
+      }
+    },
+    [todoFeatures, inProgressFeatures, doneFeatures]
+  );
+
+  return (
+    <div className="h-full flex flex-col">
+      <div className="mb-6 flex-shrink-0">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+              Kanban Board
+            </h1>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+              Track feature progress across development stages
+              {features.length > 0 && ` (${features.length} features)`}
+            </p>
+          </div>
+          <button
+            onClick={fetchFeatures}
+            disabled={isLoading}
+            className="px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 transition-colors"
+            aria-label="Refresh features"
+          >
+            {isLoading ? "Loading..." : "Refresh"}
+          </button>
+        </div>
+      </div>
+
+      {error && (
+        <div
+          className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex-shrink-0"
+          role="alert"
+        >
+          <p className="text-sm text-red-700 dark:text-red-400">{error}</p>
+          <button
+            onClick={fetchFeatures}
+            className="mt-2 text-sm text-red-600 dark:text-red-400 underline hover:no-underline"
+          >
+            Try again
+          </button>
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 flex-1 min-h-0">
+        {columns.map((column) => (
+          <KanbanColumnComponent
+            key={column.id}
+            column={column}
+            features={getColumnFeatures(column.id)}
+            isLoading={isLoading}
+          />
         ))}
       </div>
     </div>
