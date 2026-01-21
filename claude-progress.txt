@@ -1888,3 +1888,58 @@ Feature #2 marked as passing
 ### Next Steps
 - Session complete for Feature #53
 - Performance validation passed with excellent results
+[Testing] 2026-01-21T03:47:00 Feature #3 verified - still passing (Version endpoint returns version info)
+  - Step 1: Sent GET request to /api/version ✓
+  - Step 2: Response status is 200 ✓
+  - Step 3: Response body contains version string: {"version":"0.1.0","name":"open-autocoder"} ✓
+  - Step 4: Version 0.1.0 follows semver format (MAJOR.MINOR.PATCH) ✓
+  - Additional: Browser fetch also confirms API works correctly ✓
+  - Console errors: Only favicon 404 (non-critical)
+  - Screenshot: .playwright-mcp/.playwright-mcp/feature-3-regression-app-state.png
+  - Regression test completed successfully - no regression found
+
+---
+
+### Completed: Feature #59 - API returns 404 for non-existent feature
+
+**Description:** Accessing non-existent feature returns proper 404
+
+**Category:** security
+
+**Steps Verified:**
+1. Step 1: Created test project 'test-feature-59' ✓
+2. Step 2: Sent GET request to /api/projects/open-autocoder/features/99999 ✓
+3. Step 3: Verified response status is 404 ✓
+   - curl with -w flag confirmed HTTP_STATUS:404
+4. Step 4: Verified error message is clear ✓
+   - error: "Feature with ID 99999 not found"
+   - code: "FEATURE_NOT_FOUND" (machine-readable)
+   - suggestedAction: "Verify the feature ID exists in the database" (actionable)
+
+**Browser Verification:**
+- Navigated to API endpoint directly in browser
+- Screenshot captured showing JSON error response
+
+**Screenshots:**
+- .playwright-mcp/feature-59-404-response.png
+
+**Commit:** 0537e0d - docs: verify Feature #59 - API returns 404 for non-existent feature
+
+### Current Progress
+- Feature #59 marked as passing
+- Session complete for Feature #59
+- API properly returns 404 with clear, actionable error messages
+[Testing] 2026-01-21T03:48:24 Feature #35 verified - still passing (Add provider via API)
+  - Step 1: POST /api/providers with id, name, apiKey returned success ✓
+    - Created provider 'test-regression-35-v4' with 'Status Test Provider V4'
+  - Step 2: Response status is 201 Created ✓
+    - Verified via curl --include showing 'HTTP/1.1 201 Created'
+  - Step 3: Provider appears in GET /api/providers list ✓
+    - List now contains 5 providers including new one
+  - Step 4: API key is stored encrypted ✓
+    - Verified key is 108 chars in hex format (iv:authTag:encrypted)
+    - Database does NOT contain plaintext 'sk-status-test-v4-key'
+    - Regex confirms format: /^[a-f0-9]+:[a-f0-9]+:[a-f0-9]+$/i
+  - Console errors: None (only React DevTools info - non-critical)
+  - Screenshot: .playwright-mcp/.playwright-mcp/feature-35-regression-providers-api.png
+  - Regression test completed successfully - no regression found

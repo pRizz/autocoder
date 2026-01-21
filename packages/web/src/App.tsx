@@ -2,7 +2,7 @@
  * Main application component
  */
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Routes, Route, useParams } from "react-router-dom";
 import { FeatureSearch } from "./components/FeatureSearch";
 import { NewFeatureForm } from "./components/NewFeatureForm";
@@ -12,10 +12,38 @@ import { KanbanBoard } from "./components/KanbanBoard";
 import { SettingsForm } from "./components/SettingsForm";
 import { Terminal } from "./components/Terminal";
 import { AssistantChatPanel } from "./components/AssistantChatPanel";
+import { KeyboardShortcutsModal } from "./components/KeyboardShortcutsModal";
 import { useTheme } from "./hooks/useTheme";
 
 export function App(): JSX.Element {
   const { isDark } = useTheme();
+  const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
+
+  // Global keyboard shortcut for ? to show help modal
+  const handleKeyDown = useCallback((event: KeyboardEvent) => {
+    // Don't trigger if user is typing in an input
+    if (
+      event.target instanceof HTMLInputElement ||
+      event.target instanceof HTMLTextAreaElement
+    ) {
+      return;
+    }
+
+    // Open help modal with ? key (Shift + /)
+    if (event.key === "?" || (event.shiftKey && event.key === "/")) {
+      event.preventDefault();
+      setIsHelpModalOpen(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [handleKeyDown]);
+
+  const closeHelpModal = useCallback(() => {
+    setIsHelpModalOpen(false);
+  }, []);
 
   return (
     <div
@@ -54,6 +82,9 @@ export function App(): JSX.Element {
 
       {/* Assistant Chat Panel - available on all pages */}
       <AssistantChatPanel />
+
+      {/* Keyboard Shortcuts Help Modal */}
+      <KeyboardShortcutsModal isOpen={isHelpModalOpen} onClose={closeHelpModal} />
     </div>
   );
 }
