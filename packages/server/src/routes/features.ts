@@ -489,4 +489,40 @@ export async function registerFeatureRoutes(
       }
     }
   );
+
+  /**
+   * DELETE /api/projects/:name/features/:id - Delete a feature
+   * Permanently removes the feature from the database.
+   * Also cleans up orphaned dependencies in other features.
+   */
+  fastify.delete(
+    "/api/projects/:name/features/:id",
+    async (
+      request: FastifyRequest<{ Params: { name: string; id: string } }>,
+      reply: FastifyReply
+    ) => {
+      try {
+        const featureId = parseInt(request.params.id, 10);
+        if (isNaN(featureId)) {
+          return reply.status(400).send({
+            error: "Invalid feature ID",
+            code: "VALIDATION_ERROR",
+          });
+        }
+
+        const projectPath = await getProjectPath(request.params.name);
+        const repo = getFeatureRepository(projectPath);
+        await repo.delete(featureId);
+
+        logger.info("Feature deleted via API", {
+          featureId,
+          projectName: request.params.name,
+        });
+
+        return reply.status(204).send();
+      } catch (error) {
+        return handleError(error, reply);
+      }
+    }
+  );
 }
