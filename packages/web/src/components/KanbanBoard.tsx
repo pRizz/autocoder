@@ -18,6 +18,8 @@ interface Feature {
   passes: number;
   inProgress: number;
   priority: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
 interface KanbanColumn {
@@ -32,6 +34,38 @@ const columns: KanbanColumn[] = [
   { id: "done", title: "Done", color: "border-green-400" },
 ];
 
+/**
+ * Format an ISO timestamp in the user's local timezone
+ * Shows relative time for recent dates, full date for older ones
+ */
+function formatLocalTimestamp(isoTimestamp: string): string {
+  const date = new Date(isoTimestamp);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMins = Math.floor(diffMs / (1000 * 60));
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+  // Relative time for recent timestamps
+  if (diffMins < 1) {
+    return "just now";
+  } else if (diffMins < 60) {
+    return `${diffMins}m ago`;
+  } else if (diffHours < 24) {
+    return `${diffHours}h ago`;
+  } else if (diffDays < 7) {
+    return `${diffDays}d ago`;
+  }
+
+  // For older timestamps, show local date/time
+  return date.toLocaleDateString(undefined, {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}
+
 interface FeatureCardProps {
   feature: Feature;
 }
@@ -42,6 +76,10 @@ interface FeatureCardProps {
 const FeatureCard = memo(function FeatureCard({
   feature,
 }: FeatureCardProps): JSX.Element {
+  const localTime = formatLocalTimestamp(feature.createdAt);
+  // Also get full local datetime for tooltip (accessible via title attribute)
+  const fullLocalTime = new Date(feature.createdAt).toLocaleString();
+
   return (
     <div className="bg-white dark:bg-gray-700 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-3">
       <span className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
@@ -52,6 +90,13 @@ const FeatureCard = memo(function FeatureCard({
       </h4>
       <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
         #{feature.id} &middot; Priority: {feature.priority}
+      </p>
+      <p
+        className="text-xs text-gray-400 dark:text-gray-500 mt-1"
+        title={fullLocalTime}
+        data-testid="feature-created-at"
+      >
+        Created: {localTime}
       </p>
     </div>
   );
