@@ -215,6 +215,37 @@ export class FeatureRepository {
   }
 
   /**
+   * Count features with optional filtering (for pagination)
+   * Same filters as list() but returns count instead of features
+   */
+  async count(options?: {
+    passes?: boolean;
+    inProgress?: boolean;
+    category?: string;
+  }): Promise<number> {
+    const conditions = [];
+
+    if (options?.passes !== undefined) {
+      conditions.push(eq(features.passes, options.passes ? 1 : 0));
+    }
+    if (options?.inProgress !== undefined) {
+      conditions.push(eq(features.inProgress, options.inProgress ? 1 : 0));
+    }
+    if (options?.category) {
+      conditions.push(eq(features.category, options.category));
+    }
+
+    let query = this.db.select({ count: sql<number>`count(*)` }).from(features);
+
+    if (conditions.length > 0) {
+      query = query.where(and(...conditions)) as typeof query;
+    }
+
+    const result = query.get();
+    return result?.count ?? 0;
+  }
+
+  /**
    * Search features by name (case-insensitive)
    */
   async search(query: string, options?: {

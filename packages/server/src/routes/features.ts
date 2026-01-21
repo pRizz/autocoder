@@ -198,9 +198,20 @@ export async function registerFeatureRoutes(
 
         // Otherwise, list all features with filters
         const features = await repo.list(options);
+        // Get total count for pagination (without limit/offset)
+        const countOptions: {
+          passes?: boolean;
+          inProgress?: boolean;
+          category?: string;
+        } = {};
+        if (options.passes !== undefined) countOptions.passes = options.passes;
+        if (options.inProgress !== undefined) countOptions.inProgress = options.inProgress;
+        if (options.category !== undefined) countOptions.category = options.category;
+        const total = await repo.count(countOptions);
         return reply.send({
           features,
           count: features.length,
+          total,
         });
       } catch (error) {
         return handleError(error, reply);
