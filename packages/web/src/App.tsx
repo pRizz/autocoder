@@ -424,26 +424,90 @@ function TerminalPage(): JSX.Element {
 }
 
 function SettingsPage(): JSX.Element {
+  const { isDark } = useTheme();
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [projectSettings, setProjectSettings] = useState<{
+    model?: string;
+    provider?: string;
+    concurrency?: number;
+    yoloMode?: boolean;
+    testingAgentRatio?: number;
+  } | null>(null);
+
+  // Fetch project settings on mount
+  useEffect(() => {
+    const fetchProjectSettings = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        const response = await fetch("http://localhost:3001/api/projects/open-autocoder");
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        const data = await response.json();
+        // Convert yoloMode from number to boolean (database stores as 0/1)
+        setProjectSettings({
+          model: data.model || "",
+          provider: data.provider || "",
+          concurrency: data.concurrency ?? 3,
+          yoloMode: data.yoloMode === 1,
+          testingAgentRatio: data.testingAgentRatio ?? 1,
+        });
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "Failed to fetch project settings";
+        setError(message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProjectSettings();
+  }, []);
+
   return (
     <div className="p-8">
       <div className="max-w-2xl">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
           Settings
         </h1>
-        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-          <SettingsForm
-            projectName="open-autocoder"
-            apiBaseUrl="http://localhost:3001/api"
-            initialSettings={{
-              concurrency: 3,
-              yoloMode: false,
-              testingAgentRatio: 1,
-            }}
-            onSave={(settings) => {
-              console.log("Settings saved:", settings);
-            }}
-          />
-        </div>
+
+        {isLoading && (
+          <div className="flex items-center justify-center py-8">
+            <div
+              className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"
+              style={{ width: "32px", height: "32px", borderRadius: "50%", borderBottomWidth: "2px", borderColor: "#2563eb" }}
+            />
+            <span className="ml-2 text-gray-600 dark:text-gray-400" style={{ marginLeft: "8px", color: isDark ? "#9ca3af" : "#4b5563" }}>
+              Loading settings...
+            </span>
+          </div>
+        )}
+
+        {error && (
+          <div
+            role="alert"
+            className="p-4 bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 rounded-lg mb-4"
+            style={{ padding: "16px", backgroundColor: isDark ? "#7f1d1d" : "#fee2e2", color: isDark ? "#fca5a5" : "#b91c1c", borderRadius: "8px", marginBottom: "16px" }}
+          >
+            Error: {error}
+          </div>
+        )}
+
+        {!isLoading && !error && projectSettings && (
+          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+            <SettingsForm
+              projectName="open-autocoder"
+              apiBaseUrl="http://localhost:3001/api"
+              initialSettings={projectSettings}
+              onSave={(settings) => {
+                console.log("Settings saved:", settings);
+                // Update local state to reflect saved values
+                setProjectSettings(settings);
+              }}
+            />
+          </div>
+        )}
       </div>
     </div>
   );
