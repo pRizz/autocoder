@@ -3,6 +3,7 @@ generations/
 automaker/
 temp/
 .backups/
+.playwright-mcp/
 
 # Temporary test/debug scripts
 get-feature-*.cjs
