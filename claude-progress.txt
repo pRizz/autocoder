@@ -3635,3 +3635,58 @@ Modified SettingsPage to fetch actual project settings from the API (GET /api/pr
 ### Session Complete
 - Feature #153 verified and marked as passing
 - Whitespace-only input validation working correctly
+
+---
+
+### Completed: Feature #90 - Feature dependencies persist correctly
+
+**Description:** Feature dependency relationships persist
+
+**Category:** data
+
+**Steps Verified (via Playwright browser automation):**
+1. Step 1: Create feature A ✓
+   - Created Feature A (ID 155) via POST /api/projects/open-autocoder/features
+   - Name: "Test Feature A for Dep Persistence"
+   - Category: "test"
+
+2. Step 2: Create feature B depending on A ✓
+   - Created Feature B (ID 156) via POST with dependencies: [155]
+   - Name: "Test Feature B depends on A"
+   - API response confirmed: dependencies: "[155]"
+
+3. Step 3: Refresh page ✓
+   - Navigated to http://localhost:3000
+   - Page refreshed successfully
+
+4. Step 4: Get feature B details ✓
+   - GET /api/projects/open-autocoder/features/156 returned:
+     - id: 156
+     - name: "Test Feature B depends on A"
+     - dependencies: "[155]"
+
+5. Step 5: Verify dependencies array contains A's ID ✓
+   - API response shows dependencies: "[155]" (correct!)
+   - UI Feature Detail Modal shows "Dependencies: Feature #155"
+   - Dependency persisted correctly in SQLite database
+
+**Additional Verification:**
+- Opened Feature B in Kanban board modal
+- Modal displayed "Dependencies: Feature #155" section
+- Both test features visible in To Do column
+
+**Console errors:** Only favicon 404 (non-critical), WebSocket reconnecting warnings
+**Connection status:** Connected via WebSocket
+
+**Screenshots:**
+- .playwright-mcp/feature-90-graph-page.png
+- .playwright-mcp/feature-90-kanban-view.png
+- .playwright-mcp/feature-90-dependency-persists.png (shows modal with "Feature #155" dependency)
+
+### Current Progress
+- Passing: 69/232 features (~29.7%)
+- Feature #90 marked as passing
+
+### Session Complete
+- Feature #90 verified and marked as passing
+- Feature dependencies correctly persist in database and display in UI
