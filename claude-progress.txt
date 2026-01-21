@@ -2,6 +2,54 @@
 
 ## Session: 2026-01-21
 
+### Completed: Feature #12 - List all projects via API
+
+**Description:** GET /api/projects returns list of all registered projects
+
+**Category:** functional
+
+**Steps Verified:**
+1. Step 1: Create 2 test projects ✓
+   - Created test-feature-12-project-1 via POST /api/projects
+   - Created test-feature-12-project-2 via POST /api/projects
+   - Both returned 201 with correct data
+
+2. Step 2: Send GET request to /api/projects ✓
+   - Sent GET to http://localhost:3001/api/projects
+   - Response body is valid JSON array
+
+3. Step 3: Verify response status is 200 ✓
+   - HTTP status confirmed 200 via curl and browser network tab
+
+4. Step 4: Verify response contains array of projects ✓
+   - Response is JSON array with 22 projects total
+   - Both newly created test projects appear in the list
+
+5. Step 5: Verify each project has name, path, created_at fields ✓
+   - Each project object contains:
+     - name: string (project identifier)
+     - path: string (absolute filesystem path)
+     - createdAt: ISO 8601 timestamp
+   - Additional fields present: updatedAt, model, provider, concurrency, yoloMode, testingAgentRatio
+
+**Browser Verification:**
+- Navigated to Projects page (http://localhost:3001/projects)
+- All 22 projects displayed in card layout
+- Each card shows name, path, and creation timestamp
+- Network tab confirms GET /api/projects returned 200 OK
+
+**Console errors:** None
+
+**Screenshots:**
+- .playwright-mcp/feature-12-api-projects-response.png (JSON API response)
+- .playwright-mcp/feature-12-projects-page-all-listed.png (Projects page UI)
+
+### Current Progress
+- Passing: 51/232 features (~22.0%)
+- Feature #12 marked as passing
+
+---
+
 ### Completed: Feature #67 - XSS in feature name is escaped
 
 **Description:** Feature name with script tags is safely escaped in UI
