@@ -8,7 +8,7 @@ interface LogEntry {
   timestamp: string;
   level: LogLevel;
   message: string;
-  context?: Record<string, unknown>;
+  context: Record<string, unknown> | undefined;
 }
 
 const LOG_LEVELS: Record<LogLevel, number> = {

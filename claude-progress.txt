@@ -4189,3 +4189,77 @@ Modified SettingsPage to fetch actual project settings from the API (GET /api/pr
 - Feature #233 already verified and passing
 - No code changes required
 
+[Testing] 2026-01-21T04:49:52Z Feature #60 verified - still passing (API validates required fields on project creation)
+  - Step 1: Send POST to /api/projects without name ✓
+    - Sent: { path: '/some/path' }
+  - Step 2: Verify response status is 400 ✓
+    - Response: 400 Bad Request
+  - Step 3: Verify error mentions missing field ✓
+    - Error: 'Validation failed: name: Required'
+  - Step 4: Send POST without path ✓
+    - Sent: { name: 'test-project' }
+  - Step 5: Verify response status is 400 ✓
+    - Response: 400 Bad Request  
+    - Error: 'Validation failed: path: Required'
+  - Console errors: Only favicon 404 and expected 400s from test (non-critical)
+  - Screenshot: .playwright-mcp/.playwright-mcp/feature-60-api-validation-regression-test.png
+  - Regression test completed successfully - no regression found
+[Testing] 2026-01-21T04:49:55Z Feature #80 verified - still passing (Feature modal closes on Escape key)
+  - Step 1: Open feature detail modal ✓
+    - Clicked on 'Test Feature 3 with deps' feature card
+    - Modal opened with feature details (description, steps, dependencies)
+  - Step 2: Press Escape key ✓
+    - Pressed Escape key on keyboard
+  - Step 3: Verify modal closes ✓
+    - Modal disappeared from the page
+    - Kanban board visible without overlay
+  - Console errors: Only favicon 404 (non-critical)
+  - Screenshots:
+    - .playwright-mcp/.playwright-mcp/feature-80-step1-modal-open.png
+    - .playwright-mcp/.playwright-mcp/feature-80-step3-modal-closed.png
+  - Regression test completed successfully - no regression found
+
+---
+
+### Session: 2026-01-21 (Parallel Agent - Feature #101)
+
+**Assigned Feature:** #101 - Improve performance test feature 79
+
+**Description:** Test feature 79 for performance validation with 100+ features in the kanban board
+
+**Category:** performance
+
+**Steps Verified (via Playwright browser automation):**
+1. Step 1: Verify feature renders ✓
+   - Navigated to http://localhost:3000/kanban
+   - Kanban board loaded with 173 features (158 To Do, 2 In Progress, 13 Done)
+   - All features displayed correctly with category badges, names, IDs, priorities, and timestamps
+   - Header shows "Track feature progress across development stages (173 features)"
+
+2. Step 2: Check no lag ✓
+   - Scroll performance measured at 0.00ms (< 100ms threshold)
+   - JavaScript evaluation confirmed noLag: true
+   - No UI stuttering or freezing observed
+   - Max scroll height: 20,248px
+
+3. Step 3: Test scrolling ✓
+   - Smooth scrolling from top to bottom of To Do column
+   - Scrolled down to position showing features #174, #175 (near bottom)
+   - Scrolled back to top (0.00ms) - features #3, #5, #6 visible again
+   - Both scroll operations completed in under 1ms
+
+**Console errors:** None
+**Connection status:** Connected via WebSocket
+
+**Screenshots:**
+- .playwright-mcp/.playwright-mcp/feature-101-step1-kanban-renders-173-features.png
+- .playwright-mcp/.playwright-mcp/feature-101-step3-scrolled-to-bottom.png
+- .playwright-mcp/.playwright-mcp/feature-101-step3-scrolled-back-to-top.png
+
+### Current Progress
+- Feature #101 marked as passing in MCP database
+- Performance validation passed with excellent results (0.00ms scroll time for 173 features)
+
+### Session Complete
+- Feature #101 verified and marked as passing
+- Kanban board handles 100+ features with no performance issues

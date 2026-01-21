@@ -1,0 +1,679 @@
+<project_specification>
+  <project_name>open-autocoder</project_name>
+
+  <overview>
+    A TypeScript/React port of the autonomous coding agent system, integrated with opencode instead of Claude Code.
+    Enables long-running AI agents to build complete applications across multiple sessions with parallel execution,
+    feature tracking, dependency-aware scheduling, and real-time monitoring. Developers can run it via npm/npx,
+    as a system service, or as a desktop application.
+  </overview>
+
+  <technology_stack>
+    <frontend>
+      <framework>React 18 with TypeScript</framework>
+      <build_tool>Vite</build_tool>
+      <styling>Tailwind CSS v4</styling>
+      <state_management>TanStack Query (React Query)</state_management>
+      <ui_components>Radix UI primitives</ui_components>
+      <icons>Lucide React</icons>
+    </frontend>
+    <backend>
+      <runtime>Node.js 20+</runtime>
+      <framework>Fastify with TypeScript</framework>
+      <database>SQLite with Drizzle ORM</database>
+      <realtime>Native Fastify WebSocket</realtime>
+      <validation>Zod schemas</validation>
+    </backend>
+    <ai_integration>
+      <sdk>@opencode-ai/sdk</sdk>
+      <server>opencode serve (headless mode)</server>
+      <tools>MCP (Model Context Protocol) for feature management</tools>
+      <browser_automation>Playwright MCP</browser_automation>
+    </ai_integration>
+    <cli>
+      <framework>Commander.js</framework>
+      <process_management>execa for subprocess handling</process_management>
+    </cli>
+    <desktop>
+      <framework>Electron (optional phase)</framework>
+    </desktop>
+    <monorepo>
+      <package_manager>pnpm with workspaces</package_manager>
+      <structure>packages/core, packages/server, packages/web, packages/cli, packages/desktop</structure>
+    </monorepo>
+  </technology_stack>
+
+  <prerequisites>
+    <environment_setup>
+      <requirement>Node.js 20+ installed</requirement>
+      <requirement>pnpm installed globally (npm install -g pnpm)</requirement>
+      <requirement>opencode installed and configured with at least one AI provider</requirement>
+      <requirement>Git installed for version control</requirement>
+    </environment_setup>
+  </prerequisites>
+
+  <feature_count>225</feature_count>
+
+  <error_handling_philosophy>
+    <principle name="never_swallow">All unexpected errors must be surfaced to the user, never silently ignored</principle>
+    <principle name="actionable_messages">Error messages must explain what went wrong AND what the user can do about it</principle>
+    <principle name="severity_levels">Distinguish blocking/fatal errors from warnings and informational messages</principle>
+    <principle name="always_log">Even handled errors must be logged for debugging purposes</principle>
+    <principle name="fail_fast">Do not continue execution in an invalid state; fail early and visibly</principle>
+    <principle name="structured_errors">Use typed error classes with error codes, messages, and suggested actions</principle>
+    <anti_patterns>
+      <bad>catch (e) { /* ignore */ }</bad>
+      <bad>catch (e) { console.log("error") }</bad>
+      <bad>.catch(() => {})</bad>
+      <bad>|| true to suppress failures</bad>
+    </anti_patterns>
+    <good_patterns>
+      <example>
+        catch (e) {
+          logger.error("Failed to connect to opencode", { error: e });
+          throw new UserFacingError(
+            "Cannot connect to opencode server",
+            "Make sure opencode is running: `opencode serve`"
+          );
+        }
+      </example>
+    </good_patterns>
+  </error_handling_philosophy>
+
+  <core_features>
+    <project_management>
+      - Create new project with interactive spec generation wizard
+      - Continue existing projects across sessions
+      - Project registry stored in ~/.open-autocoder/registry.db
+      - List all registered projects with status
+      - Delete projects (with confirmation)
+      - Project settings (model, concurrency, provider)
+      - Import existing project directory
+      - Export project configuration
+      - Project path validation and error handling
+      - Detect and handle missing/moved project directories
+      - Project statistics dashboard (features complete, time spent)
+      - Recent projects quick access
+    </project_management>
+
+    <spec_creation>
+      - Interactive conversational spec wizard
+      - Quick mode (AI derives technical details)
+      - Detailed mode (user specifies tech choices)
+      - Generate app_spec.txt in XML format
+      - Generate initializer_prompt.md
+      - Generate coding_prompt.md
+      - Spec validation before saving
+      - Edit existing spec
+      - Spec version history
+      - Template library for common app types
+      - Import spec from existing project
+      - Spec preview before generation
+      - Progress indicator during spec creation
+      - Error recovery if spec generation fails
+      - Actionable error messages for spec issues
+    </spec_creation>
+
+    <feature_database>
+      - SQLite database for feature storage (features.db per project)
+      - Feature schema: id, priority, category, name, description, steps (JSON), passes, in_progress, dependencies (JSON)
+      - Create single feature
+      - Create features in bulk (feature_create_bulk)
+      - Read feature by ID
+      - List all features with filtering
+      - Update feature status (mark passing/failing)
+      - Mark feature in-progress (atomic claim)
+      - Clear in-progress status
+      - Skip feature (move to end of queue)
+      - Feature dependency system with depends_on array
+      - Circular dependency detection and prevention
+      - Orphaned dependency cleanup
+      - Maximum 20 dependencies per feature limit
+      - Dependency graph computation
+      - Scheduling score calculation for parallel execution
+      - Get next ready feature (dependencies satisfied)
+      - Get blocked features list
+      - Get features for regression testing (random passing)
+      - Feature statistics (passing, in_progress, total, percentage)
+      - Database migrations for schema changes
+      - Database backup before destructive operations
+      - Handle database corruption gracefully
+      - Clear error messages for database errors
+    </feature_database>
+
+    <agent_orchestration>
+      - Initializer agent (reads spec, creates all features)
+      - Coding agent (implements one feature at a time)
+      - Testing agent (regression tests passing features)
+      - Parallel orchestrator with configurable concurrency (1-5 agents)
+      - Dependency-aware scheduling (only start when deps satisfied)
+      - Atomic feature claiming to prevent race conditions
+      - Agent subprocess management (spawn, monitor, kill)
+      - Process tree cleanup on stop (no orphaned processes)
+      - Session persistence across restarts
+      - Auto-continue after rate limits with backoff
+      - Error recovery and retry logic (max 3 retries per feature)
+      - Agent output streaming to UI
+      - Agent status tracking (idle, running, paused, error)
+      - Graceful shutdown on SIGINT/SIGTERM
+      - Resume interrupted features from previous session
+      - Testing agent ratio configuration (0-3 per coding agent)
+      - YOLO mode (skip browser testing for rapid prototyping)
+      - Agent heartbeat monitoring
+      - Detect and handle stuck agents
+      - Clear error messages when agents fail
+      - Log all agent activity for debugging
+    </agent_orchestration>
+
+    <web_dashboard>
+      - Project selector dropdown with search
+      - Kanban board view (To Do, In Progress, Done columns)
+      - Feature cards with status indicators
+      - Feature card drag-and-drop (manual priority adjustment)
+      - Feature detail modal (full description, steps, dependencies)
+      - Dependency graph visualization (network diagram)
+      - Progress dashboard (percentage, counts, charts)
+      - Agent control panel (Start, Pause, Stop buttons)
+      - Agent status indicators with activity
+      - Real-time updates via WebSocket
+      - Debug log viewer (filterable, searchable)
+      - Settings modal (concurrency, model, dark mode)
+      - Keyboard shortcuts (?, space, s, p, etc.)
+      - Dark mode / light mode toggle
+      - Responsive layout (desktop, tablet, mobile)
+      - Loading states for all async operations
+      - Error boundaries with recovery options
+      - Toast notifications for actions
+      - Confirmation dialogs for destructive actions
+      - Empty states with helpful guidance
+      - Connection status indicator (WebSocket)
+      - Auto-reconnect on connection loss
+      - Celebration animation when all features complete
+      - Export features to JSON/CSV
+      - Activity feed showing recent agent actions
+      - Agent thought/reasoning display
+      - Terminal view for raw agent output
+      - Multiple terminal tabs support
+      - Dev server control (start/stop)
+      - Setup wizard for first-time users
+      - Expand project modal (add features mid-session)
+      - Feature editing form
+      - Add feature form
+      - Dependency badge component
+      - Question options component for spec creation
+      - Typing indicator for AI responses
+      - View toggle (Kanban vs Graph)
+      - Folder browser for project selection
+      - Assistant chat panel
+      - Assistant floating action button
+    </web_dashboard>
+
+    <browser_automation>
+      - Playwright MCP integration for browser control
+      - Screenshot capture during testing
+      - Headless mode toggle (PLAYWRIGHT_HEADLESS env var)
+      - Visible mode for debugging
+      - Browser isolation for parallel agents (--isolated flag)
+      - Navigate, click, type, fill form actions
+      - Wait for elements/navigation
+      - Console message capture
+      - Network request monitoring
+      - Dialog handling (alert, confirm, prompt)
+      - File upload support
+      - Viewport resize
+      - Tab management
+      - Browser installation check
+      - Clear error messages for browser automation failures
+    </browser_automation>
+
+    <realtime_updates>
+      - WebSocket server for live updates
+      - Feature status change events
+      - Agent output streaming
+      - Progress updates
+      - Connection state management
+      - Automatic reconnection with exponential backoff
+      - Message queuing during disconnection
+      - Heartbeat/ping-pong for connection health
+      - Multiple client support
+      - Event filtering by project
+      - Clear error messages for WebSocket issues
+    </realtime_updates>
+
+    <provider_management>
+      - List configured AI providers
+      - Add new provider with API key
+      - Edit provider configuration
+      - Remove provider
+      - Select default provider
+      - Select default model per provider
+      - Per-project provider override
+      - Provider connection test/validation
+      - Model listing per provider
+      - Provider status indicator (connected, error)
+      - Secure API key storage
+      - API key masking in UI
+      - Clear error messages for provider issues
+      - Actionable steps when provider fails
+      - Support for OpenAI, Anthropic, Gemini, local models
+    </provider_management>
+
+    <cli_interface>
+      - Default command (no args): start web server, print URL
+      - `open-autocoder serve`: headless API server only
+      - `open-autocoder web`: web UI + API server (alias for default)
+      - `open-autocoder --help`: show all commands and options
+      - `open-autocoder --version`: show version number
+      - `open-autocoder --port <port>`: specify server port
+      - `open-autocoder --host <host>`: specify server host
+      - `open-autocoder config`: show/edit configuration
+      - `open-autocoder projects list`: list all projects
+      - `open-autocoder projects create <name>`: create new project
+      - `open-autocoder projects delete <name>`: delete project
+      - Colored terminal output
+      - Progress spinners for long operations
+      - Clear error messages with suggested fixes
+      - Exit codes for scripting (0 success, 1 error)
+      - Quiet mode (--quiet) for scripting
+      - Verbose mode (--verbose) for debugging
+    </cli_interface>
+
+    <service_management>
+      - `open-autocoder service install`: install as system service
+      - `open-autocoder service uninstall`: remove system service
+      - `open-autocoder service start`: start the service
+      - `open-autocoder service stop`: stop the service
+      - `open-autocoder service status`: check service status
+      - `open-autocoder service logs`: view service logs
+      - systemd unit file generation for Linux
+      - launchd plist generation for macOS
+      - Auto-start on boot when installed
+      - Service runs as current user
+      - PID file management
+      - Graceful shutdown handling
+      - Log rotation configuration
+      - Service health check endpoint
+      - Clear error messages for service issues
+      - Detect if running as service vs interactive
+    </service_management>
+
+    <opencode_integration>
+      - Initialize opencode SDK client
+      - Connect to opencode headless server
+      - Session management (create, resume, list)
+      - Message sending and streaming responses
+      - Tool call handling
+      - Agent configuration (build, plan modes)
+      - MCP server registration (feature tools)
+      - Permission management for tools
+      - Provider/model selection via SDK
+      - Error handling for SDK failures
+      - Retry logic for transient failures
+      - Connection health monitoring
+      - Clear error messages when opencode unavailable
+      - Detect opencode version compatibility
+      - Handle opencode server restarts gracefully
+      - Pass-through opencode configuration
+      - Environment variable support for opencode config
+      - Actionable steps to start opencode if not running
+    </opencode_integration>
+
+    <logging_debugging>
+      - Structured JSON logging
+      - Log levels (debug, info, warn, error)
+      - Log to file (orchestrator_debug.log)
+      - Log rotation (max size, max files)
+      - Request/response logging for API
+      - Agent subprocess output capture
+      - Timestamp on all log entries
+      - Correlation IDs for request tracing
+      - Log filtering in debug viewer
+      - Log export functionality
+      - Performance timing logs
+      - Never log sensitive data (API keys, tokens)
+    </logging_debugging>
+
+    <testing_quality>
+      - Unit tests for core business logic
+      - Integration tests for API endpoints
+      - E2E tests for critical user flows
+      - Test coverage reporting
+      - Mocking utilities for external services
+      - Test fixtures and factories
+      - CI-friendly test runner
+      - Snapshot tests for UI components
+      - Type checking (tsc --noEmit)
+      - Linting (ESLint)
+      - Formatting (Prettier)
+    </testing_quality>
+  </core_features>
+
+  <database_schema>
+    <tables>
+      <features>
+        - id: INTEGER PRIMARY KEY AUTOINCREMENT
+        - priority: INTEGER NOT NULL (lower = higher priority)
+        - category: TEXT NOT NULL (e.g., "functional", "style", "security")
+        - name: TEXT NOT NULL
+        - description: TEXT NOT NULL
+        - steps: TEXT NOT NULL (JSON array of step strings)
+        - passes: INTEGER NOT NULL DEFAULT 0 (boolean: 0=false, 1=true)
+        - in_progress: INTEGER NOT NULL DEFAULT 0 (boolean)
+        - dependencies: TEXT (JSON array of feature IDs, nullable)
+        - created_at: TEXT NOT NULL (ISO 8601 timestamp)
+        - updated_at: TEXT NOT NULL (ISO 8601 timestamp)
+      </features>
+      <projects>
+        - name: TEXT PRIMARY KEY
+        - path: TEXT NOT NULL (absolute path to project directory)
+        - created_at: TEXT NOT NULL
+        - updated_at: TEXT NOT NULL
+        - model: TEXT (preferred AI model)
+        - provider: TEXT (preferred AI provider)
+        - concurrency: INTEGER DEFAULT 3
+        - yolo_mode: INTEGER DEFAULT 0 (boolean)
+        - testing_agent_ratio: INTEGER DEFAULT 1
+      </projects>
+      <providers>
+        - id: TEXT PRIMARY KEY (e.g., "openai", "anthropic")
+        - name: TEXT NOT NULL (display name)
+        - api_key_encrypted: TEXT (encrypted API key)
+        - base_url: TEXT (custom API endpoint)
+        - is_default: INTEGER DEFAULT 0 (boolean)
+        - created_at: TEXT NOT NULL
+        - updated_at: TEXT NOT NULL
+      </providers>
+      <sessions>
+        - id: TEXT PRIMARY KEY (UUID)
+        - project_name: TEXT NOT NULL (FK to projects)
+        - agent_type: TEXT NOT NULL (initializer, coding, testing)
+        - feature_id: INTEGER (FK to features, nullable)
+        - started_at: TEXT NOT NULL
+        - ended_at: TEXT (nullable)
+        - status: TEXT NOT NULL (running, completed, failed, cancelled)
+        - output_log: TEXT (path to log file)
+      </sessions>
+    </tables>
+  </database_schema>
+
+  <api_endpoints_summary>
+    <health>
+      - GET /api/health - Health check endpoint
+      - GET /api/version - Version information
+    </health>
+    <projects>
+      - GET /api/projects - List all projects
+      - POST /api/projects - Create new project
+      - GET /api/projects/:name - Get project details
+      - PUT /api/projects/:name - Update project settings
+      - DELETE /api/projects/:name - Delete project
+      - GET /api/projects/:name/stats - Get project statistics
+    </projects>
+    <features>
+      - GET /api/projects/:name/features - List features (with filters)
+      - POST /api/projects/:name/features - Create single feature
+      - POST /api/projects/:name/features/bulk - Create features in bulk
+      - GET /api/projects/:name/features/:id - Get feature details
+      - PUT /api/projects/:name/features/:id - Update feature
+      - DELETE /api/projects/:name/features/:id - Delete feature
+      - POST /api/projects/:name/features/:id/claim - Claim feature (atomic)
+      - POST /api/projects/:name/features/:id/pass - Mark as passing
+      - POST /api/projects/:name/features/:id/fail - Mark as failing
+      - POST /api/projects/:name/features/:id/skip - Skip feature
+      - GET /api/projects/:name/features/next - Get next ready feature
+      - GET /api/projects/:name/features/ready - Get all ready features
+      - GET /api/projects/:name/features/blocked - Get blocked features
+      - GET /api/projects/:name/features/regression - Get random passing for testing
+      - GET /api/projects/:name/features/graph - Get dependency graph data
+      - GET /api/projects/:name/features/stats - Get feature statistics
+    </features>
+    <agents>
+      - GET /api/projects/:name/agent/status - Get orchestrator status
+      - POST /api/projects/:name/agent/start - Start orchestrator
+      - POST /api/projects/:name/agent/pause - Pause orchestrator
+      - POST /api/projects/:name/agent/stop - Stop orchestrator
+      - GET /api/projects/:name/agent/logs - Get agent logs
+    </agents>
+    <providers>
+      - GET /api/providers - List all providers
+      - POST /api/providers - Add provider
+      - GET /api/providers/:id - Get provider details
+      - PUT /api/providers/:id - Update provider
+      - DELETE /api/providers/:id - Delete provider
+      - POST /api/providers/:id/test - Test provider connection
+      - GET /api/providers/:id/models - List available models
+    </providers>
+    <spec>
+      - POST /api/projects/:name/spec/create - Start spec creation session
+      - POST /api/projects/:name/spec/message - Send message to spec wizard
+      - GET /api/projects/:name/spec/status - Get spec creation status
+    </spec>
+    <devserver>
+      - GET /api/projects/:name/devserver/status - Get dev server status
+      - POST /api/projects/:name/devserver/start - Start dev server
+      - POST /api/projects/:name/devserver/stop - Stop dev server
+    </devserver>
+    <websocket>
+      - WS /ws/projects/:name - Real-time updates for project
+    </websocket>
+  </api_endpoints_summary>
+
+  <ui_layout>
+    <main_structure>
+      - Header: Logo, project selector, settings button, theme toggle
+      - Sidebar (collapsible): Navigation, agent controls, quick stats
+      - Main content: View area (Kanban, Graph, Terminal)
+      - Footer: Status bar, WebSocket indicator, version
+    </main_structure>
+    <views>
+      - Dashboard: Overview with stats, recent activity, quick actions
+      - Kanban: Three-column board (To Do, In Progress, Done)
+      - Graph: Network visualization of feature dependencies
+      - Terminal: Raw agent output with tabs for multiple agents
+      - Settings: Configuration panels for project, providers, preferences
+      - Spec Creation: Chat-style interface for spec wizard
+    </views>
+    <modals>
+      - Feature detail modal
+      - New project modal
+      - Settings modal
+      - Expand project modal
+      - Confirm dialog (for destructive actions)
+      - Keyboard shortcuts help
+      - Setup wizard (first-time)
+    </modals>
+  </ui_layout>
+
+  <design_system>
+    <color_palette>
+      - Primary: Blue (#3B82F6)
+      - Success: Green (#22C55E)
+      - Warning: Yellow (#EAB308)
+      - Error: Red (#EF4444)
+      - Background (light): White (#FFFFFF)
+      - Background (dark): Slate (#0F172A)
+      - Text (light): Slate (#1E293B)
+      - Text (dark): Slate (#F1F5F9)
+    </color_palette>
+    <typography>
+      - Font family: Inter (system fallbacks)
+      - Monospace: JetBrains Mono (for code/terminal)
+    </typography>
+    <spacing>
+      - Base unit: 4px (Tailwind default)
+      - Consistent padding/margins using Tailwind scale
+    </spacing>
+  </design_system>
+
+  <implementation_steps>
+    <step number="1">
+      <title>Project Setup and Monorepo Structure</title>
+      <tasks>
+        - Initialize pnpm workspace
+        - Create packages/core, packages/server, packages/web, packages/cli
+        - Configure TypeScript for each package
+        - Set up shared tsconfig and ESLint config
+        - Configure Vite for web package
+        - Set up Drizzle ORM with SQLite
+        - Create base error handling utilities
+      </tasks>
+    </step>
+    <step number="2">
+      <title>Core Package - Database and Business Logic</title>
+      <tasks>
+        - Implement Drizzle schema for all tables
+        - Create database connection manager
+        - Implement feature repository (CRUD operations)
+        - Implement project repository
+        - Implement provider repository
+        - Port dependency resolver from Python
+        - Port scheduling score computation
+        - Implement atomic feature claiming
+        - Create typed error classes
+        - Add comprehensive logging
+      </tasks>
+    </step>
+    <step number="3">
+      <title>Server Package - API and WebSocket</title>
+      <tasks>
+        - Set up Fastify with TypeScript
+        - Implement all REST API endpoints
+        - Add Zod validation for all routes
+        - Implement WebSocket server for real-time updates
+        - Create opencode SDK wrapper service
+        - Implement parallel orchestrator (port from Python)
+        - Add subprocess management for agents
+        - Implement health check and status endpoints
+        - Add request logging middleware
+        - Implement error handling middleware
+      </tasks>
+    </step>
+    <step number="4">
+      <title>MCP Server - Feature Tools</title>
+      <tasks>
+        - Port feature_mcp.py to TypeScript
+        - Implement all feature management tools
+        - Register with opencode MCP system
+        - Test tool invocations
+        - Add error handling for all tools
+      </tasks>
+    </step>
+    <step number="5">
+      <title>Web Package - React Dashboard</title>
+      <tasks>
+        - Port existing React components from Python project
+        - Implement TanStack Query hooks for API
+        - Implement WebSocket hook for real-time updates
+        - Create Kanban board component
+        - Create dependency graph visualization
+        - Implement all modals and forms
+        - Add dark mode support
+        - Implement keyboard shortcuts
+        - Add error boundaries
+        - Create loading and empty states
+      </tasks>
+    </step>
+    <step number="6">
+      <title>CLI Package - Commands and Service Scripts</title>
+      <tasks>
+        - Implement Commander.js CLI structure
+        - Create default command (start web server)
+        - Implement serve command
+        - Implement service subcommands (install, uninstall, start, stop, status)
+        - Generate systemd unit file
+        - Generate launchd plist
+        - Add colored output and progress indicators
+        - Implement config command
+        - Add projects subcommands
+        - Create npm bin entry point
+      </tasks>
+    </step>
+    <step number="7">
+      <title>Provider Management</title>
+      <tasks>
+        - Implement provider API endpoints
+        - Create provider management UI
+        - Add API key encryption/decryption
+        - Implement provider connection testing
+        - Add model listing per provider
+        - Create provider selection UI
+      </tasks>
+    </step>
+    <step number="8">
+      <title>Integration and Testing</title>
+      <tasks>
+        - Write unit tests for core package
+        - Write integration tests for API
+        - Write E2E tests for critical flows
+        - Test with real opencode instance
+        - Test parallel agent execution
+        - Test service installation on Linux/macOS
+        - Performance testing
+        - Error scenario testing
+      </tasks>
+    </step>
+    <step number="9">
+      <title>Documentation and Polish</title>
+      <tasks>
+        - Write README with installation instructions
+        - Document all CLI commands
+        - Create troubleshooting guide
+        - Add inline code documentation
+        - Create example projects
+        - Polish UI animations and transitions
+        - Final error message review
+      </tasks>
+    </step>
+    <step number="10">
+      <title>Publishing and Distribution</title>
+      <tasks>
+        - Configure npm package.json for publishing
+        - Set up npm publish workflow
+        - Test npx installation
+        - Test global npm install
+        - Create GitHub releases
+        - Optional: Electron desktop build
+      </tasks>
+    </step>
+  </implementation_steps>
+
+  <success_criteria>
+    <functionality>
+      - All features from Python version work in TypeScript port
+      - Can create project, generate spec, run agents, track features
+      - Parallel orchestrator works with configurable concurrency
+      - Real-time updates work via WebSocket
+      - Browser automation works via Playwright MCP
+      - Provider management allows multiple AI providers
+    </functionality>
+    <user_experience>
+      - Single command to start: `npx open-autocoder`
+      - Clear onboarding for first-time users
+      - Responsive UI that works on desktop and tablet
+      - Informative error messages with actionable suggestions
+      - Keyboard shortcuts for power users
+    </user_experience>
+    <technical_quality>
+      - TypeScript strict mode with no any types
+      - All errors handled with proper error types
+      - No swallowed errors - all logged and surfaced
+      - Comprehensive test coverage for critical paths
+      - Clean code following ESLint rules
+      - Consistent formatting with Prettier
+    </technical_quality>
+    <operations>
+      - Service installation works on Linux (systemd) and macOS (launchd)
+      - Auto-start on boot when installed as service
+      - Graceful shutdown handling
+      - Log rotation for long-running service
+      - Health check endpoint for monitoring
+    </operations>
+    <design_polish>
+      - Consistent design system throughout
+      - Smooth animations and transitions
+      - Dark mode that looks intentional
+      - Mobile-friendly responsive layout
+      - Accessible (keyboard navigation, ARIA labels)
+    </design_polish>
+  </success_criteria>
+</project_specification>
