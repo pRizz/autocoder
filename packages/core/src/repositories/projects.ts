@@ -7,9 +7,43 @@ import type { DatabaseConnection } from "../db/connection.js";
 import { projects, sessions, type Project, type NewProject } from "../db/schema.js";
 import { ProjectNotFoundError, ValidationError } from "../errors/index.js";
 import { logger } from "../utils/logger.js";
+import { createBackup, type BackupResult } from "../utils/backup.js";
 
 export class ProjectRepository {
-  constructor(private readonly db: DatabaseConnection) {}
+  private readonly maybeDbPath: string | undefined;
+
+  constructor(db: DatabaseConnection, dbPath?: string) {
+    this.db = db;
+    this.maybeDbPath = dbPath;
+  }
+
+  private readonly db: DatabaseConnection;
+
+  /**
+   * Create a backup before a destructive operation
+   * Only creates a backup if dbPath was provided during construction
+   *
+   * @param operation - Description of the operation being performed
+   * @returns Backup result if backup was created, undefined otherwise
+   */
+  private createBackupIfPossible(operation: string): BackupResult | undefined {
+    if (!this.maybeDbPath) {
+      logger.debug("Cannot create backup: dbPath not provided to ProjectRepository", { operation });
+      return undefined;
+    }
+
+    try {
+      return createBackup(this.maybeDbPath, operation);
+    } catch (error) {
+      // Log the warning but don't block the operation
+      const message = error instanceof Error ? error.message : String(error);
+      logger.warn("Failed to create backup before operation", {
+        operation,
+        error: message,
+      });
+      return undefined;
+    }
+  }
 
   /**
    * Create a new project
@@ -140,8 +174,15 @@ export class ProjectRepository {
 
   /**
    * Delete a project and its associated sessions
+   * Creates a backup of the registry database before deletion for recovery purposes
    */
   async delete(name: string): Promise<void> {
+    // Verify project exists first (throws if not found)
+    await this.getByName(name);
+
+    // Create backup of registry database before destructive operation
+    this.createBackupIfPossible(`delete project '${name}'`);
+
     // First, delete associated sessions
     const deletedSessions = this.db
       .delete(sessions)

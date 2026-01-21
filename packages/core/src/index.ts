@@ -27,3 +27,4 @@ export * from "./errors/index.js";
 
 // Utilities
 export * from "./utils/logger.js";
+export * from "./utils/backup.js";

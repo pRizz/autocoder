@@ -63,7 +63,8 @@ function getProjectRepository(): ProjectRepository {
     const dbPath = getRegistryDbPath();
     const db = getDatabase(dbPath);
     initializeTables(db);
-    projectRepo = new ProjectRepository(db);
+    // Pass dbPath for backup support (Feature #139)
+    projectRepo = new ProjectRepository(db, dbPath);
   }
   return projectRepo;
 }
@@ -303,7 +304,8 @@ export async function registerProjectRoutes(
           try {
             const featuresDb = getDatabase(featuresDbPath);
             initializeTables(featuresDb);
-            const featuresRepo = new FeatureRepository(featuresDb);
+            // Pass dbPath for backup support (Feature #139)
+            const featuresRepo = new FeatureRepository(featuresDb, featuresDbPath);
             const deletedCount = await featuresRepo.deleteAll();
             logger.info("Features deleted during project deletion", {
               projectName: request.params.name,

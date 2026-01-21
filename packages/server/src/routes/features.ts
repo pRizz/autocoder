@@ -68,7 +68,8 @@ function getFeatureRepository(projectPath: string): FeatureRepository {
     }
     const db = getDatabase(dbPath);
     initializeTables(db);
-    repo = new FeatureRepository(db);
+    // Pass dbPath for backup support (Feature #139)
+    repo = new FeatureRepository(db, dbPath);
     featureRepos.set(cacheKey, repo);
   }
 

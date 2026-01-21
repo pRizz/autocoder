@@ -60,6 +60,15 @@ export function SettingsForm({
   const concurrencyInputRef = useRef<HTMLInputElement>(null);
   const testingAgentRatioInputRef = useRef<HTMLInputElement>(null);
 
+  // Default values for settings reset
+  const DEFAULT_SETTINGS = {
+    model: "",
+    provider: "",
+    concurrency: "3",
+    yoloMode: false,
+    testingAgentRatio: "1",
+  };
+
   // Track if form has unsaved changes (any value differs from initial)
   const hasUnsavedChanges = useMemo(() => {
     const initialModel = initialSettings?.model ?? "";
@@ -237,6 +246,19 @@ export function SettingsForm({
     },
     []
   );
+
+  /**
+   * Reset all settings to their default values
+   */
+  const handleResetToDefaults = useCallback(() => {
+    setModel(DEFAULT_SETTINGS.model);
+    setProvider(DEFAULT_SETTINGS.provider);
+    setConcurrency(DEFAULT_SETTINGS.concurrency);
+    setYoloMode(DEFAULT_SETTINGS.yoloMode);
+    setTestingAgentRatio(DEFAULT_SETTINGS.testingAgentRatio);
+    setErrors({});
+    setSubmitMessage(null);
+  }, []);
 
   /**
    * Handle form submission
@@ -488,13 +510,22 @@ export function SettingsForm({
       )}
 
         {/* Form Actions */}
-        <div className="flex gap-3">
+        <div className="flex gap-3 flex-wrap">
           <button
             type="submit"
             disabled={isSubmitting || Object.keys(errors).length > 0}
             className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSubmitting ? "Saving..." : "Save Settings"}
+          </button>
+          <button
+            type="button"
+            onClick={handleResetToDefaults}
+            disabled={isSubmitting}
+            aria-label="Reset to Defaults"
+            className="px-4 py-2 text-sm font-medium text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-amber-900/30 rounded-lg hover:bg-amber-200 dark:hover:bg-amber-900/50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Reset to Defaults
           </button>
           {onCancel && (
             <button

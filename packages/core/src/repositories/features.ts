@@ -12,11 +12,45 @@ import {
 } from "../errors/index.js";
 import type { FeatureStats, DependencyGraph, FeatureStatus } from "../types/index.js";
 import { logger } from "../utils/logger.js";
+import { createBackup, type BackupResult } from "../utils/backup.js";
 
 const MAX_DEPENDENCIES = 20;
 
 export class FeatureRepository {
-  constructor(private readonly db: DatabaseConnection) {}
+  private readonly maybeDbPath: string | undefined;
+
+  constructor(db: DatabaseConnection, dbPath?: string) {
+    this.db = db;
+    this.maybeDbPath = dbPath;
+  }
+
+  private readonly db: DatabaseConnection;
+
+  /**
+   * Create a backup before a destructive operation
+   * Only creates a backup if dbPath was provided during construction
+   *
+   * @param operation - Description of the operation being performed
+   * @returns Backup result if backup was created, undefined otherwise
+   */
+  private createBackupIfPossible(operation: string): BackupResult | undefined {
+    if (!this.maybeDbPath) {
+      logger.warn("Cannot create backup: dbPath not provided to FeatureRepository", { operation });
+      return undefined;
+    }
+
+    try {
+      return createBackup(this.maybeDbPath, operation);
+    } catch (error) {
+      // Log the warning but don't block the operation
+      const message = error instanceof Error ? error.message : String(error);
+      logger.warn("Failed to create backup before operation", {
+        operation,
+        error: message,
+      });
+      return undefined;
+    }
+  }
 
   /**
    * Create a single feature
@@ -556,8 +590,15 @@ export class FeatureRepository {
 
   /**
    * Delete a feature by ID
+   * Creates a backup before deletion for recovery purposes
    */
   async delete(id: number): Promise<void> {
+    // Verify feature exists first (throws if not found)
+    await this.getById(id);
+
+    // Create backup before destructive operation
+    this.createBackupIfPossible(`delete feature ${id}`);
+
     const result = this.db
       .delete(features)
       .where(eq(features.id, id))
@@ -577,10 +618,16 @@ export class FeatureRepository {
   /**
    * Delete all features in the database
    * Used when deleting a project to cascade the deletion to all its features
+   * Creates a backup before deletion for recovery purposes
    * Returns the number of features deleted
    */
   async deleteAll(): Promise<number> {
     const count = this.db.select().from(features).all().length;
+
+    if (count > 0) {
+      // Create backup before destructive operation
+      this.createBackupIfPossible(`delete all features (${count} features)`);
+    }
 
     this.db.delete(features).run();
 
