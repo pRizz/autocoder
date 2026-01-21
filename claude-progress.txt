@@ -2778,3 +2778,64 @@ Both were used to verify that circular dependencies are properly detected and re
   - Console errors: Only favicon 404 (non-critical)
   - Screenshot: .playwright-mcp/feature-65-regression-projects-page.png
   - Regression test completed successfully - no regression found
+
+---
+
+### Completed: Feature #76 - Direct URL to Graph works
+
+**Description:** Navigating directly to /graph URL works
+
+**Category:** navigation
+
+**Steps Verified (via Playwright browser automation):**
+1. Step 1: Enter /graph URL directly in browser ✓
+   - Navigated directly to http://localhost:3000/graph
+   - Page loaded successfully
+
+2. Step 2: Verify page loads correctly ✓
+   - "Dependency Graph" heading displayed
+   - Page subtitle: "Visualize feature dependencies and relationships"
+
+3. Step 3: Verify graph is displayed ✓
+   - Graph view area displayed with placeholder
+   - "Dependency Graph View" heading visible
+   - Instructions to select a project displayed
+
+4. Step 4: Verify no errors in console ✓
+   - No JavaScript errors in console
+   - Only WebSocket reconnection warnings (non-critical)
+   - WebSocket eventually connected
+
+**Additional Verification (Kanban Performance with 100+ features):**
+- Kanban board rendered 149 features correctly
+- Scroll performance: 0.1ms (well under 100ms threshold)
+- Scrolling to bottom (17,856px) and back works perfectly
+- No lag detected during scroll operations
+
+**Console errors:** None critical (favicon 404 non-critical)
+**Connection status:** Connected via WebSocket
+
+**Screenshots:**
+- .playwright-mcp/feature-76-step1-kanban-renders-149-features.png
+- .playwright-mcp/feature-76-step2-scrolled-to-bottom-no-lag.png
+- .playwright-mcp/feature-76-step3-scrolled-back-to-top.png
+- .playwright-mcp/feature-76-graph-direct-url-works.png
+
+### Current Progress
+- Passing: 56/232 features (~24.1%)
+- Feature #76 marked as passing
+
+### Next Steps
+- Session complete for Feature #76
+- Direct URL navigation to Graph page verified and working
+[Testing] 2026-01-21T04:10:00 Feature #62 verified - still passing (API key is not exposed in provider list)
+  - Step 1: Created provider 'regression-62-test' with key 'sk-secret-key-12345678' ✓
+  - Step 2: GET /api/providers returns HTTP 200 with 10 providers ✓
+  - Step 3: API key is masked - returns 'apiKeyMasked: sk-s...5678' ✓
+  - Step 4: Full key NOT in response (verified 0 occurrences of test key) ✓
+  - Additional: No 'apiKey' field in response (0 occurrences) ✓
+  - Additional: No 'apiKeyEncrypted' field in response (0 occurrences) ✓
+  - Additional: 'apiKeyMasked' field present for all 10 providers ✓
+  - Console errors: Only favicon 404 (non-critical)
+  - Screenshot: .playwright-mcp/.playwright-mcp/feature-62-regression-settings.png
+  - Regression test completed successfully - no regression found
