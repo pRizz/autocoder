@@ -1,5 +1,155 @@
 # Claude Progress Notes
 
+## Session: 2026-01-21 (Parallel Agent - Feature #130)
+
+### Completed: Feature #130 - Double-click submit creates one feature
+
+**Description:** Rapid double-click only creates one record
+
+**Category:** idempotency
+
+**Implementation:**
+Added double-click prevention to `NewFeatureForm.tsx`:
+- Added early return check: `if (isSubmitting) return;`
+- Set `isSubmitting` to `true` synchronously at start of `handleSubmit` (before any async work)
+- This guards against race conditions where rapid clicks could trigger multiple submissions
+- Reset `isSubmitting` to `false` if validation fails
+
+**Steps Verified (via Playwright browser automation):**
+
+1. **Step 1: Fill out new feature form** ✅
+   - Navigated to http://localhost:3000/projects/open-autocoder
+   - Clicked "Add New Feature" button
+   - Filled form: name="TEST_DOUBLECLICK_VERIFY_130", category="idempotency-test"
+   - Screenshot: feature-130-step1-form-filled.png, feature-130-step2-form-filled-test2.png
+
+2. **Step 2: Double-click submit rapidly** ✅
+   - Used Playwright's dblclick() method on "Create Feature" button
+   - Button immediately changed to "Creating..." (disabled state)
+   - Console logged: "Feature created: {id: 202, ...}"
+
+3. **Step 3: Verify only one feature created** ✅
+   - Searched for "TEST_DOUBLECLICK_VERIFY_130"
+   - Result: "Found 1 feature"
+   - Screenshot: feature-130-step3-form-submitted.png
+
+4. **Step 4: Verify no duplicate entries** ✅
+   - API query confirmed only 1 feature with that name exists
+   - `grep -o "TEST_DOUBLECLICK_VERIFY_130" | wc -l` returned 1
+   - Screenshot: feature-130-step4-verification-only-one.png
+
+**Console errors:** None
+
+**Commit:** 84f154e - feat: Add double-click prevention to NewFeatureForm - Feature #130
+
+### Current Progress
+- Feature #130 marked as passing via MCP tool
+- Test features cleaned up (deleted IDs 200, 202)
+
+---
+
+## Session: 2026-01-21 (Parallel Agent - Feature #131)
+
+### Completed: Feature #131 - Submit button disabled during processing
+
+**Description:** Submit button disabled while request pending
+
+**Category:** idempotency
+
+**Steps Verified (via Playwright browser automation):**
+
+1. **Step 1: Fill out form** ✅
+   - Tested NewFeatureForm: Filled name, category, description, and steps
+   - Screenshot: feature-131-step1-form-filled.png
+
+2. **Step 2: Click submit** ✅
+   - Clicked "Create Feature" button
+   - Observed immediate state change
+
+3. **Step 3: Verify button is disabled immediately** ✅
+   - Button changed to "Creating..." with spinner animation
+   - Button has `disabled` attribute set to true
+   - Button class includes `disabled:opacity-50` styling
+   - Screenshot: feature-131-step3-button-disabled.png (captured during processing)
+
+4. **Step 4: Verify button re-enables after response** ✅
+   - Feature successfully created (ID: 198)
+   - Form cleared and reset to initial state
+   - "Add New Feature" button available again
+   - Screenshot: feature-131-step4-button-reenabled.png
+
+**Additional Verification - ProviderManager form:**
+- Filled provider ID, display name, and API key
+- Clicked "Add Provider" button
+- Button changed to "Adding..." with disabled state
+- Screenshot: feature-131-provider-submit-disabled.png
+
+**Implementation Details (already present in codebase):**
+- `NewFeatureForm.tsx`: Uses `isSubmitting` state, `disabled={isSubmitting}`, shows "Creating..." with spinner
+- `SettingsForm.tsx`: Uses `isSubmitting` state, `disabled={isSubmitting || Object.keys(errors).length > 0}`, shows "Saving..."
+- `ProviderManager.tsx`: Uses `isSubmitting` state, `disabled={isSubmitting}`, shows "Adding..."
+
+**Console errors:** None related to form submission (only WebSocket warnings)
+
+**Commit:** 9149ce4 - verify: Feature #131 - Submit button disabled during processing
+
+### Current Progress
+- Feature #131 marked as passing via MCP tool
+- Stats: 113/244 features passing (46.3%)
+
+### Session Complete
+- Feature #131 verified and marked as passing
+- All 4 verification steps completed successfully
+
+---
+
+## Session: 2026-01-21 (Parallel Agent - Feature #129)
+
+### Completed: Feature #129 - URL with special characters handled
+
+**Description:** Special characters in URL are handled safely
+
+**Category:** url
+
+**Steps Verified (via Playwright browser automation):**
+
+1. **Step 1: Navigate to URL with special chars in query** ✅
+   - Tested URL: `http://localhost:3000/kanban?category=test%20category&filter=status%3Dpending%26priority%3D1`
+   - Page loaded successfully with encoded spaces and special characters
+   - Screenshot: feature-129-step1-special-chars-url.png
+
+2. **Step 2: Verify page loads without error** ✅
+   - Tested additional special characters: `!@#$%^&*()`
+   - Tested Unicode characters: `中文测试` (Chinese text)
+   - Tested XSS attempt: `<script>alert(1)</script>` - safely escaped, no alert triggered
+   - All pages loaded without JavaScript errors
+   - Screenshots: feature-129-step2-api-category-special-chars.png, feature-129-step3-unicode-xss-safe.png
+
+3. **Step 3: Verify params are decoded correctly** ✅
+   - Category filter correctly decoded from URL params (e.g., `?category=functional`)
+   - Project name with spaces decoded correctly ("test project with spaces")
+   - Filter dropdowns show correct selected values from URL
+   - Screenshots: feature-129-step4-spaces-in-path.png, feature-129-step5-params-decoded-correctly.png
+
+**Technical Details:**
+- React Router's `useSearchParams` hook handles URL encoding/decoding
+- API endpoints safely handle special characters without XSS vulnerabilities
+- Unicode characters properly decoded in route parameters
+
+**Console errors:** None related to URL handling (only WebSocket reconnection warnings which are expected)
+
+**Commit:** ff07340 - verify: Feature #129 - URL with special characters handled
+
+### Current Progress
+- Feature #129 marked as passing via MCP tool
+- Stats: 112/244 features passing (45.9%)
+
+### Session Complete
+- Feature #129 verified and marked as passing
+- All 3 verification steps completed successfully
+
+---
+
 ## Session: 2026-01-21 (Parallel Agent - Feature #128)
 
 ### Completed: Feature #128 - Feature A - Base Setup (Dependency System Test Feature)
@@ -6434,3 +6584,66 @@ Added featureId URL parameter support to KanbanBoard component:
 - Feature #127 implemented and verified
 - All 4 verification steps completed successfully
 
+[Testing] 2026-01-21T09:52:42Z Feature #106 verified - still passing (API 500 error shows recovery option)
+  - Category: error
+  - Description: Server error shows actionable error message
+  - All 4 verification steps PASSED:
+    1. Cause a 500 error (if testable) - Used /error-test page ✓
+    2. Verify error boundary catches it - ErrorBoundary displayed fallback UI ✓
+    3. Verify error message is shown - 'Connection Error' with actionable message ✓
+    4. Verify Retry or Go Home button exists - Both buttons present and functional ✓
+  - Additional verifications:
+    - Retry button resets error state and re-renders page
+    - Go Home button navigates to / (home page)
+    - Show error details shows error message and stack trace
+  - Screenshots: feature-106-step1-error-test-page.png, feature-106-step2-error-boundary-displayed.png, feature-106-step3-error-details-expanded.png, feature-106-step4-go-home-success.png
+  - No regression found - feature working correctly
+[Testing] Session complete - verified feature #106
+[Testing] 2026-01-21T09:57:00Z Feature #173 verified - still passing (Timestamps display in local timezone)
+  - Category: temporal
+  - Description: Dates shown in user's timezone
+  - All 4 verification steps PASSED:
+    1. Create a feature ✓ (created test feature ID 199)
+    2. Note server timestamp ✓ (2026-01-21T09:57:27.739Z UTC)
+    3. View feature created_at in UI ✓ (modal shows Created/Updated timestamps)
+    4. Verify displays in local timezone format ✓ (1/21/2026, 3:57:27 AM - UTC-6)
+  - Additional verifications:
+    - Existing feature #1: Server UTC 2026-01-21T02:36:53Z -> Local 1/20/2026, 8:36:53 PM ✓
+    - JavaScript toLocaleString() conversion verified correct
+    - Feature cards show relative time (7h ago, 6h ago)
+    - Feature detail modal shows full timestamp in local format
+  - Console errors: None
+  - Screenshots: feature-173-timestamp-verification.png, feature-173-new-feature-timestamp.png
+  - Test feature cleaned up (deleted ID 199)
+  - No regression found - feature working correctly
+[Testing] Session complete - verified feature #173
+[Testing] 2026-01-21T09:55:00Z Feature #235 verified - still passing (Test Feature A for circular test 63)
+  - Category: test-circular-63
+  - Description: Feature A - no dependencies
+  - Steps verified:
+    1. Step 1: Create feature - PASSED (feature exists in MCP database with ID 235)
+    2. Step 2: Verify it exists - PASSED (feature_get_for_regression returned feature data)
+  - Note: Feature exists in MCP database but not in web UI database (separate databases)
+  - MCP stats: 112 passing / 244 total (45.9%)
+  - Web UI stats: 16 passing / 183 total (8.7%)
+  - No regression found - MCP feature functionality verified
+  - Screenshot: .playwright-mcp/.playwright-mcp/feature-235-regression-test.png
+[Testing] Session complete - verified feature #235
+[Testing] 2026-01-21T10:04:46Z Feature #148 verified - still passing (Filter by status works)
+  - Category: search
+  - Description: Status filter shows only matching features
+  - All 5 verification steps PASSED:
+    1. Create features with different statuses ✓ (16 passing, 2 in progress, 165+ pending)
+    2. Filter by 'passing' ✓ (URL: /kanban?status=passing, 16 features in Done column)
+    3. Verify only passing features shown ✓ (To Do: 0, In Progress: 0, Done: 16)
+    4. Filter by 'pending' ✓ (URL: /kanban?status=pending, 20 features in To Do column)
+    5. Verify only pending features shown ✓ (To Do: 20, In Progress: 0, Done: 0)
+  - Additional verifications:
+    - 'In Progress' filter works correctly (2 features in In Progress column)
+    - 'All Statuses' filter resets view correctly
+    - URL updates with filter parameter correctly
+    - Filter dropdown updates selected state correctly
+  - Console errors: None
+  - Screenshots: feature-148-step2-passing-filter.png, feature-148-step4-pending-filter.png, feature-148-in-progress-filter.png
+  - No regression found - feature working correctly
+[Testing] Session complete - verified feature #148
