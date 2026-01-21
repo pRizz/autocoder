@@ -38,8 +38,21 @@ const createFeatureSchema = z.object({
   dependencies: z.array(z.number().int().positive()).optional(),
 });
 
+const bulkCreateFeatureItemSchema = z.object({
+  category: z.string().min(1, "Category is required"),
+  name: z.string().min(1, "Name is required"),
+  description: z.string().min(1, "Description is required"),
+  steps: z.array(z.string()).min(1, "At least one step is required"),
+  depends_on_indices: z.array(z.number().int().min(0)).optional(),
+});
+
+const bulkCreateFeaturesSchema = z.object({
+  features: z.array(bulkCreateFeatureItemSchema).min(1, "At least one feature is required"),
+});
+
 type SearchQuery = z.input<typeof searchQuerySchema>;
 type CreateFeatureBody = z.infer<typeof createFeatureSchema>;
+type BulkCreateFeaturesBody = z.infer<typeof bulkCreateFeaturesSchema>;
 
 // Feature database cache per project
 const featureRepos = new Map<string, FeatureRepository>();
@@ -342,6 +355,99 @@ export async function registerFeatureRoutes(
         });
 
         return reply.status(201).send(feature);
+      } catch (error) {
+        return handleError(error, reply);
+      }
+    }
+  );
+
+  /**
+   * POST /api/projects/:name/features/bulk - Create features in bulk
+   * Body: { features: Array<{ category, name, description, steps, depends_on_indices? }> }
+   *
+   * depends_on_indices uses 0-based array indices to reference features within the same batch,
+   * allowing dependencies to be specified before IDs are known.
+   */
+  fastify.post(
+    "/api/projects/:name/features/bulk",
+    async (
+      request: FastifyRequest<{
+        Params: { name: string };
+        Body: BulkCreateFeaturesBody;
+      }>,
+      reply: FastifyReply
+    ) => {
+      try {
+        // Validate request body
+        const parseResult = bulkCreateFeaturesSchema.safeParse(request.body);
+        if (!parseResult.success) {
+          const errorMessage = parseResult.error.errors
+            .map((e) => `${e.path.join(".")}: ${e.message}`)
+            .join(", ");
+          return reply.status(400).send({
+            error: `Validation failed: ${errorMessage}`,
+            code: "VALIDATION_ERROR",
+          });
+        }
+
+        const body = parseResult.data;
+        const projectPath = await getProjectPath(request.params.name);
+        const repo = getFeatureRepository(projectPath);
+
+        // Map features to repository format, filtering out undefined depends_on_indices
+        const featuresToCreate = body.features.map((f) => ({
+          category: f.category,
+          name: f.name,
+          description: f.description,
+          steps: f.steps,
+          ...(f.depends_on_indices !== undefined && { depends_on_indices: f.depends_on_indices }),
+        }));
+
+        const result = await repo.createBulk(featuresToCreate);
+
+        logger.info("Features created in bulk via API", {
+          created: result.created,
+          withDependencies: result.withDependencies,
+          projectName: request.params.name,
+        });
+
+        return reply.status(201).send(result);
+      } catch (error) {
+        return handleError(error, reply);
+      }
+    }
+  );
+
+  /**
+   * POST /api/projects/:name/features/:id/pass - Mark feature as passing
+   * Sets passes=true and clears in_progress flag.
+   * Returns the updated feature.
+   */
+  fastify.post(
+    "/api/projects/:name/features/:id/pass",
+    async (
+      request: FastifyRequest<{ Params: { name: string; id: string } }>,
+      reply: FastifyReply
+    ) => {
+      try {
+        const featureId = parseInt(request.params.id, 10);
+        if (isNaN(featureId)) {
+          return reply.status(400).send({
+            error: "Invalid feature ID",
+            code: "VALIDATION_ERROR",
+          });
+        }
+
+        const projectPath = await getProjectPath(request.params.name);
+        const repo = getFeatureRepository(projectPath);
+        const feature = await repo.markPassing(featureId);
+
+        logger.info("Feature marked as passing via API", {
+          featureId: feature.id,
+          projectName: request.params.name,
+        });
+
+        return reply.send(feature);
       } catch (error) {
         return handleError(error, reply);
       }
