@@ -9,7 +9,7 @@
 
 import { useState, useEffect, useMemo, useCallback, memo } from "react";
 import { useSearchParams } from "react-router-dom";
-import { Download, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
+import { Download, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, X } from "lucide-react";
 import { CategoryFilter } from "./CategoryFilter";
 import { StatusFilter } from "./StatusFilter";
 import { FeatureDetailModal, type Feature } from "./FeatureDetailModal";
@@ -359,6 +359,24 @@ export function KanbanBoard({
     }, { replace: true });
   }, [setSearchParams]);
 
+  // Handle clear all filters - resets category, status, and page to defaults
+  const handleClearFilters = useCallback(() => {
+    setSelectedCategory("");
+    setSelectedStatus("");
+    setCurrentPage(1);
+    // Clear all filter-related URL params
+    setSearchParams((prev) => {
+      const newParams = new URLSearchParams(prev);
+      newParams.delete("category");
+      newParams.delete("status");
+      newParams.delete("page");
+      return newParams;
+    }, { replace: true });
+  }, [setSearchParams]);
+
+  // Check if any filters are active
+  const hasActiveFilters = selectedCategory !== "" || selectedStatus !== "";
+
   // Handle page change - updates both state and URL params for pagination state preservation
   const handlePageChange = useCallback((page: number) => {
     // Clamp page to valid range
@@ -519,7 +537,7 @@ export function KanbanBoard({
             </button>
           </div>
         </div>
-        <div className="flex gap-4 flex-wrap">
+        <div className="flex gap-4 flex-wrap items-end">
           <div className="w-48">
             <CategoryFilter
               projectName={projectName}
@@ -534,6 +552,18 @@ export function KanbanBoard({
               onStatusChange={handleStatusChange}
             />
           </div>
+          {hasActiveFilters && (
+            <button
+              onClick={handleClearFilters}
+              className="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-1.5"
+              aria-label="Clear all filters"
+              title="Clear all filters and show all features"
+              data-testid="clear-filters-button"
+            >
+              <X className="w-4 h-4" />
+              Clear Filters
+            </button>
+          )}
         </div>
       </div>
 
