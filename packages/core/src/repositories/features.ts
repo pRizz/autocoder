@@ -349,6 +349,7 @@ export class FeatureRepository {
 
   /**
    * Skip a feature (move to end of priority queue)
+   * Also clears dependencies so the feature becomes a regular pending feature
    */
   async skip(id: number): Promise<Feature> {
     const now = new Date().toISOString();
@@ -361,9 +362,15 @@ export class FeatureRepository {
 
     const newPriority = (maxPriorityResult?.maxPriority ?? 0) + 1;
 
+    // Clear dependencies so the feature is no longer blocked
     const result = this.db
       .update(features)
-      .set({ priority: newPriority, inProgress: 0, updatedAt: now })
+      .set({
+        priority: newPriority,
+        inProgress: 0,
+        dependencies: null,
+        updatedAt: now,
+      })
       .where(eq(features.id, id))
       .returning()
       .get();
@@ -372,7 +379,11 @@ export class FeatureRepository {
       throw new FeatureNotFoundError(id);
     }
 
-    logger.info("Feature skipped", { featureId: id, newPriority });
+    logger.info("Feature skipped", {
+      featureId: id,
+      newPriority,
+      dependenciesCleared: true,
+    });
     return result;
   }
 
