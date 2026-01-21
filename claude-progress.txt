@@ -2,6 +2,53 @@
 
 ## Session: 2026-01-21
 
+### Completed: Feature #73 - Sidebar navigation to Terminal works
+
+**Description:** Clicking Terminal link navigates to terminal view
+
+**Category:** navigation
+
+**Steps Verified:**
+1. Step 1: Navigate to dashboard ✓
+   - Navigated to http://localhost:3000
+   - Dashboard loaded with "Welcome to Open Autocoder" heading
+   - Sidebar visible with navigation links
+
+2. Step 2: Click Terminal link in sidebar ✓
+   - Clicked Terminal link (ref=e39)
+   - Link responded immediately to click
+
+3. Step 3: Verify URL changes to /terminal ✓
+   - URL changed to http://localhost:3000/terminal
+   - React Router handled navigation correctly
+
+4. Step 4: Verify terminal output area is displayed ✓
+   - "Terminal" heading displayed
+   - "Real-time agent output and logs" description shown
+   - Terminal component rendered with:
+     - Agent Output header with line count
+     - Log filter dropdown (All Levels, Debug, Info, Warning, Error)
+     - Auto-scroll toggle button
+     - Test Logs button for generating test data
+     - Clear button to clear terminal
+     - Log area showing "[Terminal] Initialized for project: open-autocoder"
+
+**Additional Verifications:**
+- Terminal link shows active styling (highlighted) when on /terminal route
+- WebSocket connection status indicator visible (Connected/Reconnecting)
+- No JavaScript errors related to navigation
+
+**Console errors:** Only favicon 404 (non-critical)
+
+**Screenshots:**
+- .playwright-mcp/feature-73-terminal-navigation.png
+
+### Current Progress
+- Passing: 54/232 features (~23.3%)
+- Feature #73 marked as passing
+
+---
+
 ### Completed: Feature #12 - List all projects via API
 
 **Description:** GET /api/projects returns list of all registered projects
@@ -2606,4 +2653,16 @@ Both were used to verify that circular dependencies are properly detected and re
     - .playwright-mcp/feature-150-validation-errors.png
     - .playwright-mcp/feature-150-validation-errors-full.png
   - Implementation: NewFeatureForm.tsx with validateForm() and per-field validation
+  - Regression test completed successfully - no regression found
+[Testing] 2026-01-21T04:05:59 Feature #65 verified - still passing (Project path traversal is blocked)
+  - Step 1: POST with path '../../../etc/passwd' → HTTP 400, rejected ✓
+  - Step 2: Error message: 'Project path cannot contain ..' ✓
+  - Step 3: POST with path '..' → HTTP 400, rejected ✓
+  - Step 4: Error message confirmed ✓
+  - Additional: '/tmp/../etc/shadow' → rejected ✓
+  - Additional: 'foo/../../bar' → rejected ✓
+  - Additional: Valid path '/tmp/test-valid-path-65' → HTTP 201, accepted ✓
+  - Projects page loads correctly with 23 projects ✓
+  - Console errors: None
+  - Screenshot: .playwright-mcp/.playwright-mcp/feature-65-regression-projects-page.png
   - Regression test completed successfully - no regression found
