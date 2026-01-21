@@ -16,6 +16,7 @@ export function App(): JSX.Element {
       <main className="ml-64 min-h-screen">
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/dashboard" element={<HomePage />} />
           <Route path="/kanban" element={<KanbanPage />} />
           <Route path="/graph" element={<GraphPage />} />
           <Route path="/projects" element={<ProjectsPage />} />
