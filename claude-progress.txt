@@ -2,6 +2,44 @@
 
 ## Session: 2026-01-21
 
+### Completed: Feature #84 - Update performance test feature 62
+
+**Description:** Test feature 62 for performance validation with 100+ features in the kanban board
+
+**Category:** infrastructure
+
+**Steps Verified (via Playwright browser automation):**
+1. Step 1: Verify feature renders ✓
+   - Navigated to http://localhost:3000/kanban
+   - Kanban board loaded with 149 features (141 To Do, 1 In Progress, 7 Done)
+   - All features displayed correctly with category badges, names, IDs, priorities, and timestamps
+   - Header shows "Track feature progress across development stages (149 features)"
+
+2. Step 2: Check no lag ✓
+   - Scroll performance measured at 0.10ms (well under 100ms threshold)
+   - JavaScript evaluation confirmed noLag: true
+   - No UI stuttering or freezing observed
+   - Scrollable container height: 18,146px
+
+3. Step 3: Test scrolling ✓
+   - Smooth scrolling from top to bottom of To Do column (17,710px scroll position)
+   - Scrolled back to top (position 0) in 0.00ms
+   - Features at bottom (#147-#149) visible, then top features (#3, #5, #6) visible after scroll back
+
+**Console errors:** Only favicon 404 (non-critical)
+**Connection status:** Connected via WebSocket
+
+**Screenshots:**
+- .playwright-mcp/feature-84-step1-kanban-renders.png
+- .playwright-mcp/feature-84-step2-scrolled-to-bottom.png
+- .playwright-mcp/feature-84-step3-scrolled-back-to-top.png
+
+### Current Progress
+- Passing: 63/232 features (~27.2%)
+- Feature #84 marked as passing
+
+---
+
 ### Completed: Feature #80 - Feature modal closes on Escape key
 
 **Description:** Pressing Escape key closes feature modal
@@ -3120,4 +3158,78 @@ Both were used to verify that circular dependencies are properly detected and re
   - Console errors: None after page refresh
   - WebSocket: Connected
   - Screenshot: .playwright-mcp/feature-62-regression-final.png
+  - Regression test completed successfully - no regression found
+
+### Completed: Feature #79 - Feature modal closes on backdrop click
+
+**Description:** Clicking outside feature modal closes it
+
+**Category:** navigation
+
+**Steps Verified (via Playwright browser automation):**
+1. Step 1: Open feature detail modal
+   - Navigated to http://localhost:3000/kanban
+   - Clicked on feature card "Auth Check" in To Do column
+   - Modal opened successfully with feature details displayed
+
+2. Step 2: Click on backdrop (outside modal)
+   - Dispatched PointerEvent on backdrop element (data-testid="feature-modal-backdrop")
+   - Modal closed successfully (Radix UI Dialog.Overlay built-in behavior)
+
+3. Step 3: Verify modal closes
+   - Page snapshot confirmed no dialog element present
+   - Modal overlay no longer visible
+
+4. Step 4: Verify underlying view is visible
+   - Kanban board fully visible with all three columns
+   - Feature cards accessible and interactive
+
+**Implementation Details:**
+- Uses same FeatureDetailModal component created for Feature #80
+- Radix UI Dialog.Overlay handles backdrop click automatically
+- onOpenChange callback properly closes modal and clears selected feature
+
+**Screenshots:**
+- .playwright-mcp/feature-79-modal-open.png (from previous session)
+- .playwright-mcp/feature-79-backdrop-click-closed.png
+
+**Note:** Code already committed in 92f6162 (Feature #80) since both features share the same implementation. The Radix UI Dialog component handles both Escape key (Feature #80) and backdrop click (Feature #79) automatically.
+
+### Current Progress
+- Feature #79 marked as passing
+- Same implementation as Feature #80 (shared FeatureDetailModal component)
+[Testing] 2026-01-21T04:21:29Z Feature #1 verified - still passing (App loads without errors)
+  - Step 1: Navigate to root URL ✓ (http://localhost:3000)
+  - Step 2: Page fully loaded ✓ (title: 'Open Autocoder')
+  - Step 3: No JavaScript errors ✓ (only favicon 404 - non-critical)
+  - Step 4: Main content area renders ✓ ('Welcome to Open Autocoder' displayed)
+  - Step 5: Header visible with logo ✓ ('Open Autocoder' heading in sidebar)
+  - Additional: WebSocket connected ✓ (green indicator)
+  - Additional: All 6 navigation links present ✓
+  - Additional: Agent Controls showing 'idle' status ✓
+  - Additional: Quick Stats: Passing 7, In Progress 1, Total 149 (4.7%) ✓
+  - Console errors: Only favicon 404 (non-critical)
+  - Screenshot: .playwright-mcp/feature-1-regression-test.png
+  - Regression test completed successfully - no regression found
+[Testing] 2026-01-21T04:22:16Z Feature #154 verified - still passing (Numeric fields reject letters)
+  - Step 1: Open settings form ✓
+    - Navigated to http://localhost:3000/settings
+    - Settings form displayed with Concurrency and Testing Agent Ratio fields
+  - Step 2: Try to enter letters in concurrency field ✓
+    - Cleared field, typed 'abcXYZ' → Field remained empty (all letters rejected)
+    - Typed 'a1b2c3' → Field shows '123' (only numbers accepted)
+  - Step 3: Verify input rejected or filtered ✓
+    - Letters completely filtered out from input
+    - Special characters like '!' also filtered
+  - Step 4: Verify only numbers accepted ✓
+    - Typed '4' → Field shows '4'
+    - Mixed input 'a1b2c3' → Only '123' accepted
+  - Additional: Testing Agent Ratio field also tested ✓
+    - Typed 'xyz789!' → Field shows '789' (letters and special chars filtered)
+  - Additional: Range validation working ✓
+    - '123' shows error: 'Concurrency must be between 1 and 5'
+    - '789' shows error: 'Testing agent ratio must be between 0 and 3'
+    - Save button disabled when validation fails
+  - Console errors: Only favicon 404 (non-critical)
+  - Screenshot: .playwright-mcp/feature-154-numeric-validation.png
   - Regression test completed successfully - no regression found
