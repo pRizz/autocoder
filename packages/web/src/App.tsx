@@ -214,9 +214,17 @@ interface Project {
   testingAgentRatio?: number;
 }
 
+interface FeatureStats {
+  passing: number;
+  inProgress: number;
+  total: number;
+  percentage: number;
+}
+
 function ProjectsPage(): JSX.Element {
   const { isDark } = useTheme();
   const [projects, setProjects] = useState<Project[]>([]);
+  const [projectStats, setProjectStats] = useState<Record<string, FeatureStats>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -229,8 +237,33 @@ function ProjectsPage(): JSX.Element {
         if (!response.ok) {
           throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
-        const data = await response.json();
+        const data: Project[] = await response.json();
         setProjects(data);
+
+        // Fetch feature stats for each project
+        const statsPromises = data.map(async (project) => {
+          try {
+            const statsResponse = await fetch(
+              `http://localhost:3001/api/projects/${encodeURIComponent(project.name)}/features/stats`
+            );
+            if (statsResponse.ok) {
+              const stats: FeatureStats = await statsResponse.json();
+              return { name: project.name, stats };
+            }
+          } catch {
+            // Silently ignore stats fetch errors for individual projects
+          }
+          return null;
+        });
+
+        const statsResults = await Promise.all(statsPromises);
+        const newStats: Record<string, FeatureStats> = {};
+        for (const result of statsResults) {
+          if (result) {
+            newStats[result.name] = result.stats;
+          }
+        }
+        setProjectStats(newStats);
       } catch (err) {
         const message = err instanceof Error ? err.message : "Failed to fetch projects";
         setError(message);
@@ -292,56 +325,78 @@ function ProjectsPage(): JSX.Element {
 
       {!isLoading && !error && projects.length > 0 && (
         <div className="space-y-4" style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-          {projects.map((project) => (
-            <div
-              key={project.name}
-              className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md transition-shadow"
-              style={{
-                backgroundColor: isDark ? "#1f2937" : "#fff",
-                borderRadius: "8px",
-                border: `1px solid ${isDark ? "#374151" : "#e5e7eb"}`,
-                padding: "16px",
-              }}
-            >
-              <div className="flex justify-between items-start">
-                <div>
-                  <h2
-                    className="text-lg font-semibold text-gray-900 dark:text-white"
-                    style={{ fontSize: "1.125rem", fontWeight: 600, color: isDark ? "#fff" : "#111827" }}
+          {projects.map((project) => {
+            const stats = projectStats[project.name];
+            return (
+              <div
+                key={project.name}
+                className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md transition-shadow"
+                style={{
+                  backgroundColor: isDark ? "#1f2937" : "#fff",
+                  borderRadius: "8px",
+                  border: `1px solid ${isDark ? "#374151" : "#e5e7eb"}`,
+                  padding: "16px",
+                }}
+              >
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h2
+                      className="text-lg font-semibold text-gray-900 dark:text-white"
+                      style={{ fontSize: "1.125rem", fontWeight: 600, color: isDark ? "#fff" : "#111827" }}
+                    >
+                      {project.name}
+                    </h2>
+                    <p
+                      className="text-sm text-gray-500 dark:text-gray-400 mt-1"
+                      style={{ fontSize: "0.875rem", color: isDark ? "#9ca3af" : "#6b7280", marginTop: "4px" }}
+                    >
+                      <span className="font-medium" style={{ fontWeight: 500 }}>Path:</span> {project.path}
+                    </p>
+                    <p
+                      className="text-sm text-gray-500 dark:text-gray-400 mt-1"
+                      style={{ fontSize: "0.875rem", color: isDark ? "#9ca3af" : "#6b7280", marginTop: "4px" }}
+                    >
+                      <span className="font-medium" style={{ fontWeight: 500 }}>Created:</span> {formatDate(project.createdAt)}
+                    </p>
+                    {stats && (
+                      <p
+                        className="text-sm mt-2"
+                        style={{ fontSize: "0.875rem", marginTop: "8px" }}
+                      >
+                        <span
+                          className="font-medium text-green-600 dark:text-green-400"
+                          style={{ fontWeight: 500, color: isDark ? "#4ade80" : "#16a34a" }}
+                        >
+                          {stats.passing}/{stats.total}
+                        </span>
+                        <span
+                          className="text-gray-500 dark:text-gray-400 ml-1"
+                          style={{ color: isDark ? "#9ca3af" : "#6b7280", marginLeft: "4px" }}
+                        >
+                          features complete ({stats.percentage.toFixed(1)}%)
+                        </span>
+                      </p>
+                    )}
+                  </div>
+                  <a
+                    href={`/projects/${encodeURIComponent(project.name)}`}
+                    className="px-3 py-1.5 text-sm font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 rounded-md hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors"
+                    style={{
+                      padding: "6px 12px",
+                      fontSize: "0.875rem",
+                      fontWeight: 500,
+                      color: isDark ? "#60a5fa" : "#2563eb",
+                      backgroundColor: isDark ? "rgba(37, 99, 235, 0.2)" : "#eff6ff",
+                      borderRadius: "6px",
+                      textDecoration: "none",
+                    }}
                   >
-                    {project.name}
-                  </h2>
-                  <p
-                    className="text-sm text-gray-500 dark:text-gray-400 mt-1"
-                    style={{ fontSize: "0.875rem", color: isDark ? "#9ca3af" : "#6b7280", marginTop: "4px" }}
-                  >
-                    <span className="font-medium" style={{ fontWeight: 500 }}>Path:</span> {project.path}
-                  </p>
-                  <p
-                    className="text-sm text-gray-500 dark:text-gray-400 mt-1"
-                    style={{ fontSize: "0.875rem", color: isDark ? "#9ca3af" : "#6b7280", marginTop: "4px" }}
-                  >
-                    <span className="font-medium" style={{ fontWeight: 500 }}>Created:</span> {formatDate(project.createdAt)}
-                  </p>
+                    View
+                  </a>
                 </div>
-                <a
-                  href={`/projects/${encodeURIComponent(project.name)}`}
-                  className="px-3 py-1.5 text-sm font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 rounded-md hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors"
-                  style={{
-                    padding: "6px 12px",
-                    fontSize: "0.875rem",
-                    fontWeight: 500,
-                    color: isDark ? "#60a5fa" : "#2563eb",
-                    backgroundColor: isDark ? "rgba(37, 99, 235, 0.2)" : "#eff6ff",
-                    borderRadius: "6px",
-                    textDecoration: "none",
-                  }}
-                >
-                  View
-                </a>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
