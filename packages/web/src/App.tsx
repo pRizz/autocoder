@@ -6,6 +6,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Routes, Route, useParams } from "react-router-dom";
 import { FeatureSearch } from "./components/FeatureSearch";
 import { NewFeatureForm } from "./components/NewFeatureForm";
+import { NewProjectWizard } from "./components/NewProjectWizard";
 import { Sidebar } from "./components/Sidebar";
 import { Footer } from "./components/Footer";
 import { KanbanBoard } from "./components/KanbanBoard";
@@ -14,6 +15,7 @@ import { Terminal } from "./components/Terminal";
 import { AssistantChatPanel } from "./components/AssistantChatPanel";
 import { KeyboardShortcutsModal } from "./components/KeyboardShortcutsModal";
 import { useTheme } from "./hooks/useTheme";
+import { Plus } from "lucide-react";
 
 // Sidebar width constants (must match Sidebar.tsx)
 const SIDEBAR_COLLAPSED_WIDTH = 64;
@@ -227,53 +229,61 @@ function ProjectsPage(): JSX.Element {
   const [projectStats, setProjectStats] = useState<Record<string, FeatureStats>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isWizardOpen, setIsWizardOpen] = useState(false);
+
+  const fetchProjects = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const response = await fetch("http://localhost:3001/api/projects");
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      const data: Project[] = await response.json();
+      setProjects(data);
+
+      // Fetch feature stats for each project
+      const statsPromises = data.map(async (project) => {
+        try {
+          const statsResponse = await fetch(
+            `http://localhost:3001/api/projects/${encodeURIComponent(project.name)}/features/stats`
+          );
+          if (statsResponse.ok) {
+            const stats: FeatureStats = await statsResponse.json();
+            return { name: project.name, stats };
+          }
+        } catch {
+          // Silently ignore stats fetch errors for individual projects
+        }
+        return null;
+      });
+
+      const statsResults = await Promise.all(statsPromises);
+      const newStats: Record<string, FeatureStats> = {};
+      for (const result of statsResults) {
+        if (result) {
+          newStats[result.name] = result.stats;
+        }
+      }
+      setProjectStats(newStats);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to fetch projects";
+      setError(message);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-        const response = await fetch("http://localhost:3001/api/projects");
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-        const data: Project[] = await response.json();
-        setProjects(data);
-
-        // Fetch feature stats for each project
-        const statsPromises = data.map(async (project) => {
-          try {
-            const statsResponse = await fetch(
-              `http://localhost:3001/api/projects/${encodeURIComponent(project.name)}/features/stats`
-            );
-            if (statsResponse.ok) {
-              const stats: FeatureStats = await statsResponse.json();
-              return { name: project.name, stats };
-            }
-          } catch {
-            // Silently ignore stats fetch errors for individual projects
-          }
-          return null;
-        });
-
-        const statsResults = await Promise.all(statsPromises);
-        const newStats: Record<string, FeatureStats> = {};
-        for (const result of statsResults) {
-          if (result) {
-            newStats[result.name] = result.stats;
-          }
-        }
-        setProjectStats(newStats);
-      } catch (err) {
-        const message = err instanceof Error ? err.message : "Failed to fetch projects";
-        setError(message);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     fetchProjects();
-  }, []);
+  }, [fetchProjects]);
+
+  const handleProjectCreated = useCallback((projectName: string) => {
+    // Refresh the project list and navigate to the new project
+    fetchProjects();
+    // Navigate to the new project page
+    window.location.href = `/projects/${encodeURIComponent(projectName)}`;
+  }, [fetchProjects]);
 
   const formatDate = (dateString: string): string => {
     try {
@@ -285,12 +295,43 @@ function ProjectsPage(): JSX.Element {
 
   return (
     <div className="p-8">
-      <h1
-        className="text-2xl font-bold text-gray-900 dark:text-white mb-6"
-        style={{ fontSize: "1.5rem", fontWeight: 700, color: isDark ? "#fff" : "#111827", marginBottom: "24px" }}
+      <div
+        className="flex items-center justify-between mb-6"
+        style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "24px" }}
       >
-        Projects
-      </h1>
+        <h1
+          className="text-2xl font-bold text-gray-900 dark:text-white"
+          style={{ fontSize: "1.5rem", fontWeight: 700, color: isDark ? "#fff" : "#111827" }}
+        >
+          Projects
+        </h1>
+        <button
+          onClick={() => setIsWizardOpen(true)}
+          className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            padding: "8px 16px",
+            fontSize: "0.875rem",
+            fontWeight: 500,
+            color: "#fff",
+            backgroundColor: "#2563eb",
+            border: "none",
+            borderRadius: "8px",
+            cursor: "pointer",
+          }}
+        >
+          <Plus size={18} />
+          New Project
+        </button>
+      </div>
+
+      <NewProjectWizard
+        isOpen={isWizardOpen}
+        onClose={() => setIsWizardOpen(false)}
+        onProjectCreated={handleProjectCreated}
+      />
 
       {isLoading && (
         <div className="flex items-center justify-center py-8">
