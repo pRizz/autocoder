@@ -3,6 +3,8 @@
  */
 
 import { NavLink } from "react-router-dom";
+import { useWebSocket } from "../hooks/useWebSocket";
+import { ConnectionStatusIndicator } from "./ConnectionStatusIndicator";
 
 interface NavItem {
   label: string;
@@ -114,7 +116,22 @@ const navItems: NavItem[] = [
   },
 ];
 
+// Determine WebSocket URL based on current environment
+function getWebSocketUrl(): string {
+  // In development, the Vite proxy handles /ws
+  // In production, use the same host but with ws/wss protocol
+  const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+  const host = window.location.host;
+  return `${protocol}//${host}/ws`;
+}
+
 export function Sidebar(): JSX.Element {
+  const { status, reconnectAttempts } = useWebSocket({
+    url: getWebSocketUrl(),
+    reconnectInterval: 3000,
+    maxReconnectAttempts: 5,
+  });
+
   return (
     <aside className="fixed left-0 top-0 h-full w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col">
       {/* Logo/Header */}
@@ -148,7 +165,15 @@ export function Sidebar(): JSX.Element {
       </nav>
 
       {/* Footer */}
-      <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+      <div className="p-4 border-t border-gray-200 dark:border-gray-700 space-y-3">
+        {/* WebSocket Connection Status */}
+        <ConnectionStatusIndicator
+          status={status}
+          reconnectAttempts={reconnectAttempts}
+          maxReconnectAttempts={5}
+        />
+
+        {/* Version */}
         <p className="text-xs text-gray-500 dark:text-gray-400">
           v0.1.0
         </p>
