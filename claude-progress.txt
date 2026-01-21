@@ -5480,6 +5480,49 @@ Loading states already implemented in:
 ### Session Complete
 - Feature #115 verified and marked as passing
 - All 3 verification steps completed successfully
+
+---
+
+## Session: 2026-01-21 (Testing Agent - Regression Test Feature #65)
+
+### Verified: Feature #65 - Project path traversal is blocked
+
+**Description:** Cannot create project with path traversal attack
+
+**Category:** security
+
+**Steps Verified:**
+
+1. **Step 1: POST with path containing ../** ✓
+   - Sent: `{"name":"traversal-test","path":"../etc/passwd"}`
+   - Response: 400 Bad Request
+   - Error: `{"error":"Project path cannot contain '..'","code":"VALIDATION_ERROR"}`
+
+2. **Step 2: Verify request is rejected** ✓
+   - Request properly rejected with VALIDATION_ERROR code
+   - User-friendly error message provided
+
+3. **Step 3: POST with path containing .. at end** ✓
+   - Sent: `{"name":"test-traversal-2","path":"/some/path/.."}`
+   - Response: 400 Bad Request
+   - Error: `{"error":"Project path cannot contain '..'","code":"VALIDATION_ERROR"}`
+
+4. **Step 4: Verify request is rejected** ✓
+   - Request properly rejected with same validation error
+
+**Additional UI Verification:**
+- Tested path traversal via UI wizard with `/tmp/../../../etc/passwd`
+- Server correctly returned 400 error
+- UI displayed error alert: "Project path cannot contain '..'"
+- Screenshot: .playwright-mcp/feature-65-path-traversal-blocked.png
+
+**Console errors:** favicon 404 only (non-critical)
+
+**Regression Test Result:** PASSED - No regression found, security feature working correctly
+
+### Session Complete
+- Feature #65 verified - still passing
+- All 4 verification steps completed successfully
 [Testing] 2026-01-21T08:30:46Z Feature #70 verified - still passing (Sidebar navigation to Dashboard works)
   - Category: navigation
   - Description: Clicking Dashboard link navigates to dashboard view
