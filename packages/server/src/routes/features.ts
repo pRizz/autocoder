@@ -525,4 +525,279 @@ export async function registerFeatureRoutes(
       }
     }
   );
+
+  /**
+   * GET /api/projects/:name/features/regression - Get random passing features for regression testing
+   * Query params:
+   * - limit: number of features to return (default: 3, max: 10)
+   *
+   * Returns a random selection of passing features that are not currently in progress.
+   * Used by testing agents to verify previously-passing features still work.
+   */
+  fastify.get(
+    "/api/projects/:name/features/regression",
+    async (
+      request: FastifyRequest<{
+        Params: { name: string };
+        Querystring: { limit?: string };
+      }>,
+      reply: FastifyReply
+    ) => {
+      try {
+        const { limit } = request.query;
+
+        // Parse and validate limit
+        let parsedLimit = 3;
+        if (limit !== undefined) {
+          parsedLimit = parseInt(limit, 10);
+          if (isNaN(parsedLimit) || parsedLimit < 1) {
+            parsedLimit = 3;
+          } else if (parsedLimit > 10) {
+            parsedLimit = 10;
+          }
+        }
+
+        const projectPath = await getProjectPath(request.params.name);
+        const repo = getFeatureRepository(projectPath);
+        const features = await repo.getForRegression(parsedLimit);
+
+        return reply.send({
+          features,
+          count: features.length,
+        });
+      } catch (error) {
+        return handleError(error, reply);
+      }
+    }
+  );
+
+  /**
+   * GET /api/projects/:name/features/next - Get the next feature ready to be worked on
+   * Returns the highest-priority pending feature with all dependencies satisfied.
+   */
+  fastify.get(
+    "/api/projects/:name/features/next",
+    async (
+      request: FastifyRequest<{ Params: { name: string } }>,
+      reply: FastifyReply
+    ) => {
+      try {
+        const projectPath = await getProjectPath(request.params.name);
+        const repo = getFeatureRepository(projectPath);
+        const feature = await repo.getNext();
+
+        if (!feature) {
+          return reply.send({
+            feature: null,
+            message: "No features ready to be worked on (all passing or blocked by dependencies)",
+          });
+        }
+
+        return reply.send({ feature });
+      } catch (error) {
+        return handleError(error, reply);
+      }
+    }
+  );
+
+  /**
+   * GET /api/projects/:name/features/ready - Get all features ready to start
+   * Query params:
+   * - limit: max number of features (default: 10, max: 50)
+   *
+   * Returns features with all dependencies satisfied, not in progress.
+   */
+  fastify.get(
+    "/api/projects/:name/features/ready",
+    async (
+      request: FastifyRequest<{
+        Params: { name: string };
+        Querystring: { limit?: string };
+      }>,
+      reply: FastifyReply
+    ) => {
+      try {
+        const { limit } = request.query;
+
+        // Parse and validate limit
+        let parsedLimit = 10;
+        if (limit !== undefined) {
+          parsedLimit = parseInt(limit, 10);
+          if (isNaN(parsedLimit) || parsedLimit < 1) {
+            parsedLimit = 10;
+          } else if (parsedLimit > 50) {
+            parsedLimit = 50;
+          }
+        }
+
+        const projectPath = await getProjectPath(request.params.name);
+        const repo = getFeatureRepository(projectPath);
+        const features = await repo.getReady(parsedLimit);
+
+        return reply.send({
+          features,
+          count: features.length,
+        });
+      } catch (error) {
+        return handleError(error, reply);
+      }
+    }
+  );
+
+  /**
+   * GET /api/projects/:name/features/blocked - Get features blocked by unmet dependencies
+   * Returns features with at least one dependency that is not yet passing.
+   */
+  fastify.get(
+    "/api/projects/:name/features/blocked",
+    async (
+      request: FastifyRequest<{ Params: { name: string } }>,
+      reply: FastifyReply
+    ) => {
+      try {
+        const projectPath = await getProjectPath(request.params.name);
+        const repo = getFeatureRepository(projectPath);
+        const features = await repo.getBlocked();
+
+        return reply.send({
+          features,
+          count: features.length,
+        });
+      } catch (error) {
+        return handleError(error, reply);
+      }
+    }
+  );
+
+  /**
+   * GET /api/projects/:name/features/graph - Get dependency graph data
+   * Returns nodes (features) and edges (dependencies) for visualization.
+   */
+  fastify.get(
+    "/api/projects/:name/features/graph",
+    async (
+      request: FastifyRequest<{ Params: { name: string } }>,
+      reply: FastifyReply
+    ) => {
+      try {
+        const projectPath = await getProjectPath(request.params.name);
+        const repo = getFeatureRepository(projectPath);
+        const graph = await repo.getGraph();
+
+        return reply.send(graph);
+      } catch (error) {
+        return handleError(error, reply);
+      }
+    }
+  );
+
+  /**
+   * POST /api/projects/:name/features/:id/fail - Mark feature as failing
+   * Sets passes=false and clears in_progress flag.
+   * Used when a testing agent discovers a regression.
+   * Returns the updated feature.
+   */
+  fastify.post(
+    "/api/projects/:name/features/:id/fail",
+    async (
+      request: FastifyRequest<{ Params: { name: string; id: string } }>,
+      reply: FastifyReply
+    ) => {
+      try {
+        const featureId = parseInt(request.params.id, 10);
+        if (isNaN(featureId)) {
+          return reply.status(400).send({
+            error: "Invalid feature ID",
+            code: "VALIDATION_ERROR",
+          });
+        }
+
+        const projectPath = await getProjectPath(request.params.name);
+        const repo = getFeatureRepository(projectPath);
+        const feature = await repo.markFailing(featureId);
+
+        logger.info("Feature marked as failing via API", {
+          featureId: feature.id,
+          projectName: request.params.name,
+        });
+
+        return reply.send(feature);
+      } catch (error) {
+        return handleError(error, reply);
+      }
+    }
+  );
+
+  /**
+   * POST /api/projects/:name/features/:id/skip - Skip a feature
+   * Moves the feature to the end of the priority queue.
+   * Returns the updated feature with new priority.
+   */
+  fastify.post(
+    "/api/projects/:name/features/:id/skip",
+    async (
+      request: FastifyRequest<{ Params: { name: string; id: string } }>,
+      reply: FastifyReply
+    ) => {
+      try {
+        const featureId = parseInt(request.params.id, 10);
+        if (isNaN(featureId)) {
+          return reply.status(400).send({
+            error: "Invalid feature ID",
+            code: "VALIDATION_ERROR",
+          });
+        }
+
+        const projectPath = await getProjectPath(request.params.name);
+        const repo = getFeatureRepository(projectPath);
+        const feature = await repo.skip(featureId);
+
+        logger.info("Feature skipped via API", {
+          featureId: feature.id,
+          projectName: request.params.name,
+          newPriority: feature.priority,
+        });
+
+        return reply.send(feature);
+      } catch (error) {
+        return handleError(error, reply);
+      }
+    }
+  );
+
+  /**
+   * POST /api/projects/:name/features/:id/clear-in-progress - Clear in_progress status
+   * Used when abandoning a feature or unsticking a stuck feature.
+   * Returns the updated feature.
+   */
+  fastify.post(
+    "/api/projects/:name/features/:id/clear-in-progress",
+    async (
+      request: FastifyRequest<{ Params: { name: string; id: string } }>,
+      reply: FastifyReply
+    ) => {
+      try {
+        const featureId = parseInt(request.params.id, 10);
+        if (isNaN(featureId)) {
+          return reply.status(400).send({
+            error: "Invalid feature ID",
+            code: "VALIDATION_ERROR",
+          });
+        }
+
+        const projectPath = await getProjectPath(request.params.name);
+        const repo = getFeatureRepository(projectPath);
+        const feature = await repo.clearInProgress(featureId);
+
+        logger.info("Feature in_progress cleared via API", {
+          featureId: feature.id,
+          projectName: request.params.name,
+        });
+
+        return reply.send(feature);
+      } catch (error) {
+        return handleError(error, reply);
+      }
+    }
+  );
 }
