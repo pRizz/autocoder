@@ -2,6 +2,24 @@
 generations/
 automaker/
 temp/
+.backups/
+
+# Temporary test/debug scripts
+get-feature-*.cjs
+get-feature-*.mjs
+query-feature-*.mjs
+search-feature-*.cjs
+check-*.cjs
+cleanup-*.cjs
+test-feature-*.cjs
+feature-*-progress.txt
+
+# SQLite temporary files
+*.db-shm
+*.db-wal
+
+# Agent lock file
+.agent.lock
 
 nul
 issues/
