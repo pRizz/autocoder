@@ -2,6 +2,69 @@
 
 ## Session: 2026-01-21
 
+### Completed: Feature #104 - Network error shows friendly message
+
+**Description:** API failure shows user-friendly error
+
+**Category:** error
+
+**Steps Verified (via Playwright browser automation):**
+1. Step 1: Simulate network failure (disconnect/block API) ✓
+   - Used JavaScript to intercept fetch requests
+   - Threw "Failed to fetch" TypeError for POST requests to /features endpoint
+   - Simulated network disconnection scenario
+
+2. Step 2: Attempt an action (create feature) ✓
+   - Filled in feature form with test data:
+     - Name: "TEST_NETWORK_ERROR_104"
+     - Category: "test"
+     - Description: "Test feature for network error handling"
+     - Steps: 3 test steps
+   - Clicked "Create Feature" button
+
+3. Step 3: Verify friendly error message is shown ✓
+   - Alert box appeared with amber/yellow styling
+   - Title: "Connection Error"
+   - Message: "Unable to connect to the server. Please check your internet connection and try again."
+   - Clear, actionable guidance for user
+
+4. Step 4: Verify no technical details exposed ✓
+   - No stack traces visible
+   - No HTTP status codes shown
+   - No "TypeError" or "Failed to fetch" text exposed
+   - No server error messages leaked
+
+5. Step 5: Verify retry option is available ✓
+   - "Try Again" button prominently displayed
+   - "Dismiss" button available to clear error
+   - Form data preserved for retry (not cleared on error)
+
+**Implementation Details:**
+- Added NetworkError interface for error state tracking
+- Created isNetworkRelatedError() to detect network-related errors
+- Created getFriendlyErrorMessage() to return user-friendly messages
+- Extracted submitFeature() for reusable submission logic
+- Added handleRetry() and dismissNetworkError() functions
+- Network error UI uses amber colors (bg-amber-50, border-amber-200)
+- Non-network errors still show in red (existing behavior)
+
+**Console errors:** Only favicon 404 (non-critical)
+**Connection status:** Connected via WebSocket
+
+**Screenshots:**
+- .playwright-mcp/.playwright-mcp/feature-104-step1-form-before.png
+- .playwright-mcp/.playwright-mcp/feature-104-step3-friendly-error.png
+- .playwright-mcp/.playwright-mcp/feature-104-step3-error-with-retry.png
+- .playwright-mcp/.playwright-mcp/feature-104-step5-success-after-network-handling.png
+
+**Commit:** b8b873f - feat: Add user-friendly network error handling with retry - Feature #104
+
+### Current Progress
+- Passing: 85/234 features (36.3%)
+- Feature #104 marked as passing
+
+---
+
 ### Completed: Feature #103 - Skip blocked feature workflow
 
 **Description:** Skip feature that cannot be implemented yet
@@ -4567,4 +4630,24 @@ Modified SettingsPage to fetch actual project settings from the API (GET /api/pr
     - Feature B (236) correctly has [235] as dependency
     - Data integrity maintained
   - Tested via MCP tools (feature_add_dependency)
+  - Regression test completed successfully - no regression found
+[Testing] 2026-01-21T07:12:12Z Feature #67 verified - still passing (XSS in feature name is escaped)
+  - Step 1: Feature with XSS payload exists ✓
+    - Feature #148: name='<script>alert(1)</script>'
+    - Feature #149: name='<svg onload=alert(3)>'
+  - Step 2: Opened Kanban view ✓
+    - Navigated to http://localhost:3000/kanban
+    - Filtered by xss-test category
+  - Step 3: Verified script is not executed ✓
+    - No alert dialogs appeared
+    - Page continued functioning normally
+    - JavaScript evaluation confirmed no XSS injection
+  - Step 4: Verified text is escaped and displayed safely ✓
+    - Feature card headings display XSS as plain text
+    - Feature modal also escapes XSS payload
+    - Both <script> and <svg onload> vectors are safely escaped
+  - Console errors: None
+  - Screenshots:
+    - .playwright-mcp/feature-67-xss-escaped-kanban-cards.png
+    - .playwright-mcp/feature-67-xss-escaped-modal.png
   - Regression test completed successfully - no regression found
