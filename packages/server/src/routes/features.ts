@@ -419,6 +419,42 @@ export async function registerFeatureRoutes(
   );
 
   /**
+   * POST /api/projects/:name/features/:id/claim - Atomically claim a feature
+   * Marks the feature as in_progress if not already claimed.
+   * Returns the updated feature, or 409 Conflict if already claimed.
+   */
+  fastify.post(
+    "/api/projects/:name/features/:id/claim",
+    async (
+      request: FastifyRequest<{ Params: { name: string; id: string } }>,
+      reply: FastifyReply
+    ) => {
+      try {
+        const featureId = parseInt(request.params.id, 10);
+        if (isNaN(featureId)) {
+          return reply.status(400).send({
+            error: "Invalid feature ID",
+            code: "VALIDATION_ERROR",
+          });
+        }
+
+        const projectPath = await getProjectPath(request.params.name);
+        const repo = getFeatureRepository(projectPath);
+        const feature = await repo.claim(featureId);
+
+        logger.info("Feature claimed via API", {
+          featureId: feature.id,
+          projectName: request.params.name,
+        });
+
+        return reply.send(feature);
+      } catch (error) {
+        return handleError(error, reply);
+      }
+    }
+  );
+
+  /**
    * POST /api/projects/:name/features/:id/pass - Mark feature as passing
    * Sets passes=true and clears in_progress flag.
    * Returns the updated feature.
