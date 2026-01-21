@@ -8,6 +8,7 @@
 
 import { useState, useEffect, useMemo, useCallback, memo } from "react";
 import { CategoryFilter } from "./CategoryFilter";
+import { StatusFilter } from "./StatusFilter";
 
 interface Feature {
   id: number;
@@ -138,16 +139,32 @@ export function KanbanBoard({
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [selectedStatus, setSelectedStatus] = useState<string>("");
 
-  // Fetch features from API with optional category filter
+  // Fetch features from API with optional category and status filters
   const fetchFeatures = useCallback(async () => {
     setIsLoading(true);
     setError(null);
 
     try {
-      let url = `${apiBaseUrl}/projects/${encodeURIComponent(projectName)}/features`;
+      const params = new URLSearchParams();
       if (selectedCategory) {
-        url += `?category=${encodeURIComponent(selectedCategory)}`;
+        params.set("category", selectedCategory);
+      }
+      // Map status filter to API query params
+      if (selectedStatus === "passing") {
+        params.set("passes", "true");
+      } else if (selectedStatus === "pending") {
+        params.set("passes", "false");
+        params.set("inProgress", "false");
+      } else if (selectedStatus === "in-progress") {
+        params.set("inProgress", "true");
+      }
+
+      let url = `${apiBaseUrl}/projects/${encodeURIComponent(projectName)}/features`;
+      const queryString = params.toString();
+      if (queryString) {
+        url += `?${queryString}`;
       }
       const response = await fetch(url);
 
@@ -168,7 +185,7 @@ export function KanbanBoard({
     } finally {
       setIsLoading(false);
     }
-  }, [projectName, apiBaseUrl, selectedCategory]);
+  }, [projectName, apiBaseUrl, selectedCategory, selectedStatus]);
 
   // Fetch on mount and when project/category changes
   useEffect(() => {
@@ -178,6 +195,11 @@ export function KanbanBoard({
   // Handle category change
   const handleCategoryChange = useCallback((category: string) => {
     setSelectedCategory(category);
+  }, []);
+
+  // Handle status change
+  const handleStatusChange = useCallback((status: string) => {
+    setSelectedStatus(status);
   }, []);
 
   // Memoize filtered features for each column
@@ -232,7 +254,7 @@ export function KanbanBoard({
             </h1>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
               Track feature progress across development stages
-              {features.length > 0 && ` (${features.length} features${selectedCategory ? ` in "${selectedCategory}"` : ""})`}
+              {features.length > 0 && ` (${features.length} features${selectedCategory ? ` in "${selectedCategory}"` : ""}${selectedStatus ? `, status: "${selectedStatus}"` : ""})`}
             </p>
           </div>
           <button
@@ -244,13 +266,21 @@ export function KanbanBoard({
             {isLoading ? "Loading..." : "Refresh"}
           </button>
         </div>
-        <div className="max-w-xs">
-          <CategoryFilter
-            projectName={projectName}
-            selectedCategory={selectedCategory}
-            onCategoryChange={handleCategoryChange}
-            apiBaseUrl={apiBaseUrl}
-          />
+        <div className="flex gap-4 flex-wrap">
+          <div className="w-48">
+            <CategoryFilter
+              projectName={projectName}
+              selectedCategory={selectedCategory}
+              onCategoryChange={handleCategoryChange}
+              apiBaseUrl={apiBaseUrl}
+            />
+          </div>
+          <div className="w-48">
+            <StatusFilter
+              selectedStatus={selectedStatus}
+              onStatusChange={handleStatusChange}
+            />
+          </div>
         </div>
       </div>
 
