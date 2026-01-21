@@ -13,15 +13,15 @@
  */
 export class OpenAutocoderError extends Error {
   public readonly code: string;
-  public readonly suggestedAction?: string;
-  public readonly cause?: Error;
+  public readonly suggestedAction: string | undefined;
+  public readonly cause: Error | undefined;
 
   constructor(
     message: string,
     code: string,
     options?: {
-      suggestedAction?: string;
-      cause?: Error;
+      suggestedAction?: string | undefined;
+      cause?: Error | undefined;
     }
   ) {
     super(message);
@@ -127,7 +127,7 @@ export class CircularDependencyError extends OpenAutocoderError {
  * Validation error
  */
 export class ValidationError extends OpenAutocoderError {
-  public readonly field?: string;
+  public readonly field: string | undefined;
 
   constructor(message: string, field?: string) {
     super(message, "VALIDATION_ERROR", {
@@ -167,6 +167,48 @@ export class AgentError extends OpenAutocoderError {
     });
     this.name = "AgentError";
     this.agentType = agentType;
+  }
+}
+
+/**
+ * User not found error
+ */
+export class UserNotFoundError extends OpenAutocoderError {
+  public readonly username: string;
+
+  constructor(username: string) {
+    super(`User '${username}' not found`, "USER_NOT_FOUND", {
+      suggestedAction: "Check the username or register a new account",
+    });
+    this.name = "UserNotFoundError";
+    this.username = username;
+  }
+}
+
+/**
+ * Invalid credentials error (authentication failure)
+ */
+export class InvalidCredentialsError extends OpenAutocoderError {
+  constructor() {
+    super("Invalid username or password", "INVALID_CREDENTIALS", {
+      suggestedAction: "Check your credentials and try again",
+    });
+    this.name = "InvalidCredentialsError";
+  }
+}
+
+/**
+ * User already exists error
+ */
+export class UserAlreadyExistsError extends OpenAutocoderError {
+  public readonly username: string;
+
+  constructor(username: string) {
+    super(`User '${username}' already exists`, "USER_ALREADY_EXISTS", {
+      suggestedAction: "Choose a different username or login with existing account",
+    });
+    this.name = "UserAlreadyExistsError";
+    this.username = username;
   }
 }
 

@@ -13,6 +13,7 @@ export * from "./db/connection.js";
 export * from "./repositories/features.js";
 export * from "./repositories/projects.js";
 export * from "./repositories/providers.js";
+export * from "./repositories/users.js";
 
 // Services
 export * from "./services/orchestrator.js";

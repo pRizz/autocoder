@@ -75,3 +75,33 @@ export type NewProvider = typeof providers.$inferInsert;
 
 export type Session = typeof sessions.$inferSelect;
 export type NewSession = typeof sessions.$inferInsert;
+
+/**
+ * Users table - stores user accounts for authentication
+ */
+export const users = sqliteTable("users", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  username: text("username").notNull().unique(),
+  passwordHash: text("password_hash").notNull(),
+  email: text("email"),
+  role: text("role").notNull().default("user"), // 'admin' | 'user'
+  createdAt: text("created_at").notNull(),
+  updatedAt: text("updated_at").notNull(),
+});
+
+export type User = typeof users.$inferSelect;
+export type NewUser = typeof users.$inferInsert;
+
+/**
+ * Tokens table - stores authentication tokens for session management
+ */
+export const tokens = sqliteTable("tokens", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  token: text("token").notNull().unique(),
+  userId: integer("user_id").notNull(),
+  expiresAt: text("expires_at").notNull(), // ISO 8601 timestamp
+  createdAt: text("created_at").notNull(),
+});
+
+export type Token = typeof tokens.$inferSelect;
+export type NewToken = typeof tokens.$inferInsert;
