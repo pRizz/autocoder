@@ -8,6 +8,7 @@ import { useWebSocket } from "../hooks/useWebSocket";
 import { useTheme } from "../hooks/useTheme";
 import { ConnectionStatusIndicator } from "./ConnectionStatusIndicator";
 import { SettingsModal } from "./SettingsModal";
+import { useToast } from "./Toast";
 
 // API base URL for agent and stats endpoints
 const API_BASE_URL = "http://localhost:3001/api";
@@ -195,6 +196,7 @@ export function Sidebar(): JSX.Element {
     maxReconnectAttempts: 5,
   });
   const { isDark, toggleTheme } = useTheme();
+  const { showToast } = useToast();
 
   // Collapsed state - persisted in localStorage
   const [isCollapsed, setIsCollapsed] = useState<boolean>(() => {
@@ -295,9 +297,22 @@ export function Sidebar(): JSX.Element {
       });
       if (response.ok) {
         await fetchAgentStatus();
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        const message = errorData.error || `Failed to start agent (HTTP ${response.status})`;
+        showToast({
+          type: "error",
+          title: "Failed to start agent",
+          description: message,
+        });
       }
-    } catch {
-      // Handle error silently
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Network error occurred";
+      showToast({
+        type: "error",
+        title: "Failed to start agent",
+        description: message,
+      });
     } finally {
       setAgentLoading(false);
     }
@@ -311,9 +326,22 @@ export function Sidebar(): JSX.Element {
       });
       if (response.ok) {
         await fetchAgentStatus();
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        const message = errorData.error || `Failed to pause agent (HTTP ${response.status})`;
+        showToast({
+          type: "error",
+          title: "Failed to pause agent",
+          description: message,
+        });
       }
-    } catch {
-      // Handle error silently
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Network error occurred";
+      showToast({
+        type: "error",
+        title: "Failed to pause agent",
+        description: message,
+      });
     } finally {
       setAgentLoading(false);
     }
@@ -327,9 +355,22 @@ export function Sidebar(): JSX.Element {
       });
       if (response.ok) {
         await fetchAgentStatus();
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        const message = errorData.error || `Failed to resume agent (HTTP ${response.status})`;
+        showToast({
+          type: "error",
+          title: "Failed to resume agent",
+          description: message,
+        });
       }
-    } catch {
-      // Handle error silently
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Network error occurred";
+      showToast({
+        type: "error",
+        title: "Failed to resume agent",
+        description: message,
+      });
     } finally {
       setAgentLoading(false);
     }
@@ -343,9 +384,22 @@ export function Sidebar(): JSX.Element {
       });
       if (response.ok) {
         await fetchAgentStatus();
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        const message = errorData.error || `Failed to stop agent (HTTP ${response.status})`;
+        showToast({
+          type: "error",
+          title: "Failed to stop agent",
+          description: message,
+        });
       }
-    } catch {
-      // Handle error silently
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Network error occurred";
+      showToast({
+        type: "error",
+        title: "Failed to stop agent",
+        description: message,
+      });
     } finally {
       setAgentLoading(false);
     }

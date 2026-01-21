@@ -6,6 +6,7 @@
 import { useState, useCallback, useRef, useMemo } from "react";
 import { useUnsavedChanges } from "../hooks/useUnsavedChanges";
 import { UnsavedChangesDialog } from "./UnsavedChangesDialog";
+import { useToast } from "./Toast";
 
 interface SettingsFormProps {
   projectName?: string;
@@ -41,6 +42,7 @@ export function SettingsForm({
   onSave,
   onCancel,
 }: SettingsFormProps): JSX.Element {
+  const { showToast } = useToast();
   const [model, setModel] = useState(initialSettings?.model ?? "");
   const [provider, setProvider] = useState(initialSettings?.provider ?? "");
   const [concurrency, setConcurrency] = useState<string>(
@@ -324,6 +326,11 @@ export function SettingsForm({
           const message =
             error instanceof Error ? error.message : "Failed to save settings";
           setSubmitMessage({ type: "error", text: message });
+          showToast({
+            type: "error",
+            title: "Failed to save settings",
+            description: message,
+          });
         }
       } else {
         // Just call the callback if no API
@@ -341,6 +348,7 @@ export function SettingsForm({
       projectName,
       apiBaseUrl,
       onSave,
+      showToast,
     ]
   );
 

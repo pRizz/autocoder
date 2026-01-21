@@ -8,6 +8,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { useTheme } from "../hooks/useTheme";
 import { AlertCircle, CheckCircle, Loader2, Plus, Trash2, Wifi, X } from "lucide-react";
+import { useToast } from "./Toast";
 
 interface Provider {
   id: string;
@@ -36,6 +37,7 @@ export function ProviderManager({
   apiBaseUrl = "http://localhost:3001/api",
 }: ProviderManagerProps): JSX.Element {
   const { isDark } = useTheme();
+  const { showToast } = useToast();
   const [providers, setProviders] = useState<Provider[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -68,10 +70,15 @@ export function ProviderManager({
     } catch (err) {
       const message = err instanceof Error ? err.message : "Failed to fetch providers";
       setError(message);
+      showToast({
+        type: "error",
+        title: "Failed to load providers",
+        description: message,
+      });
     } finally {
       setIsLoading(false);
     }
-  }, [apiBaseUrl]);
+  }, [apiBaseUrl, showToast]);
 
   useEffect(() => {
     fetchProviders();
@@ -121,11 +128,16 @@ export function ProviderManager({
       } catch (err) {
         const message = err instanceof Error ? err.message : "Failed to add provider";
         setFormErrors({ submit: message });
+        showToast({
+          type: "error",
+          title: "Failed to add provider",
+          description: message,
+        });
       } finally {
         setIsSubmitting(false);
       }
     },
-    [apiBaseUrl, formData, fetchProviders]
+    [apiBaseUrl, formData, fetchProviders, showToast]
   );
 
   // Test connection
@@ -183,9 +195,14 @@ export function ProviderManager({
       } catch (err) {
         const message = err instanceof Error ? err.message : "Failed to delete provider";
         setError(message);
+        showToast({
+          type: "error",
+          title: "Failed to delete provider",
+          description: message,
+        });
       }
     },
-    [apiBaseUrl, fetchProviders]
+    [apiBaseUrl, fetchProviders, showToast]
   );
 
   // Dismiss test result
