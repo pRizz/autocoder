@@ -1,8 +1,11 @@
 /**
- * Settings form component with numeric validation for concurrency field
+ * Settings form component with numeric validation for concurrency field.
+ * Shows unsaved changes warning when navigating away with unsaved data.
  */
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useMemo } from "react";
+import { useUnsavedChanges } from "../hooks/useUnsavedChanges";
+import { UnsavedChangesDialog } from "./UnsavedChangesDialog";
 
 interface SettingsFormProps {
   projectName?: string;
@@ -56,6 +59,34 @@ export function SettingsForm({
 
   const concurrencyInputRef = useRef<HTMLInputElement>(null);
   const testingAgentRatioInputRef = useRef<HTMLInputElement>(null);
+
+  // Track if form has unsaved changes (any value differs from initial)
+  const hasUnsavedChanges = useMemo(() => {
+    const initialModel = initialSettings?.model ?? "";
+    const initialProvider = initialSettings?.provider ?? "";
+    const initialConcurrency = initialSettings?.concurrency?.toString() ?? "3";
+    const initialYoloMode = initialSettings?.yoloMode ?? false;
+    const initialTestingRatio = initialSettings?.testingAgentRatio?.toString() ?? "1";
+
+    return (
+      model !== initialModel ||
+      provider !== initialProvider ||
+      concurrency !== initialConcurrency ||
+      yoloMode !== initialYoloMode ||
+      testingAgentRatio !== initialTestingRatio
+    );
+  }, [model, provider, concurrency, yoloMode, testingAgentRatio, initialSettings]);
+
+  // Use the unsaved changes hook for navigation blocking
+  const {
+    showDialog: showUnsavedDialog,
+    confirmLeave,
+    cancelLeave,
+    dialogMessage,
+  } = useUnsavedChanges({
+    hasUnsavedChanges,
+    message: "You have unsaved changes in the settings form. Are you sure you want to leave? Your changes will be lost.",
+  });
 
   /**
    * Handle numeric input - only allow digits
@@ -292,8 +323,17 @@ export function SettingsForm({
   );
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Model Field */}
+    <>
+      {/* Unsaved changes confirmation dialog */}
+      <UnsavedChangesDialog
+        isOpen={showUnsavedDialog}
+        onStay={cancelLeave}
+        onLeave={confirmLeave}
+        message={dialogMessage}
+      />
+
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Model Field */}
       <div>
         <label
           htmlFor="settings-model"
@@ -447,25 +487,26 @@ export function SettingsForm({
         </div>
       )}
 
-      {/* Form Actions */}
-      <div className="flex gap-3">
-        <button
-          type="submit"
-          disabled={isSubmitting || Object.keys(errors).length > 0}
-          className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {isSubmitting ? "Saving..." : "Save Settings"}
-        </button>
-        {onCancel && (
+        {/* Form Actions */}
+        <div className="flex gap-3">
           <button
-            type="button"
-            onClick={onCancel}
-            className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+            type="submit"
+            disabled={isSubmitting || Object.keys(errors).length > 0}
+            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Cancel
+            {isSubmitting ? "Saving..." : "Save Settings"}
           </button>
-        )}
-      </div>
-    </form>
+          {onCancel && (
+            <button
+              type="button"
+              onClick={onCancel}
+              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+            >
+              Cancel
+            </button>
+          )}
+        </div>
+      </form>
+    </>
   );
 }
