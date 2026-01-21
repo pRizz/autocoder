@@ -5117,3 +5117,50 @@ Loading states already implemented in:
   - NOTE: Browser automation unavailable (Playwright MCP disconnected)
   - Tested via API instead of UI (equivalent database persistence test)
   - Regression test completed successfully - no regression found
+
+---
+
+### Session: 2026-01-21 (Parallel Agent - Feature #110)
+
+**Assigned Feature:** #110 - Duplicate project name rejected
+
+**Description:** Creating project with existing name shows error
+
+**Category:** error
+
+**Steps Verified (via API testing):**
+1. Step 1: Create project named 'test-project-dup-110' ✓
+   - POST /api/projects with name and path
+   - Response: 200 OK with project details
+   - Project created successfully
+
+2. Step 2: Try to create another project with same name ✓
+   - POST /api/projects with same name but different path
+   - Response: 400 Bad Request
+
+3. Step 3: Verify error message about duplicate name ✓
+   - Error response:
+     - `"error": "Project with name 'test-project-dup-110' already exists"`
+     - `"code": "VALIDATION_ERROR"`
+     - `"suggestedAction": "Check the input data and try again"`
+   - HTTP status: 400 Bad Request
+
+4. Step 4: Verify original project is unchanged ✓
+   - GET /api/projects/test-project-dup-110
+   - Original path: /tmp/test-project-dup-110 (unchanged)
+   - Original timestamps preserved
+
+**Implementation Details:**
+- ValidationError thrown in packages/core/src/repositories/projects.ts:36
+- Server routes properly handle ValidationError and return 400 status
+- Error response includes helpful suggestedAction field
+
+**Note:** Playwright MCP server was not connected during this session, so browser-based UI testing was not possible. Feature verified via API testing which covers the core functionality.
+
+### Current Progress
+- Passing: 93/240 features (38.8%)
+- Feature #110 marked as passing
+
+### Session Complete
+- Feature #110 verified and marked as passing
+- Duplicate project name validation working correctly
