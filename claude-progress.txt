@@ -2,6 +2,36 @@
 
 ## Session: 2026-01-21
 
+### Completed: Feature #52 - CLI --help shows usage information
+
+**Description:** Running with --help shows all available commands
+
+**Steps Verified:**
+1. Step 1: Run open-autocoder --help ✓
+   - Executed: `node packages/cli/dist/index.js --help`
+2. Step 2: Verify usage information is displayed ✓
+   - Shows: "Usage: open-autocoder [options] [command]"
+   - Description: "Autonomous coding agent system"
+3. Step 3: Verify all commands are listed ✓
+   - Commands listed: serve, web, init, start, status, features, provider, projects, service, config
+4. Step 4: Verify options are documented ✓
+   - Options listed: -V/--version, -p/--port, -H/--host, -h/--help
+
+**Subcommand Help Also Verified:**
+- `projects --help`: list, create, delete commands
+- `service --help`: install, uninstall, start, stop, status commands
+- `provider --help`: add, list commands
+
+**Console errors:** None
+
+**Screenshot:** .playwright-mcp/feature-52-cli-help-verification.png
+
+### Current Progress
+- Passing: 40/230 features (17.4%)
+- Feature #52 marked as passing
+
+---
+
 ### Completed: Feature #49 - Settings modal opens and saves
 
 **Description:** Settings button opens modal with configuration options
@@ -1759,4 +1789,26 @@ Feature #2 marked as passing
   - Step 4: Providers are listed (openai-test, anthropic-test, test-feature-35) ✓
   - Console errors: Only favicon 404 (non-critical)
   - Screenshot: .playwright-mcp/.playwright-mcp/feature-34-regression-providers-api.png
+  - Regression test completed successfully - no regression found
+[Testing] 2026-01-21T03:45:06 Feature #1 verified - still passing (App loads without errors)
+  - Step 1: Navigated to application root URL (http://localhost:3000) ✓
+  - Step 2: Page fully loaded with welcome message 'Welcome to Open Autocoder' ✓
+  - Step 3: No JavaScript errors in console (only favicon.ico 404 - non-critical) ✓
+  - Step 4: Main content area renders with heading and description ✓
+  - Step 5: Header visible with 'Open Autocoder' logo in sidebar ✓
+  - Additional: WebSocket connection shows 'Connected' (green indicator) ✓
+  - Additional: Footer shows TypeScript/React and v0.1.0 ✓
+  - Additional: Dark mode toggle and Assistant FAB visible ✓
+  - Screenshot: .playwright-mcp/feature-1-regression-test-app-loads.png
+  - Regression test completed successfully - no regression found
+[Testing] 2026-01-21T03:45:22 Feature #51 verified - still passing (CLI default command starts web server)
+  - Step 1: Ran 'node packages/cli/dist/index.js --port 3002' ✓
+  - Step 2: Server started successfully (ora spinner succeeded) ✓
+  - Step 3: Code prints URLs for Web UI, API, and WebSocket ✓
+  - Step 4: Server responded at http://localhost:3002/api/health with {status:ok} ✓
+  - Step 5: Server stopped cleanly with kill command ✓
+  - Additional: Web UI fully functional at served URL ✓
+  - Additional: WebSocket connection established ✓
+  - Console errors: Only favicon 404 (non-critical)
+  - Screenshot: .playwright-mcp/feature-51-cli-web-ui.png
   - Regression test completed successfully - no regression found
