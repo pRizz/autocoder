@@ -12,7 +12,7 @@ import { logger } from "@open-autocoder/core";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 import { existsSync } from "fs";
-import { registerProjectRoutes, getProjectPath } from "./routes/projects.js";
+import { registerProjectRoutes, getProjectPath, projectExists } from "./routes/projects.js";
 import { registerFeatureRoutes } from "./routes/features.js";
 import { registerProviderRoutes } from "./routes/providers.js";
 import { registerAgentRoutes } from "./routes/agent.js";
@@ -74,7 +74,7 @@ export async function createServer(options: ServerOptions = {}): Promise<Fastify
     };
   });
 
-  // WebSocket endpoint placeholder
+  // WebSocket endpoint placeholder (generic)
   fastify.get("/ws", { websocket: true }, (socket, _req) => {
     socket.on("message", (message: Buffer | ArrayBuffer | Buffer[]) => {
       const data = message.toString();
@@ -88,6 +88,51 @@ export async function createServer(options: ServerOptions = {}): Promise<Fastify
       })
     );
   });
+
+  // Project-specific WebSocket endpoint with validation
+  fastify.get<{ Params: { projectName: string } }>(
+    "/ws/projects/:projectName",
+    { websocket: true },
+    async (socket, req) => {
+      const { projectName } = req.params;
+
+      // Validate that the project exists
+      const exists = await projectExists(projectName);
+
+      if (!exists) {
+        logger.warn("WebSocket connection rejected: project not found", { projectName });
+
+        // Send error message before closing
+        socket.send(
+          JSON.stringify({
+            type: "error",
+            code: "PROJECT_NOT_FOUND",
+            message: `Project '${projectName}' not found`,
+            timestamp: new Date().toISOString(),
+          })
+        );
+
+        // Close the connection with code 4004 (custom code for "not found")
+        socket.close(4004, `Project '${projectName}' not found`);
+        return;
+      }
+
+      logger.info("WebSocket connection established for project", { projectName });
+
+      socket.on("message", (message: Buffer | ArrayBuffer | Buffer[]) => {
+        const data = message.toString();
+        logger.debug("WebSocket message received for project", { projectName, data });
+      });
+
+      socket.send(
+        JSON.stringify({
+          type: "connection_established",
+          projectName,
+          timestamp: new Date().toISOString(),
+        })
+      );
+    }
+  );
 
   // Register API routes
   await registerProjectRoutes(fastify);

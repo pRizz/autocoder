@@ -117,6 +117,23 @@ export async function getProjectPath(projectName: string): Promise<string> {
 }
 
 /**
+ * Check if a project exists by name
+ * Returns true if project exists, false otherwise
+ */
+export async function projectExists(projectName: string): Promise<boolean> {
+  try {
+    const repo = getProjectRepository();
+    await repo.getByName(projectName);
+    return true;
+  } catch (error) {
+    if (error instanceof ProjectNotFoundError) {
+      return false;
+    }
+    throw error;
+  }
+}
+
+/**
  * Register all project routes on the Fastify instance
  */
 export async function registerProjectRoutes(

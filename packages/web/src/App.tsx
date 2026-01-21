@@ -181,12 +181,148 @@ function GraphPage(): JSX.Element {
   );
 }
 
+interface Project {
+  name: string;
+  path: string;
+  createdAt: string;
+  updatedAt?: string;
+  model?: string | null;
+  provider?: string | null;
+  concurrency?: number;
+  yoloMode?: number;
+  testingAgentRatio?: number;
+}
+
 function ProjectsPage(): JSX.Element {
+  const { isDark } = useTheme();
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        const response = await fetch("http://localhost:3001/api/projects");
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        const data = await response.json();
+        setProjects(data);
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "Failed to fetch projects";
+        setError(message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProjects();
+  }, []);
+
+  const formatDate = (dateString: string): string => {
+    try {
+      return new Date(dateString).toLocaleString();
+    } catch {
+      return dateString;
+    }
+  };
+
   return (
     <div className="p-8">
-      <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+      <h1
+        className="text-2xl font-bold text-gray-900 dark:text-white mb-6"
+        style={{ fontSize: "1.5rem", fontWeight: 700, color: isDark ? "#fff" : "#111827", marginBottom: "24px" }}
+      >
         Projects
       </h1>
+
+      {isLoading && (
+        <div className="flex items-center justify-center py-8">
+          <div
+            className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"
+            style={{ width: "32px", height: "32px", borderRadius: "50%", borderBottomWidth: "2px", borderColor: "#2563eb" }}
+          />
+          <span className="ml-2 text-gray-600 dark:text-gray-400" style={{ marginLeft: "8px", color: isDark ? "#9ca3af" : "#4b5563" }}>
+            Loading projects...
+          </span>
+        </div>
+      )}
+
+      {error && (
+        <div
+          role="alert"
+          className="p-4 bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 rounded-lg mb-4"
+          style={{ padding: "16px", backgroundColor: isDark ? "#7f1d1d" : "#fee2e2", color: isDark ? "#fca5a5" : "#b91c1c", borderRadius: "8px", marginBottom: "16px" }}
+        >
+          Error: {error}
+        </div>
+      )}
+
+      {!isLoading && !error && projects.length === 0 && (
+        <div
+          className="text-center py-8 text-gray-500 dark:text-gray-400"
+          style={{ textAlign: "center", paddingTop: "32px", paddingBottom: "32px", color: isDark ? "#9ca3af" : "#6b7280" }}
+        >
+          No projects found. Create a project to get started.
+        </div>
+      )}
+
+      {!isLoading && !error && projects.length > 0 && (
+        <div className="space-y-4" style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+          {projects.map((project) => (
+            <div
+              key={project.name}
+              className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md transition-shadow"
+              style={{
+                backgroundColor: isDark ? "#1f2937" : "#fff",
+                borderRadius: "8px",
+                border: `1px solid ${isDark ? "#374151" : "#e5e7eb"}`,
+                padding: "16px",
+              }}
+            >
+              <div className="flex justify-between items-start">
+                <div>
+                  <h2
+                    className="text-lg font-semibold text-gray-900 dark:text-white"
+                    style={{ fontSize: "1.125rem", fontWeight: 600, color: isDark ? "#fff" : "#111827" }}
+                  >
+                    {project.name}
+                  </h2>
+                  <p
+                    className="text-sm text-gray-500 dark:text-gray-400 mt-1"
+                    style={{ fontSize: "0.875rem", color: isDark ? "#9ca3af" : "#6b7280", marginTop: "4px" }}
+                  >
+                    <span className="font-medium" style={{ fontWeight: 500 }}>Path:</span> {project.path}
+                  </p>
+                  <p
+                    className="text-sm text-gray-500 dark:text-gray-400 mt-1"
+                    style={{ fontSize: "0.875rem", color: isDark ? "#9ca3af" : "#6b7280", marginTop: "4px" }}
+                  >
+                    <span className="font-medium" style={{ fontWeight: 500 }}>Created:</span> {formatDate(project.createdAt)}
+                  </p>
+                </div>
+                <a
+                  href={`/projects/${encodeURIComponent(project.name)}`}
+                  className="px-3 py-1.5 text-sm font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 rounded-md hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors"
+                  style={{
+                    padding: "6px 12px",
+                    fontSize: "0.875rem",
+                    fontWeight: 500,
+                    color: isDark ? "#60a5fa" : "#2563eb",
+                    backgroundColor: isDark ? "rgba(37, 99, 235, 0.2)" : "#eff6ff",
+                    borderRadius: "6px",
+                    textDecoration: "none",
+                  }}
+                >
+                  View
+                </a>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
