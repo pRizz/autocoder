@@ -5594,3 +5594,70 @@ Loading states already implemented in:
 ### Session Complete
 - Feature #116 verified and marked as passing
 - All 4 verification steps completed with screenshot evidence
+
+
+---
+
+### Session: 2026-01-21 (Parallel Agent - Feature #117)
+
+**Assigned Feature:** #117 - Dropdown options come from database
+
+**Description:** Category dropdown populated from real data
+
+**Category:** integration
+
+**Steps Verified (via Playwright browser automation):**
+
+1. **Step 1: Create features with different categories** ✓
+   - Created 3 test features with unique categories:
+     - ID 186: test-category-alpha-117
+     - ID 187: test-category-beta-117
+     - ID 188: test-category-gamma-117
+   - Features created via POST /api/projects/open-autocoder/features
+
+2. **Step 2: Open feature filter dropdown** ✓
+   - Navigated to http://localhost:3000/kanban
+   - Kanban board loaded with 182 features
+   - Category filter dropdown (combobox) visible with "All Categories" default
+   - Screenshot: feature-117-category-dropdown-populated.png
+
+3. **Step 3: Verify categories match created features** ✓
+   - Opened category filter dropdown - saw all 28 unique categories from database
+   - Test categories visible in dropdown:
+     - option "test-category-alpha-117"
+     - option "test-category-beta-117"
+     - option "test-category-gamma-117"
+   - Selected "test-category-alpha-117" - board filtered to show only 1 feature
+   - Subtitle updated: "1 features in \"test-category-alpha-117\""
+   - Screenshot: feature-117-category-filter-applied.png
+   - Selected "test-category-beta-117" - board filtered correctly again
+
+4. **Step 4: Verify no hardcoded options** ✓
+   - Reviewed CategoryFilter.tsx component (packages/web/src/components/CategoryFilter.tsx)
+   - Component fetches all features from API: /api/projects/:name/features
+   - Extracts unique categories from features using Set
+   - Only static option is "All Categories" (default empty value)
+   - All other options dynamically generated from database data
+   - No hardcoded category values in the component
+
+**Implementation Verified:**
+- packages/web/src/components/CategoryFilter.tsx:
+  - Lines 28-60: fetchCategories() function fetches from API
+  - Lines 46-49: Extracts unique categories using Set
+  - Lines 88-92: Maps categories to <option> elements
+- packages/web/src/components/KanbanBoard.tsx:
+  - Lines 401-408: Integrates CategoryFilter component
+
+**Console errors:** Only favicon 404 (non-critical)
+
+**Test Cleanup:**
+- Deleted test features 186, 187, 188 after verification
+
+### Current Progress
+- Feature #117 marked as passing via MCP tool
+- Stats: 101/244 features passing (41.4%)
+
+### Session Complete
+- Feature #117 verified and marked as passing
+- All 4 verification steps completed successfully
+
