@@ -2,6 +2,56 @@
 
 ## Session: 2026-01-21
 
+### Completed: Feature #64 - Maximum dependencies limit enforced
+
+**Description:** Cannot add more than 20 dependencies per feature
+
+**Category:** security
+
+**Steps Verified:**
+1. Step 1: Create 25 features ✓
+   - Project already had 145+ features available for testing dependencies
+
+2. Step 2: Try to create feature with 21 dependencies ✓
+   - POST /api/projects/open-autocoder/features with 21 dependencies
+   - Request: `{"category":"test","name":"Test Max Deps Feature","description":"...","steps":["Step 1"],"dependencies":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21]}`
+
+3. Step 3: Verify error about max limit ✓
+   - Response: `{"error":"Feature has 21 dependencies, max is 20","code":"VALIDATION_ERROR","suggestedAction":"Check the input data and try again"}`
+   - Clear error message with actionable suggestion
+
+4. Step 4: Create feature with exactly 20 dependencies ✓
+   - POST /api/projects/open-autocoder/features with 20 dependencies
+   - Feature created successfully (ID: 147)
+
+5. Step 5: Verify it succeeds ✓
+   - Response contains full feature object with 20 dependencies
+   - Dependencies array correctly stored: `[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]`
+
+**Additional Verification:**
+- Bulk create endpoint also enforces limit (tested with depends_on_indices having 21 items)
+- Error: `{"error":"Feature at index 21 has 21 dependencies, max is 20",...}`
+- Browser verification: Feature #147 visible in Kanban board
+
+**Implementation:**
+- Added validation to `FeatureRepository.create()` method in packages/core/src/repositories/features.ts
+- Consistent with existing validation in `createBulk()` method
+- MAX_DEPENDENCIES constant = 20
+
+**Screenshots:**
+- .playwright-mcp/feature-64-step1-kanban-renders.png
+- .playwright-mcp/feature-64-step3-scroll-bottom.png
+- .playwright-mcp/feature-64-step3-scroll-top.png
+- .playwright-mcp/feature-64-verification-complete.png
+
+**Commit:** 83de2c7 - feat: enforce MAX_DEPENDENCIES limit in single feature creation - Feature #64
+
+### Current Progress
+- Passing: 48/232 features (~20.7%)
+- Feature #64 marked as passing
+
+---
+
 ### Completed: Feature #63 - Circular dependency is rejected
 
 **Description:** Creating circular dependencies returns error
@@ -2196,4 +2246,38 @@ Feature #2 marked as passing
   - Implementation: formatLocalTimestamp() uses Date.toLocaleString() for timezone conversion
   - Console errors: Only favicon 404 (non-critical)
   - Screenshots: feature-173-timezone-kanban.png, feature-173-timezone-tooltip.png
+  - Regression test completed successfully - no regression found
+[Testing] 2026-01-21T03:56:00 Feature #16 verified - still passing (Create single feature via API)
+  - Step 1: Using existing project 'open-autocoder' ✓
+  - Step 2: POST /api/projects/open-autocoder/features with feature data ✓
+    - Sent: category, name, description, steps
+    - Response contains all submitted data
+  - Step 3: Response status is 201 Created ✓
+  - Step 4: Response contains feature with auto-assigned ID (146) ✓
+  - Step 5: Priority is auto-assigned (146) ✓
+  - Step 6: Feature exists in database (verified via GET) ✓
+  - Additional: Feature visible in Kanban board UI ✓
+  - Additional: Filtered by 'regression-test' category shows the new feature ✓
+  - Console errors: Only favicon 404 and WebSocket warnings (non-critical)
+  - Screenshot: .playwright-mcp/.playwright-mcp/feature-16-regression-created-feature.png
+  - Regression test completed successfully - no regression found
+[Testing] 2026-01-21T03:56:59 Feature #10 verified - still passing (TypeScript compilation succeeds)
+  - Step 1: Ran 'pnpm build' in root directory ✓
+    - All 4 packages built successfully (core, server, web, cli)
+    - No TypeScript errors during compilation
+  - Step 2: Verified no TypeScript errors ✓
+    - Build output shows clean compilation for all packages
+  - Step 3: Verified dist folders are created ✓
+    - packages/core/dist/ - contains index.js, index.d.ts, and subdirectories
+    - packages/server/dist/ - contains index.js, index.d.ts, routes/
+    - packages/web/dist/ - contains index.html, assets/
+    - packages/cli/dist/ - contains index.js, index.d.ts
+  - Step 4: Verified type declarations are generated ✓
+    - 19 .d.ts files generated across packages
+    - Core: 12 type declaration files
+    - Server: 6 type declaration files
+    - CLI: 1 type declaration file
+  - Additional: Web UI verified functional at http://localhost:3000 ✓
+  - Console errors: Only favicon 404 and WebSocket reconnect (non-critical)
+  - Screenshot: .playwright-mcp/feature-10-typescript-compilation-web-ui.png
   - Regression test completed successfully - no regression found
