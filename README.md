@@ -1,6 +1,9 @@
-# AutoCoder
+<div align="center">
+  <h1>WARNING: HALF-FINISHED PRODUCT</h1>
+  <p><strong>Do NOT use this repo.</strong> Use Automaker instead: <a href="https://github.com/AutoMaker-Org/automaker">https://github.com/AutoMaker-Org/automaker</a></p>
+</div>
 
-[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-FFDD00?style=flat&logo=buy-me-a-coffee&logoColor=black)](https://www.buymeacoffee.com/leonvanzyl)
+# AutoCoder
 
 A long-running autonomous coding agent powered by the Claude Agent SDK. This tool can build complete applications over multiple sessions using a two-agent pattern (initializer + coding agent). Includes a React-based UI for monitoring progress in real-time.
 
