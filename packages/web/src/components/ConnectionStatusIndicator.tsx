@@ -69,17 +69,35 @@ export const ConnectionStatusIndicator = memo(function ConnectionStatusIndicator
     >
       {/* Status dot */}
       <span
-        className={`relative flex h-2.5 w-2.5 ${
-          config.animate ? "" : ""
-        }`}
+        style={{ position: "relative", display: "flex", width: "10px", height: "10px" }}
       >
         {config.animate && (
           <span
-            className={`animate-ping absolute inline-flex h-full w-full rounded-full ${config.bgColor} opacity-75`}
+            style={{
+              position: "absolute",
+              display: "inline-flex",
+              width: "100%",
+              height: "100%",
+              borderRadius: "9999px",
+              opacity: 0.75,
+              animation: "ping 1s cubic-bezier(0, 0, 0.2, 1) infinite",
+              backgroundColor: config.bgColor === "bg-green-500" ? "#22c55e" :
+                             config.bgColor === "bg-yellow-500" ? "#eab308" :
+                             config.bgColor === "bg-red-500" ? "#ef4444" : "#22c55e",
+            }}
           />
         )}
         <span
-          className={`relative inline-flex rounded-full h-2.5 w-2.5 ${config.bgColor}`}
+          style={{
+            position: "relative",
+            display: "inline-flex",
+            borderRadius: "9999px",
+            width: "10px",
+            height: "10px",
+            backgroundColor: config.bgColor === "bg-green-500" ? "#22c55e" :
+                           config.bgColor === "bg-yellow-500" ? "#eab308" :
+                           config.bgColor === "bg-red-500" ? "#ef4444" : "#22c55e",
+          }}
         />
       </span>
 
@@ -104,18 +122,22 @@ interface ConnectionIconProps {
 }
 
 function ConnectionIcon({ status }: ConnectionIconProps): JSX.Element {
+  const iconStyle = { width: "14px", height: "14px", flexShrink: 0 };
+
   // Connected - signal icon
   if (status === "connected") {
     return (
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        className="h-3.5 w-3.5 text-green-600 dark:text-green-400"
+        width="14"
+        height="14"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
+        style={{ ...iconStyle, color: "#16a34a" }}
       >
         <path d="M2 20h.01" />
         <path d="M7 20v-4" />
@@ -131,13 +153,15 @@ function ConnectionIcon({ status }: ConnectionIconProps): JSX.Element {
     return (
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        className="h-3.5 w-3.5 text-red-600 dark:text-red-400"
+        width="14"
+        height="14"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
+        style={{ ...iconStyle, color: "#dc2626" }}
       >
         <line x1="2" y1="2" x2="22" y2="22" />
         <path d="M8.5 16.5a5 5 0 0 1 7 0" />
@@ -154,13 +178,15 @@ function ConnectionIcon({ status }: ConnectionIconProps): JSX.Element {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      className="h-3.5 w-3.5 text-yellow-600 dark:text-yellow-400 animate-spin"
+      width="14"
+      height="14"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
+      style={{ ...iconStyle, color: "#ca8a04", animation: "spin 1s linear infinite" }}
     >
       <path d="M21 12a9 9 0 1 1-6.219-8.56" />
     </svg>

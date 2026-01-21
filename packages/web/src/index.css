@@ -27,3 +27,20 @@ body {
     color-scheme: dark;
   }
 }
+
+/* Custom animations (needed until Tailwind v4 utilities work) */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes ping {
+  75%, 100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}

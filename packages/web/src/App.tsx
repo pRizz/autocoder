@@ -14,9 +14,15 @@ import { AssistantChatPanel } from "./components/AssistantChatPanel";
 
 export function App(): JSX.Element {
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div
+      className="min-h-screen bg-gray-50 dark:bg-gray-900"
+      style={{ minHeight: "100vh", backgroundColor: "#f9fafb" }}
+    >
       <Sidebar />
-      <main className="ml-64 min-h-screen">
+      <main
+        className="ml-64 min-h-screen"
+        style={{ marginLeft: "256px", minHeight: "100vh" }}
+      >
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/dashboard" element={<HomePage />} />
@@ -38,12 +44,26 @@ export function App(): JSX.Element {
 // Placeholder page components - will be implemented by coding agents
 function HomePage(): JSX.Element {
   return (
-    <div className="flex items-center justify-center h-screen">
-      <div className="text-center">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+    <div
+      className="flex items-center justify-center h-screen"
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        height: "100vh",
+      }}
+    >
+      <div className="text-center" style={{ textAlign: "center" }}>
+        <h1
+          className="text-3xl font-bold text-gray-900 dark:text-white mb-2"
+          style={{ fontSize: "1.875rem", fontWeight: 700, color: "#111827", marginBottom: "8px" }}
+        >
           Welcome to Open Autocoder
         </h1>
-        <p className="text-gray-600 dark:text-gray-400">
+        <p
+          className="text-gray-600 dark:text-gray-400"
+          style={{ color: "#4b5563" }}
+        >
           Select a view from the sidebar to get started
         </p>
       </div>
@@ -80,13 +100,15 @@ function GraphPage(): JSX.Element {
             {/* Graph icon */}
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-16 w-16 mx-auto text-gray-400 dark:text-gray-500 mb-4"
+              width="64"
+              height="64"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
               strokeWidth="1.5"
               strokeLinecap="round"
               strokeLinejoin="round"
+              style={{ width: "64px", height: "64px", margin: "0 auto 16px", color: "#9ca3af" }}
             >
               <circle cx="5" cy="6" r="3" />
               <circle cx="19" cy="6" r="3" />

@@ -168,6 +168,23 @@ export function AssistantChatPanel({
             ? "bg-gray-600 hover:bg-gray-700 text-white"
             : "bg-blue-600 hover:bg-blue-700 text-white"
         }`}
+        style={{
+          position: "fixed",
+          bottom: "24px",
+          right: "24px",
+          zIndex: 50,
+          width: "56px",
+          height: "56px",
+          borderRadius: "9999px",
+          boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: isOpen ? "#4b5563" : "#2563eb",
+          color: "#fff",
+          border: "none",
+          cursor: "pointer",
+        }}
         aria-label={isOpen ? "Close assistant" : "Open assistant"}
         title={isOpen ? "Close assistant (A)" : "Open assistant (A)"}
       >
@@ -175,13 +192,15 @@ export function AssistantChatPanel({
           // Close icon (X)
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6"
+            width="24"
+            height="24"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
+            style={{ width: "24px", height: "24px" }}
           >
             <line x1="18" y1="6" x2="6" y2="18" />
             <line x1="6" y1="6" x2="18" y2="18" />
@@ -190,13 +209,15 @@ export function AssistantChatPanel({
           // Chat/Assistant icon
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6"
+            width="24"
+            height="24"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
+            style={{ width: "24px", height: "24px" }}
           >
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
             <line x1="9" y1="10" x2="15" y2="10" />
@@ -226,13 +247,15 @@ export function AssistantChatPanel({
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4"
+                width="16"
+                height="16"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
+                style={{ width: "16px", height: "16px" }}
               >
                 <line x1="18" y1="6" x2="6" y2="18" />
                 <line x1="6" y1="6" x2="18" y2="18" />
@@ -311,13 +334,15 @@ export function AssistantChatPanel({
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4"
+                  width="16"
+                  height="16"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
+                  style={{ width: "16px", height: "16px" }}
                 >
                   <line x1="22" y1="2" x2="11" y2="13" />
                   <polygon points="22 2 15 22 11 13 2 9 22 2" />
