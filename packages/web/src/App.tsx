@@ -10,6 +10,7 @@ import { Sidebar } from "./components/Sidebar";
 import { KanbanBoard } from "./components/KanbanBoard";
 import { SettingsForm } from "./components/SettingsForm";
 import { Terminal } from "./components/Terminal";
+import { AssistantChatPanel } from "./components/AssistantChatPanel";
 
 export function App(): JSX.Element {
   return (
@@ -27,6 +28,9 @@ export function App(): JSX.Element {
           <Route path="/settings" element={<SettingsPage />} />
         </Routes>
       </main>
+
+      {/* Assistant Chat Panel - available on all pages */}
+      <AssistantChatPanel />
     </div>
   );
 }
