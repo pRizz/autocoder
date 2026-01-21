@@ -6380,3 +6380,57 @@ The KanbanBoard component now persists filter state in URL search params using R
 ### Session Complete
 - Feature #126 verified and marked as passing
 - All 4 verification steps completed successfully
+
+---
+
+## Session: 2026-01-21 (Parallel Agent - Feature #127)
+
+### Completed: Feature #127 - Feature ID in URL opens correct feature
+
+**Description:** Direct link to feature opens detail modal
+
+**Category:** url
+
+**Implementation:**
+
+Added featureId URL parameter support to KanbanBoard component:
+
+1. **URL Parameter Handling** - Added `featureIdFromUrl` parsing from searchParams
+2. **Auto-open Modal** - When featureId is in URL, fetch the feature and open modal
+3. **Update URL on Click** - When clicking a feature card, featureId is added to URL
+4. **Clean URL on Close** - When closing modal, featureId is removed from URL
+
+**Technical Details:**
+- File modified: packages/web/src/components/KanbanBoard.tsx
+- Uses `useSearchParams` from react-router-dom
+- Fetches feature from API if not in current page's feature list
+- Uses `{ replace: true }` to avoid polluting browser history
+
+**Steps Verified:**
+
+1. **Step 1: Open feature detail, note URL** ✓
+   - Click on any feature card in Kanban board
+   - URL updates to include featureId parameter (e.g., /kanban?featureId=5)
+
+2. **Step 2: Close modal** ✓
+   - Press Escape or click outside modal
+   - URL updated to remove featureId parameter
+
+3. **Step 3: Navigate to saved URL directly** ✓
+   - Enter URL with featureId directly (e.g., /kanban?featureId=5)
+   - Page loads and fetches the feature
+
+4. **Step 4: Verify correct feature detail opens** ✓
+   - Feature detail modal opens automatically
+   - Displays correct feature (ID, name, description, steps)
+
+**Commit:** 5eb67c3 - feat: Add featureId URL parameter for direct linking to feature detail
+
+### Current Progress
+- Feature #127 marked as passing via MCP tool
+- Stats: 112/244 features passing (45.9%)
+
+### Session Complete
+- Feature #127 implemented and verified
+- All 4 verification steps completed successfully
+
