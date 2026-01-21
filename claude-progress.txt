@@ -7902,3 +7902,136 @@ The complete feature workflow was tested and verified working:
 
 ### Session Complete
 - Regression test completed for Feature #115
+
+---
+
+## Session: 2026-01-21 (Parallel Agent - Feature #160)
+
+### Completed: Feature #160 - Confirmation dialog for delete
+
+**Description:** Delete operations require confirmation
+
+**Category:** feedback
+
+**Implementation:**
+
+Created a confirmation dialog system for delete operations to prevent accidental data loss:
+
+1. **ConfirmDialog Component (packages/web/src/components/ConfirmDialog.tsx)**
+   - Reusable confirmation dialog built with Radix UI Dialog
+   - Supports "default" and "danger" variants (red confirm button for destructive actions)
+   - Shows customizable title, message, and button labels
+   - Loading state during async operations
+   - Accessible with proper focus management and keyboard support
+   - Data-testid attributes for testing
+
+2. **FeatureDetailModal Updates (packages/web/src/components/FeatureDetailModal.tsx)**
+   - Added delete button (trash icon) in the modal header
+   - onDelete callback prop for feature deletion
+   - State management for confirmation dialog (showDeleteConfirm, isDeleting)
+   - Handlers: handleDeleteClick, handleDeleteCancel, handleDeleteConfirm
+   - Closes both dialogs after successful deletion
+
+3. **KanbanBoard Updates (packages/web/src/components/KanbanBoard.tsx)**
+   - Added handleDeleteFeature async function
+   - Calls DELETE /api/projects/:name/features/:id
+   - Updates local state to remove deleted feature
+   - Shows success/error toast notifications
+   - Passes onDelete handler to FeatureDetailModal
+
+**Steps Verified (via Playwright browser automation):**
+
+1. **Step 1: Click delete on a feature** ✓
+   - Created test feature "TEST_DELETE_160_VERIFY" (ID 220)
+   - Opened feature in detail modal
+   - Red trash icon delete button visible in header
+   - Screenshot: feature-160-step1-modal-with-delete-button.png
+
+2. **Step 2: Verify confirmation dialog appears** ✓
+   - Clicked delete button
+   - Dialog appeared with title "Delete Feature"
+   - Warning message: 'Are you sure you want to delete "TEST_DELETE_160_VERIFY"? This action cannot be undone.'
+   - Cancel and Delete buttons visible
+   - Screenshot: feature-160-step2-confirmation-dialog.png
+
+3. **Step 3: Click Cancel, verify nothing deleted** ✓
+   - Clicked Cancel button
+   - Dialog closed, returned to feature modal
+   - Feature still visible in Kanban board (To Do: 1)
+   - Screenshot: feature-160-step3-after-cancel-not-deleted.png
+
+4. **Step 4: Click delete again and confirm** ✓
+   - Clicked delete button again
+   - Confirmation dialog appeared
+   - Clicked "Delete" confirmation button
+
+5. **Step 5: Verify feature deleted** ✓
+   - Both dialogs closed
+   - Feature removed from UI (To Do: 0, "No features")
+   - Total count decreased from 195 to 194
+   - API confirms: GET /features/220 returns 404 "Feature not found"
+   - Screenshot: feature-160-step5-feature-deleted.png
+
+**Console errors:** None (only favicon 404 - unrelated)
+
+**Commit:** decbe6d - feat: Add confirmation dialog for delete operations - Feature #160
+
+### Current Progress
+- Feature #160 marked as passing via MCP tool
+- Stats: 128/244 features passing (52.5%)
+
+### Session Complete
+- Feature #160 implemented and verified
+- All 5 verification steps completed successfully
+
+---
+
+## Session: 2026-01-21 (Parallel Agent - Feature #162)
+
+### Completed: Feature #162 - Layout works at 768px width
+
+**Description:** Tablet layout correct at 768px
+
+**Category:** responsive
+
+**Steps Verified (via Playwright browser automation):**
+
+1. **Step 1: Set viewport to 768px width** ✓
+   - Used browser_resize to set viewport to 768x1024
+   - Tablet portrait orientation
+
+2. **Step 2: Verify layout adjusts appropriately** ✓
+   - Home page: Sidebar + main content fit properly
+   - Kanban page: All 3 columns (To Do, In Progress, Done) visible
+   - Graph page: Content area displays correctly
+   - No content cutoff or overlap
+
+3. **Step 3: Verify sidebar collapses or adapts** ✓
+   - Sidebar can collapse to icon-only mode via "Collapse sidebar" button
+   - Collapsed state shows only navigation icons
+   - Sidebar can expand back to full mode via "Expand sidebar" button
+   - Both states work correctly at 768px width
+
+4. **Step 4: Verify no horizontal scroll** ✓
+   - Verified via JavaScript: scrollWidth === clientWidth (768px)
+   - Tested on Home, Kanban, and Graph pages
+   - No horizontal overflow on any page
+
+**Console errors:**
+- favicon 404 (expected - no favicon file)
+- React setState warning during render (development warning, does not affect functionality)
+
+**Screenshots:**
+- feature-162-step1-768px-home.png - Home page at 768px
+- feature-162-step2-768px-kanban.png - Kanban board at 768px
+- feature-162-step3-768px-sidebar-collapsed.png - Collapsed sidebar at 768px
+- feature-162-step4-768px-graph.png - Graph view at 768px
+- feature-162-step5-768px-sidebar-expanded.png - Expanded sidebar at 768px
+
+### Current Progress
+- Feature #162 marked as passing via MCP tool
+- Stats: 131/244 features passing (53.7%)
+
+### Session Complete
+- Feature #162 verified and marked as passing
+- All 4 verification steps completed successfully
