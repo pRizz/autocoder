@@ -8,6 +8,7 @@ import { FeatureSearch } from "./components/FeatureSearch";
 import { NewFeatureForm } from "./components/NewFeatureForm";
 import { Sidebar } from "./components/Sidebar";
 import { KanbanBoard } from "./components/KanbanBoard";
+import { SettingsForm } from "./components/SettingsForm";
 
 export function App(): JSX.Element {
   return (
@@ -170,9 +171,25 @@ function ProjectDetailPage(): JSX.Element {
 function SettingsPage(): JSX.Element {
   return (
     <div className="p-8">
-      <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-        Settings
-      </h1>
+      <div className="max-w-2xl">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+          Settings
+        </h1>
+        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+          <SettingsForm
+            projectName="open-autocoder"
+            apiBaseUrl="http://localhost:3001/api"
+            initialSettings={{
+              concurrency: 3,
+              yoloMode: false,
+              testingAgentRatio: 1,
+            }}
+            onSave={(settings) => {
+              console.log("Settings saved:", settings);
+            }}
+          />
+        </div>
+      </div>
     </div>
   );
 }
