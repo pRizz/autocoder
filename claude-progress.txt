@@ -2,6 +2,58 @@
 
 ## Session: 2026-01-21
 
+### Completed: Feature #4 - Login API
+
+**Description:** User login functionality
+
+**Implementation:**
+- Added users table to database schema (packages/core/src/db/schema.ts)
+  - id, username (unique), passwordHash, email, role, createdAt, updatedAt
+- Added tokens table for session management
+- Created UserRepository (packages/core/src/repositories/users.ts)
+  - create() - Register new user with password hashing
+  - login() - Authenticate user and return token
+  - getByUsername(), getById(), list(), update(), delete()
+- Added authentication error types (packages/core/src/errors/index.ts)
+  - InvalidCredentialsError (401)
+  - UserNotFoundError (404)
+  - UserAlreadyExistsError (409)
+- Created auth routes (packages/server/src/routes/auth.ts)
+  - POST /api/auth/login - User login with username/password
+  - POST /api/auth/register - User registration
+  - GET /api/auth/me - Get current user (placeholder)
+- Password hashing with SHA-256 + salt
+- Token generation using crypto.randomBytes
+
+**Testing Results (verified via Playwright browser automation):**
+- Step 1: Created test user via POST /api/auth/register
+  - HTTP 201 Created
+  - User returned: id=1, username=testuser_feature4, role=user
+- Step 2: Login with correct credentials via POST /api/auth/login
+  - HTTP 200 OK
+  - Response includes user object and 64-character hex token
+- Step 3: Verify token presence in response ✓
+- Step 4: Login with invalid password
+  - HTTP 401 Unauthorized
+  - Error: "Invalid username or password", code: "INVALID_CREDENTIALS"
+
+**Screenshots captured:**
+- .playwright-mcp/.playwright-mcp/feature-4-login-api-test.png
+
+**Console errors:** Only favicon 404 (non-critical) and expected 401 from invalid credentials test
+
+**Commit:** 5659655 - feat: implement Login API - Feature #4
+
+### Current Progress
+- Feature #4 (Login API) marked as passing via REST API
+- Build passes (tsc compiles successfully)
+
+### Next Steps
+- Session complete for Feature #4
+- Authentication API is now available for user login functionality
+
+---
+
 ### Completed: Feature #22 - Claim feature atomically via API
 
 **Description:** POST /api/projects/:name/features/:id/claim atomically marks in_progress
