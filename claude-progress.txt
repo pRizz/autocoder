@@ -2,6 +2,48 @@
 
 ## Session: 2026-01-21
 
+### Completed: Feature #74 - Sidebar navigation to Settings works
+
+**Description:** Clicking Settings link opens settings view/modal
+
+**Category:** navigation
+
+**Steps Verified:**
+1. Step 1: Navigate to dashboard ✓
+   - Navigated to http://localhost:3000/dashboard
+   - Dashboard page loaded successfully with "Welcome to Open Autocoder" heading
+
+2. Step 2: Click Settings link in sidebar ✓
+   - Clicked Settings link in navigation sidebar
+   - URL changed to /settings
+
+3. Step 3: Verify settings panel or modal opens ✓
+   - Settings page opened with "Settings" heading
+   - Page displays all configuration options
+
+4. Step 4: Verify settings options are displayed ✓
+   - Model input field (placeholder: e.g., claude-3-opus, gpt-4)
+   - Provider input field (placeholder: e.g., anthropic, openai)
+   - Concurrency (1-5) with default value "3"
+   - YOLO Mode checkbox (Skip browser testing for rapid prototyping)
+   - Testing Agent Ratio (0-3) with default value "1"
+   - Save Settings button
+
+**Console errors:** Only favicon 404 (non-critical)
+**Connection status:** Connected via WebSocket
+
+**Screenshots:**
+- .playwright-mcp/feature-74-step1-kanban-renders.png
+- .playwright-mcp/feature-74-step3-scrolling-verified.png
+- .playwright-mcp/feature-74-visible-in-kanban.png
+- .playwright-mcp/feature-74-settings-page-verified.png
+
+### Current Progress
+- Passing: 54/232 features (~23.3%)
+- Feature #74 marked as passing
+
+---
+
 ### Completed: Feature #69 - Improve performance test feature 47
 
 **Description:** Test feature 47 for performance validation with 100+ features in the kanban board
@@ -2712,4 +2754,27 @@ Both were used to verify that circular dependencies are properly detected and re
   - Projects page loads correctly with 23 projects ✓
   - Console errors: None
   - Screenshot: .playwright-mcp/.playwright-mcp/feature-65-regression-projects-page.png
+  - Regression test completed successfully - no regression found
+[Testing] 2026-01-21T04:08:00 Feature #66 verified - still passing (SQL injection in project name blocked)
+  - Step 1: Sent POST with new SQL injection payload - DROP TABLE sessions
+  - Step 2: Verified request accepted but safely escaped (HTTP 201)
+  - Step 3: Verified database is not corrupted - 24 projects returned
+  - Step 4: Verified normal operations still work - Projects page loads correctly
+  - Console errors: None (only non-critical WebSocket reconnect warnings)
+  - Screenshots: feature-66-regression-verification.png, feature-66-sql-injection-project-view.png
+  - Protection: Drizzle ORM parameterized queries automatically escape all values
+  - Regression test completed successfully - no regression found
+[Testing] 2026-01-21T04:09:29 Feature #65 verified - still passing (Project path traversal is blocked)
+  - Step 1: POST with path containing ../ ✓
+    - Payload: /tmp/../etc/passwd
+    - Response: VALIDATION_ERROR - Project path cannot contain '..'
+  - Step 2: Request rejected ✓
+  - Step 3: POST with path containing .. ✓
+    - Payload: /tmp/project/..
+    - Response: VALIDATION_ERROR - Project path cannot contain '..'
+  - Step 4: Request rejected ✓
+  - Additional: Multiple ../ segments rejected (../../etc/shadow) ✓
+  - Additional: Valid paths still work (/tmp/valid-path-regression-65 created) ✓
+  - Console errors: Only favicon 404 (non-critical)
+  - Screenshot: .playwright-mcp/feature-65-regression-projects-page.png
   - Regression test completed successfully - no regression found
