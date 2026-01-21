@@ -31,16 +31,16 @@ const searchQuerySchema = z.object({
 });
 
 const createFeatureSchema = z.object({
-  category: z.string().min(1, "Category is required"),
-  name: z.string().min(1, "Name is required"),
+  category: z.string().min(1, "Category is required").max(100, "Category must be 100 characters or less"),
+  name: z.string().min(1, "Name is required").max(255, "Name must be 255 characters or less"),
   description: z.string().min(1, "Description is required"),
   steps: z.array(z.string()).min(1, "At least one step is required"),
   dependencies: z.array(z.number().int().positive()).optional(),
 });
 
 const bulkCreateFeatureItemSchema = z.object({
-  category: z.string().min(1, "Category is required"),
-  name: z.string().min(1, "Name is required"),
+  category: z.string().min(1, "Category is required").max(100, "Category must be 100 characters or less"),
+  name: z.string().min(1, "Name is required").max(255, "Name must be 255 characters or less"),
   description: z.string().min(1, "Description is required"),
   steps: z.array(z.string()).min(1, "At least one step is required"),
   depends_on_indices: z.array(z.number().int().min(0)).optional(),
