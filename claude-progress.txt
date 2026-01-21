@@ -2324,3 +2324,60 @@ Feature #2 marked as passing
   - Console errors: Only favicon 404 (non-critical)
   - Screenshot: .playwright-mcp/feature-154-numeric-field-verification.png
   - Regression test completed successfully - no regression found
+[Testing] 2026-01-21T04:00:00 Feature #60 verified - still passing (API validates required fields on project creation)
+  - Step 1: POST /api/projects without name field ✓
+  - Step 2: Response status is 400 ✓
+  - Step 3: Error mentions missing field: 'name: Required' ✓
+  - Step 4: POST /api/projects without path field ✓
+  - Step 5: Response status is 400 ✓
+  - Additional: Empty JSON returns both missing fields ✓
+  - Additional: Browser fetch confirms same behavior ✓
+  - Error response includes VALIDATION_ERROR code (machine-readable) ✓
+  - Console errors: Only favicon 404 (non-critical)
+  - Screenshot: .playwright-mcp/feature-60-projects-page.png
+  - Regression test completed successfully - no regression found
+
+### Completed: Feature #231 - Test Feature A for Circular Dep Test
+
+**Description:** Test feature A to verify circular dependency detection
+
+**Category:** testing
+
+**Steps Verified:**
+1. Step 1: Create feature ✓
+   - Feature already existed in database (id=231, priority=232)
+   - Created as part of circular dependency testing (Feature #63)
+
+2. Step 2: Verify it exists ✓
+   - Database query confirmed: features.db contains 232 features
+   - Feature #231 verified in MCP server database
+   - Category: testing, Name: "Test Feature A for Circular Dep Test"
+
+**Note:** This is a test data feature created during circular dependency testing (Feature #63).
+The companion feature #232 ("Test Feature B for Circular Dep Test") depends on #231.
+Both were used to verify that circular dependencies are properly detected and rejected.
+
+**Database Verification:**
+- Total features in database: 232
+- Feature #231 found with correct attributes
+- Feature #232 has dependency on [231]
+
+**Screenshot:**
+- .playwright-mcp/feature-231-verification-kanban.png
+
+### Current Progress
+- Passing: 50/232 features (21.6%)
+- Feature #231 marked as passing
+
+### Next Steps
+- Session complete for Feature #231
+- Test data feature verified and marked as passing
+[Testing] 2026-01-21T03:55:00 Feature #34 verified - still passing (List providers via API)
+  - Step 1: GET /api/providers request completed successfully ✓
+  - Step 2: Response status is 200 ✓
+  - Step 3: Response is array of 6 provider objects with correct schema ✓
+    - Each provider has: id, name, baseUrl, isDefault, createdAt, updatedAt, apiKeyMasked
+  - Step 4: Multiple providers are listed (openai-test, anthropic-test, test-feature-35, etc.) ✓
+  - Console errors: None critical (only WebSocket reconnection warnings - non-critical)
+  - Screenshot: .playwright-mcp/feature-34-regression-settings-page.png
+  - Regression test completed successfully - no regression found
