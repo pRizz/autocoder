@@ -2,6 +2,45 @@
 
 ## Session: 2026-01-21
 
+### Completed: Feature #86 - Add performance test feature 64
+
+**Description:** Test feature 64 for performance validation with 100+ features in the kanban board
+
+**Category:** api
+
+**Steps Verified (via Playwright browser automation):**
+1. Step 1: Verify feature renders ✓
+   - Navigated to http://localhost:3000/kanban
+   - Kanban board loaded with 149 features (141 To Do, 1 In Progress, 7 Done)
+   - All features displayed correctly with category badges, names, IDs, priorities, and timestamps
+   - Header shows "Track feature progress across development stages (149 features)"
+
+2. Step 2: Check no lag ✓
+   - Scroll performance measured at 0.00ms to bottom (well under 100ms threshold)
+   - JavaScript evaluation confirmed noLag: true
+   - No UI stuttering or freezing observed
+   - Scrollable container height: 18,146px
+
+3. Step 3: Test scrolling ✓
+   - Smooth scrolling from top to bottom of To Do column (17,710px scroll position)
+   - Scrolled back to top (position 0) in 0.00ms
+   - Features at bottom (#147-#149) visible, then top features (#3, #5, #6) visible after scroll back
+   - XSS test features (#148, #149) properly escaped in display
+
+**Console errors:** Only favicon 404 (non-critical)
+**Connection status:** Connected via WebSocket
+
+**Screenshots:**
+- .playwright-mcp/feature-86-step1-kanban-renders-149-features.png
+- .playwright-mcp/feature-86-step3-scrolled-to-bottom.png
+- .playwright-mcp/feature-86-step3-scrolled-back-to-top.png
+
+### Current Progress
+- Passing: 66/232 features (~28.4%)
+- Feature #86 marked as passing
+
+---
+
 ### Completed: Feature #85 - Breadcrumbs show correct path / Performance Test
 
 **Description:** Test feature 85 for performance validation with 100+ features in the kanban board
