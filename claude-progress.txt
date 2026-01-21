@@ -2,6 +2,51 @@
 
 ## Session: 2026-01-21
 
+### Completed: Feature #89 - Feature passing status persists
+
+**Description:** Marking feature as passing persists correctly
+
+**Category:** data
+
+**Steps Verified (via Playwright browser automation):**
+1. Step 1: Create a feature ✓
+   - Created "TEST_PERSIST_FEATURE_89_VERIFY_ME" via POST /api/projects/open-autocoder/features
+   - Feature ID: 151, category: "test-persistence"
+   - Response returned passes: 0 (not passing yet)
+
+2. Step 2: Mark as passing ✓
+   - Marked feature #151 as passing via POST /api/projects/open-autocoder/features/151/pass
+   - Response returned passes: 1 (now passing)
+
+3. Step 3: Refresh page ✓
+   - Navigated fresh to http://localhost:3000/kanban
+   - Page fully loaded with new data from server
+
+4. Step 4: Verify feature still shows as passing ✓
+   - GET /api/features/151 returns passes: 1
+   - UI modal shows "Done" badge for the feature
+   - Quick Stats updated to Passing: 8
+
+5. Step 5: Verify in Done column on Kanban ✓
+   - Feature "TEST_PERSIST_FEATURE_89_VERIFY_ME" visible in Done column
+   - Done column shows 8 features total
+   - Feature card displays correct ID (#151), priority (151), and category (test-persistence)
+
+**Console errors:** WebSocket reconnection errors only (non-critical, transient)
+**Connection status:** Connected via WebSocket
+
+**Screenshots:**
+- .playwright-mcp/feature-89-persistence-verified-done-column.png (Kanban with 8 Done features)
+- .playwright-mcp/feature-89-persistence-modal-done-status.png (Modal showing Done badge)
+
+**Commit:** 8e49b65 - docs: verify Feature #89 - Feature passing status persists
+
+### Current Progress
+- Feature #89 marked as passing
+- Persistence verified: database correctly stores and retrieves passes status across page refreshes
+
+---
+
 ### Completed: Feature #86 - Add performance test feature 64
 
 **Description:** Test feature 64 for performance validation with 100+ features in the kanban board
@@ -3346,3 +3391,104 @@ Both were used to verify that circular dependencies are properly detected and re
   - Screenshot: .playwright-mcp/feature-150-form-validation-errors.png
   - Console errors: None critical (only WebSocket reconnect warnings)
   - Regression test completed successfully - no regression found
+[Testing] 2026-01-21T04:27:07Z Feature #10 verified - still passing (TypeScript compilation succeeds)
+  - Step 1: Run pnpm build in root directory ✓
+  - Step 2: Verify no TypeScript errors ✓ (all 4 packages compiled without errors)
+    - packages/core: tsc ✓
+    - packages/server: tsc ✓
+    - packages/web: tsc && vite build ✓ (150 modules transformed)
+    - packages/cli: tsc ✓
+  - Step 3: Verify dist folders are created ✓ (all 4 dist folders exist)
+    - packages/core/dist/ with subdirectories (db, errors, repositories, services, types, utils)
+    - packages/server/dist/ with routes subdirectory
+    - packages/web/dist/ with assets and index.html
+    - packages/cli/dist/ with compiled JavaScript
+  - Step 4: Verify type declarations are generated ✓ (19 .d.ts files found)
+    - packages/core: 12 type declaration files
+    - packages/server: 6 type declaration files
+    - packages/cli: 1 type declaration file
+  - Regression test completed successfully - no regression found
+[Testing] 2026-01-21T04:27:53Z Feature #59 verified - still passing (API returns 404 for non-existent feature)
+  - Step 1: Project 'open-autocoder' exists ✓
+  - Step 2: GET /api/projects/open-autocoder/features/99999 → HTTP 404 ✓
+  - Step 3: Response status is 404 ✓
+  - Step 4: Error message is clear:
+    - error: 'Feature with ID 99999 not found'
+    - code: 'FEATURE_NOT_FOUND'
+    - suggestedAction: 'Verify the feature ID exists in the database'
+  - Additional edge cases:
+    - Feature ID 0 → 404 ✓
+    - Feature ID 999999999 → 404 ✓
+    - Valid feature ID 1 → 200 ✓ (confirms positive case works)
+  - Browser test: fetch() in browser returns same 404 response ✓
+  - Console errors: Only favicon 404 (non-critical) + expected 404 from test
+  - Screenshot: .playwright-mcp/feature-59-regression-test.png
+  - Regression test completed successfully - no regression found
+[Testing] 2026-01-21T04:30:23Z Feature #231 verified - still passing (Test Feature A for Circular Dep Test)
+  - Step 1: Create feature ✓ (Feature exists with ID 231)
+  - Step 2: Verify it exists ✓ (Retrieved via MCP and API)
+  - Additional: Circular dependency detection tested:
+    - Added dependency 152→153 ✓ (Success)
+    - Attempted circular 153→152 ✓ (Correctly rejected with 'Cannot add: would create circular dependency')
+  - Additional: Algorithm verified in api/dependency_resolver.py (DFS-based cycle detection)
+  - Console errors: None critical
+  - Screenshot: .playwright-mcp/feature-231-graph-view.png
+  - Regression test completed successfully - no regression found
+
+---
+
+### Completed: Feature #87 - Updated project persists after page refresh
+
+**Description:** Project settings persist in database after refresh
+
+**Category:** data
+
+**Problem Found:**
+The SettingsPage component had hardcoded initial values for settings (concurrency: 3, yoloMode: false, testingAgentRatio: 1). When a user updated settings and refreshed the page, the form would revert to these hardcoded defaults instead of showing the actual saved values from the database.
+
+**Solution:**
+Modified SettingsPage to fetch actual project settings from the API (GET /api/projects/open-autocoder) on component mount. The fetched values are now used as initial settings for the SettingsForm.
+
+**Steps Verified (via Playwright browser automation):**
+1. Step 1: Create project ✓
+   - Used existing "open-autocoder" project
+   - Project already had concurrency=5 in database
+
+2. Step 2: Update concurrency setting to 5 ✓
+   - Changed concurrency from 4 to 5 in the Settings form
+   - Clicked "Save Settings" button
+   - Saw "Settings saved successfully" message
+   - Verified via curl: concurrency was updated to 5 in database
+
+3. Step 3: Refresh the page ✓
+   - Navigated to http://localhost:3000/settings (fresh load)
+
+4. Step 4: Open settings ✓
+   - Settings page loaded with loading indicator
+   - Then displayed fetched settings from API
+
+5. Step 5: Verify concurrency is still 5 ✓
+   - Concurrency field shows "5" (fetched from database)
+   - NOT the hardcoded default "3"
+
+**Additional Testing:**
+- Tested with multiple values (4, then 5) to confirm persistence
+- Verified API responses match UI display
+- Confirmed yoloMode conversion from database (0/1) to boolean works
+
+**Console errors:** Only favicon 404 (non-critical)
+**Connection status:** Connected via WebSocket
+
+**Screenshots:**
+- .playwright-mcp/.playwright-mcp/feature-87-settings-persist-after-refresh.png
+- .playwright-mcp/.playwright-mcp/feature-87-concurrency-5-persisted.png
+
+**Commit:** fa673fd - fix: Fetch project settings from API on SettingsPage load - Feature #87
+
+### Current Progress
+- Passing: 67/232 features (~28.9%)
+- Feature #87 marked as passing
+
+### Next Steps
+- Session complete for Feature #87
+- Project settings now persist correctly after page refresh
