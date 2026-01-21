@@ -7038,3 +7038,226 @@ Response:
 - Feature #138 verified and marked as passing
 - All 4 verification steps completed successfully
 - Commit: ed30080
+[Testing] 2026-01-21T11:03:03Z Feature #10 verified - still passing (TypeScript compilation succeeds)
+  - Category: functional
+  - Description: All packages compile without TypeScript errors
+  - All 4 verification steps PASSED:
+    1. Run pnpm build in root directory ✓ (all 4 packages built successfully)
+    2. Verify no TypeScript errors ✓ (no errors in output)
+    3. Verify dist folders are created ✓ (packages/core/dist, packages/server/dist, packages/cli/dist, packages/web/dist)
+    4. Verify type declarations are generated ✓ (20+ .d.ts files found)
+  - Build output: packages/web: 1705 modules transformed, 367KB JS + 35KB CSS
+  - No regression found - feature working correctly
+[Testing] Session complete - verified feature #10
+
+
+---
+
+## Session: 2026-01-21 (Parallel Agent - Feature #141)
+
+### Completed: Feature #141 - Settings reset to defaults
+
+**Description:** Reset button restores default settings
+
+**Category:** defaults
+
+**Implementation:**
+
+Added "Reset to Defaults" button to the SettingsForm component (packages/web/src/components/SettingsForm.tsx):
+
+1. **DEFAULT_SETTINGS constant** - Defines all default values:
+   - model: "" (empty)
+   - provider: "" (empty)
+   - concurrency: "3"
+   - yoloMode: false
+   - testingAgentRatio: "1"
+
+2. **handleResetToDefaults callback** - Resets all form fields to defaults:
+   - Clears model and provider text
+   - Sets concurrency to 3
+   - Unchecks YOLO Mode
+   - Sets testing agent ratio to 1
+   - Clears any validation errors
+   - Clears any submit messages
+
+3. **Reset to Defaults button** - Styled with amber color theme:
+   - Placed between Save Settings and Cancel buttons
+   - Disabled during form submission
+   - Has aria-label for accessibility
+
+**Steps Verified (via browser automation):**
+
+1. **Step 1: Change various settings** ✓
+   - Set Model to "test-model-for-reset"
+   - Set Provider to "test-provider-for-reset"
+   - Changed Concurrency from 5 to 1
+   - Checked YOLO Mode checkbox
+   - Changed Testing Agent Ratio from 1 to 2
+   - Screenshot: feature-141-step1-modified-settings.png
+
+2. **Step 2: Click Reset to Defaults** ✓
+   - Clicked the "Reset to Defaults" button
+
+3. **Step 3: Verify settings return to defaults** ✓
+   - Model: empty ✓
+   - Provider: empty ✓
+   - Concurrency: 3 ✓
+   - YOLO Mode: unchecked ✓
+   - Testing Agent Ratio: 1 ✓
+   - Screenshot: feature-141-step3-after-reset.png
+
+**Console errors:** None (only favicon 404)
+
+**Commit:** c8afa1d - feat: Add Reset to Defaults button to SettingsForm - Feature #141
+
+### Current Progress
+- Feature #141 marked as passing via MCP tool
+- Stats: 125/244 features passing (51.2%)
+
+### Session Complete
+- Feature #141 implemented and verified
+- All 3 verification steps completed successfully
+
+
+---
+
+## Session: 2026-01-21 (Parallel Agent - Feature #140)
+
+### Completed: Feature #140 - Reset filters returns to default view
+
+**Description:** Clear filters button resets all filters
+
+**Category:** defaults
+
+**Implementation:**
+
+Added a "Clear Filters" button to the KanbanBoard component that appears when any filter is active:
+
+1. **handleClearFilters function** - Resets category, status, and page to defaults
+2. **hasActiveFilters check** - Conditionally shows the button only when filters are active
+3. **URL params cleared** - Removes category, status, and page from URL
+4. **Visual indicator** - X icon with "Clear Filters" text
+
+**Code changes (packages/web/src/components/KanbanBoard.tsx):**
+- Added `X` icon import from lucide-react
+- Added `handleClearFilters` callback to reset all filter state
+- Added `hasActiveFilters` boolean check
+- Added conditional "Clear Filters" button with data-testid="clear-filters-button"
+
+**Steps Verified (via Playwright browser automation):**
+
+1. **Step 1: Apply multiple filters** ✓
+   - Set category filter to "API"
+   - Set status filter to "Pending (To Do)"
+   - URL: /kanban?category=API&status=pending
+   - Shows 3 features in "API" category
+   - Screenshot: feature-140-step1-multiple-filters-applied.png
+
+2. **Step 2: Click Clear/Reset filters button** ✓
+   - Clicked "Clear Filters" button (ref=e238)
+   - Button found via data-testid="clear-filters-button"
+
+3. **Step 3: Verify all filters cleared** ✓
+   - Category dropdown: "All Categories" [selected]
+   - Status dropdown: "All Statuses" [selected]
+   - URL: /kanban (no filter params)
+   - "Clear Filters" button no longer visible
+
+4. **Step 4: Verify showing all features** ✓
+   - Shows "20 features" on page 1
+   - To Do: 15, In Progress: 0, Done: 5
+   - Screenshot: feature-140-step2-filters-cleared.png
+
+**Console errors:** None (only favicon 404)
+
+**Commit:** b5194fe - feat: Add Clear Filters button to KanbanBoard - Feature #140
+
+### Current Progress
+- Feature #140 marked as passing via MCP tool
+- Stats: 123/244 features passing (50.4%)
+
+### Session Complete
+- Feature #140 implemented and verified
+- All 4 verification steps completed successfully
+
+---
+
+## Session: 2026-01-21 (Parallel Agent - Feature #139)
+
+### Completed: Feature #139 - Database backup before destructive operations
+
+**Description:** Creating backups before delete operations for recovery
+
+**Category:** defaults (per MCP feature)
+
+**Implementation:**
+
+Created a comprehensive database backup system that automatically creates backups before any destructive database operations:
+
+1. **Database Backup Utility (packages/core/src/utils/backup.ts)**
+   - `createBackup(dbPath, operation)` - Creates timestamped backup before destructive ops
+   - `listBackups(dbPath)` - Lists all backups for a database sorted by timestamp
+   - `restoreBackup(backupPath, dbPath)` - Restores database from a backup
+   - `deleteBackup(backupPath)` - Deletes a specific backup
+   - `getBackupDirectory(dbPath)` - Returns .backups directory path
+   - Automatically backs up WAL and SHM files (SQLite WAL mode)
+   - Auto-cleanup keeps only 10 most recent backups
+
+2. **FeatureRepository Integration (packages/core/src/repositories/features.ts)**
+   - Constructor accepts optional `dbPath` parameter for backup support
+   - `delete(id)` - Creates backup before deleting a feature
+   - `deleteAll()` - Creates backup before deleting all features
+
+3. **ProjectRepository Integration (packages/core/src/repositories/projects.ts)**
+   - Constructor accepts optional `dbPath` parameter for backup support
+   - `delete(name)` - Creates backup of registry DB before deleting project
+
+4. **Server Routes Updates**
+   - `packages/server/src/routes/features.ts` - Passes dbPath when creating FeatureRepository
+   - `packages/server/src/routes/projects.ts` - Passes dbPath when creating ProjectRepository
+
+5. **Unit Tests (packages/core/src/utils/backup.test.ts)**
+   - 18 tests covering all backup functionality
+   - Tests for create, list, restore, delete operations
+   - Tests for WAL/SHM file handling
+   - Tests for backup cleanup (max 10 backups)
+
+**Steps Verified (via API testing and browser automation):**
+
+1. **Step 1: Create test feature** ✓
+   - Created feature TEST_BACKUP_139_DELETE_ME via API
+   - Verified no .backups directory existed
+
+2. **Step 2: Delete feature** ✓
+   - Deleted feature via DELETE /api/projects/open-autocoder/features/212
+   - HTTP 204 returned successfully
+
+3. **Step 3: Verify backup created** ✓
+   - .backups directory created with:
+     - features_2026-01-21T11-04-01.414Z.backup (98KB)
+     - features_2026-01-21T11-04-01.414Z.backup-wal (4MB)
+     - features_2026-01-21T11-04-01.414Z.backup-shm (32KB)
+
+4. **Step 4: Verify second backup creates unique file** ✓
+   - Created and deleted second test feature
+   - Second backup created with different timestamp
+   - Both backups exist in .backups directory
+
+**Console errors:** None (only favicon 404 - unrelated)
+
+**Screenshots:**
+- feature-139-step1-kanban-view.png - Kanban board before operations
+- feature-139-step2-verified-backups.png - Kanban board after verification
+
+**Test Results:**
+- All 76 core package tests passing (including 18 new backup tests)
+- Server package builds successfully
+
+### Current Progress
+- Feature #139 marked as passing via MCP tool
+- Stats: 124/244 features passing (50.8%)
+
+### Session Complete
+- Feature #139 implemented and verified
+- Database backup functionality working for all destructive operations
+- All verification steps completed successfully
