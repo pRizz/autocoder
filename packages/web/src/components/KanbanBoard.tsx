@@ -9,18 +9,10 @@
 import { useState, useEffect, useMemo, useCallback, memo } from "react";
 import { CategoryFilter } from "./CategoryFilter";
 import { StatusFilter } from "./StatusFilter";
+import { FeatureDetailModal, type Feature } from "./FeatureDetailModal";
 
-interface Feature {
-  id: number;
-  name: string;
-  description: string;
-  category: string;
-  passes: number;
-  inProgress: number;
-  priority: number;
-  createdAt: string;
-  updatedAt: string;
-}
+// Re-export Feature type from FeatureDetailModal
+export type { Feature };
 
 interface KanbanColumn {
   id: string;
@@ -68,6 +60,7 @@ function formatLocalTimestamp(isoTimestamp: string): string {
 
 interface FeatureCardProps {
   feature: Feature;
+  onClick?: (feature: Feature) => void;
 }
 
 /**
@@ -75,13 +68,36 @@ interface FeatureCardProps {
  */
 const FeatureCard = memo(function FeatureCard({
   feature,
+  onClick,
 }: FeatureCardProps): JSX.Element {
   const localTime = formatLocalTimestamp(feature.createdAt);
   // Also get full local datetime for tooltip (accessible via title attribute)
   const fullLocalTime = new Date(feature.createdAt).toLocaleString();
 
+  const handleClick = useCallback(() => {
+    onClick?.(feature);
+  }, [feature, onClick]);
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        onClick?.(feature);
+      }
+    },
+    [feature, onClick]
+  );
+
   return (
-    <div className="bg-white dark:bg-gray-700 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-3">
+    <div
+      className="bg-white dark:bg-gray-700 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-3 cursor-pointer hover:border-blue-400 hover:shadow-md transition-all"
+      onClick={handleClick}
+      onKeyDown={handleKeyDown}
+      role="button"
+      tabIndex={0}
+      aria-label={`View details for feature: ${feature.name}`}
+      data-testid={`feature-card-${feature.id}`}
+    >
       <span className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
         {feature.category}
       </span>
@@ -106,6 +122,7 @@ interface KanbanColumnProps {
   column: KanbanColumn;
   features: Feature[];
   isLoading: boolean;
+  onFeatureClick?: (feature: Feature) => void;
 }
 
 /**
@@ -115,6 +132,7 @@ const KanbanColumnComponent = memo(function KanbanColumnComponent({
   column,
   features,
   isLoading,
+  onFeatureClick,
 }: KanbanColumnProps): JSX.Element {
   return (
     <div
@@ -163,7 +181,7 @@ const KanbanColumnComponent = memo(function KanbanColumnComponent({
           </p>
         ) : (
           features.map((feature) => (
-            <FeatureCard key={feature.id} feature={feature} />
+            <FeatureCard key={feature.id} feature={feature} onClick={onFeatureClick} />
           ))
         )}
       </div>
@@ -185,6 +203,8 @@ export function KanbanBoard({
   const [error, setError] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [selectedStatus, setSelectedStatus] = useState<string>("");
+  const [selectedFeature, setSelectedFeature] = useState<Feature | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Fetch features from API with optional category and status filters
   const fetchFeatures = useCallback(async () => {
@@ -289,6 +309,20 @@ export function KanbanBoard({
     [todoFeatures, inProgressFeatures, doneFeatures]
   );
 
+  // Handle feature card click to open detail modal
+  const handleFeatureClick = useCallback((feature: Feature) => {
+    setSelectedFeature(feature);
+    setIsModalOpen(true);
+  }, []);
+
+  // Handle modal open/close state change
+  const handleModalOpenChange = useCallback((open: boolean) => {
+    setIsModalOpen(open);
+    if (!open) {
+      setSelectedFeature(null);
+    }
+  }, []);
+
   return (
     <div className="h-full flex flex-col">
       <div className="mb-6 flex-shrink-0">
@@ -351,9 +385,17 @@ export function KanbanBoard({
             column={column}
             features={getColumnFeatures(column.id)}
             isLoading={isLoading}
+            onFeatureClick={handleFeatureClick}
           />
         ))}
       </div>
+
+      {/* Feature Detail Modal */}
+      <FeatureDetailModal
+        feature={selectedFeature}
+        open={isModalOpen}
+        onOpenChange={handleModalOpenChange}
+      />
     </div>
   );
 }
