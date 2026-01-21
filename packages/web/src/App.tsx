@@ -12,12 +12,15 @@ import { KanbanBoard } from "./components/KanbanBoard";
 import { SettingsForm } from "./components/SettingsForm";
 import { Terminal } from "./components/Terminal";
 import { AssistantChatPanel } from "./components/AssistantChatPanel";
+import { useTheme } from "./hooks/useTheme";
 
 export function App(): JSX.Element {
+  const { isDark } = useTheme();
+
   return (
     <div
       className="min-h-screen bg-gray-50 dark:bg-gray-900"
-      style={{ minHeight: "100vh", backgroundColor: "#f9fafb" }}
+      style={{ minHeight: "100vh", backgroundColor: isDark ? "#111827" : "#f9fafb" }}
     >
       <Sidebar />
       <div
@@ -57,6 +60,8 @@ export function App(): JSX.Element {
 
 // Placeholder page components - will be implemented by coding agents
 function HomePage(): JSX.Element {
+  const { isDark } = useTheme();
+
   return (
     <div
       className="flex items-center justify-center h-screen"
@@ -70,13 +75,13 @@ function HomePage(): JSX.Element {
       <div className="text-center" style={{ textAlign: "center" }}>
         <h1
           className="text-3xl font-bold text-gray-900 dark:text-white mb-2"
-          style={{ fontSize: "1.875rem", fontWeight: 700, color: "#111827", marginBottom: "8px" }}
+          style={{ fontSize: "1.875rem", fontWeight: 700, color: isDark ? "#fff" : "#111827", marginBottom: "8px" }}
         >
           Welcome to Open Autocoder
         </h1>
         <p
           className="text-gray-600 dark:text-gray-400"
-          style={{ color: "#4b5563" }}
+          style={{ color: isDark ? "#9ca3af" : "#4b5563" }}
         >
           Select a view from the sidebar to get started
         </p>

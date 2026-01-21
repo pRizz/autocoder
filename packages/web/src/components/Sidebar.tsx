@@ -4,7 +4,9 @@
 
 import { NavLink } from "react-router-dom";
 import { useWebSocket } from "../hooks/useWebSocket";
+import { useTheme } from "../hooks/useTheme";
 import { ConnectionStatusIndicator } from "./ConnectionStatusIndicator";
+import { SettingsModal } from "./SettingsModal";
 
 interface NavItem {
   label: string;
@@ -162,6 +164,7 @@ export function Sidebar(): JSX.Element {
     reconnectInterval: 3000,
     maxReconnectAttempts: 5,
   });
+  const { isDark, toggleTheme } = useTheme();
 
   return (
     <aside
@@ -172,8 +175,8 @@ export function Sidebar(): JSX.Element {
         top: 0,
         height: "100%",
         width: "256px",
-        backgroundColor: "#fff",
-        borderRight: "1px solid #e5e7eb",
+        backgroundColor: isDark ? "#1f2937" : "#fff",
+        borderRight: `1px solid ${isDark ? "#374151" : "#e5e7eb"}`,
         display: "flex",
         flexDirection: "column",
       }}
@@ -181,14 +184,26 @@ export function Sidebar(): JSX.Element {
       {/* Logo/Header */}
       <div
         className="p-4 border-b border-gray-200 dark:border-gray-700"
-        style={{ padding: "16px", borderBottom: "1px solid #e5e7eb" }}
+        style={{
+          padding: "16px",
+          borderBottom: `1px solid ${isDark ? "#374151" : "#e5e7eb"}`,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
       >
         <h1
           className="text-xl font-bold text-gray-900 dark:text-white"
-          style={{ fontSize: "1.25rem", fontWeight: 700, color: "#111827" }}
+          style={{ fontSize: "1.25rem", fontWeight: 700, color: isDark ? "#fff" : "#111827" }}
         >
           Open Autocoder
         </h1>
+
+        {/* Settings Modal Button */}
+        <SettingsModal
+          projectName="open-autocoder"
+          apiBaseUrl="http://localhost:3001/api"
+        />
       </div>
 
       {/* Navigation */}
@@ -206,8 +221,12 @@ export function Sidebar(): JSX.Element {
                   borderRadius: "8px",
                   fontSize: "14px",
                   fontWeight: 500,
-                  color: isActive ? "#1d4ed8" : "#374151",
-                  backgroundColor: isActive ? "#dbeafe" : "transparent",
+                  color: isActive
+                    ? (isDark ? "#60a5fa" : "#1d4ed8")
+                    : (isDark ? "#d1d5db" : "#374151"),
+                  backgroundColor: isActive
+                    ? (isDark ? "#1e3a5f" : "#dbeafe")
+                    : "transparent",
                   textDecoration: "none",
                 })}
               >
@@ -222,8 +241,72 @@ export function Sidebar(): JSX.Element {
       {/* Footer */}
       <div
         className="p-4 border-t border-gray-200 dark:border-gray-700 space-y-3"
-        style={{ padding: "16px", borderTop: "1px solid #e5e7eb" }}
+        style={{ padding: "16px", borderTop: `1px solid ${isDark ? "#374151" : "#e5e7eb"}` }}
       >
+        {/* Theme Toggle Button */}
+        <button
+          onClick={toggleTheme}
+          aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+          className="flex items-center gap-2 w-full px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            width: "100%",
+            padding: "8px 12px",
+            fontSize: "14px",
+            fontWeight: 500,
+            color: isDark ? "#e5e7eb" : "#374151",
+            backgroundColor: isDark ? "#374151" : "#f3f4f6",
+            border: "none",
+            borderRadius: "8px",
+            cursor: "pointer",
+          }}
+        >
+          {isDark ? (
+            // Sun icon for switching to light mode
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={{ width: "20px", height: "20px", flexShrink: 0 }}
+            >
+              <circle cx="12" cy="12" r="5" />
+              <line x1="12" y1="1" x2="12" y2="3" />
+              <line x1="12" y1="21" x2="12" y2="23" />
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+              <line x1="1" y1="12" x2="3" y2="12" />
+              <line x1="21" y1="12" x2="23" y2="12" />
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+            </svg>
+          ) : (
+            // Moon icon for switching to dark mode
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={{ width: "20px", height: "20px", flexShrink: 0 }}
+            >
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+            </svg>
+          )}
+          {isDark ? "Light Mode" : "Dark Mode"}
+        </button>
+
         {/* WebSocket Connection Status */}
         <ConnectionStatusIndicator
           status={status}
@@ -234,7 +317,7 @@ export function Sidebar(): JSX.Element {
         {/* Version */}
         <p
           className="text-xs text-gray-500 dark:text-gray-400"
-          style={{ fontSize: "12px", color: "#6b7280", marginTop: "12px" }}
+          style={{ fontSize: "12px", color: isDark ? "#9ca3af" : "#6b7280", marginTop: "12px" }}
         >
           v0.1.0
         </p>
