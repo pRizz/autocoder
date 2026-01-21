@@ -7,6 +7,7 @@
  */
 
 import { useState, useEffect, useMemo, useCallback, memo } from "react";
+import { Download } from "lucide-react";
 import { CategoryFilter } from "./CategoryFilter";
 import { StatusFilter } from "./StatusFilter";
 import { FeatureDetailModal, type Feature } from "./FeatureDetailModal";
@@ -323,6 +324,45 @@ export function KanbanBoard({
     }
   }, []);
 
+  // Export features to JSON file
+  const handleExportToJson = useCallback(() => {
+    if (features.length === 0) {
+      return;
+    }
+
+    // Create a clean export object with all features
+    const exportData = {
+      projectName,
+      exportedAt: new Date().toISOString(),
+      totalFeatures: features.length,
+      features: features.map((f) => ({
+        id: f.id,
+        priority: f.priority,
+        category: f.category,
+        name: f.name,
+        description: f.description,
+        steps: f.steps,
+        passes: f.passes === 1,
+        inProgress: f.inProgress === 1,
+        dependencies: f.dependencies,
+        createdAt: f.createdAt,
+        updatedAt: f.updatedAt,
+      })),
+    };
+
+    // Create and trigger download
+    const jsonString = JSON.stringify(exportData, null, 2);
+    const blob = new Blob([jsonString], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${projectName}-features-${new Date().toISOString().split("T")[0]}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }, [features, projectName]);
+
   return (
     <div className="h-full flex flex-col">
       <div className="mb-6 flex-shrink-0">
@@ -336,14 +376,26 @@ export function KanbanBoard({
               {features.length > 0 && ` (${features.length} features${selectedCategory ? ` in "${selectedCategory}"` : ""}${selectedStatus ? `, status: "${selectedStatus}"` : ""})`}
             </p>
           </div>
-          <button
-            onClick={fetchFeatures}
-            disabled={isLoading}
-            className="px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 transition-colors"
-            aria-label="Refresh features"
-          >
-            {isLoading ? "Loading..." : "Refresh"}
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={handleExportToJson}
+              disabled={isLoading || features.length === 0}
+              className="px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 transition-colors flex items-center gap-1.5"
+              aria-label="Export features to JSON"
+              title="Export features to JSON file"
+            >
+              <Download className="w-4 h-4" />
+              Export
+            </button>
+            <button
+              onClick={fetchFeatures}
+              disabled={isLoading}
+              className="px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 transition-colors"
+              aria-label="Refresh features"
+            >
+              {isLoading ? "Loading..." : "Refresh"}
+            </button>
+          </div>
         </div>
         <div className="flex gap-4 flex-wrap">
           <div className="w-48">
