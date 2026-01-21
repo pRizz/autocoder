@@ -8,6 +8,7 @@ import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { z } from "zod";
 import {
   UserRepository,
+  TokenRepository,
   getDatabase,
   initializeTables,
   logger,
@@ -49,8 +50,9 @@ function getAuthDbPath(): string {
   return join(registryDir, "registry.db");
 }
 
-// Lazy-loaded user repository
+// Lazy-loaded repositories
 let userRepo: UserRepository | null = null;
+let tokenRepo: TokenRepository | null = null;
 
 function getUserRepository(): UserRepository {
   if (!userRepo) {
@@ -60,6 +62,16 @@ function getUserRepository(): UserRepository {
     userRepo = new UserRepository(db);
   }
   return userRepo;
+}
+
+function getTokenRepository(): TokenRepository {
+  if (!tokenRepo) {
+    const dbPath = getAuthDbPath();
+    const db = getDatabase(dbPath);
+    initializeTables(db);
+    tokenRepo = new TokenRepository(db);
+  }
+  return tokenRepo;
 }
 
 /**
@@ -154,12 +166,19 @@ export async function registerAuthRoutes(
 
         const { username, password } = parseResult.data;
         const repo = getUserRepository();
+        const tokenRepoInstance = getTokenRepository();
 
-        // Attempt login
+        // Attempt login (validates credentials)
         const result = await repo.login(username, password);
 
+        // Create a persistent token in the database
+        const persistentToken = tokenRepoInstance.create(result.user.id);
+
         logger.info("User logged in via API", { username });
-        return reply.send(result);
+        return reply.send({
+          user: result.user,
+          token: persistentToken,
+        });
       } catch (error) {
         return handleError(error, reply);
       }
@@ -227,10 +246,7 @@ export async function registerAuthRoutes(
    *
    * Response:
    *   - Success (200): { id, username, email, role, createdAt, updatedAt }
-   *   - Unauthorized (401): { error, code }
-   *
-   * Note: This is a placeholder. Token validation would require
-   * a session/token store which is beyond the scope of this feature.
+   *   - Unauthorized (401): { error, code, suggestedAction }
    */
   fastify.get("/api/auth/me", async (request, reply) => {
     const authHeader = request.headers.authorization;
@@ -243,15 +259,68 @@ export async function registerAuthRoutes(
       });
     }
 
-    // For now, return a message indicating token validation is not implemented
-    // In a full implementation, we would:
-    // 1. Extract the token from the header
-    // 2. Validate the token against a session store
-    // 3. Return the associated user
-    return reply.status(501).send({
-      error: "Token validation not yet implemented",
-      code: "NOT_IMPLEMENTED",
-      suggestedAction: "Use login endpoint to authenticate",
-    });
+    // Extract token from header
+    const token = authHeader.substring(7); // Remove "Bearer " prefix
+
+    if (!token) {
+      return reply.status(401).send({
+        error: "Token is required",
+        code: "UNAUTHORIZED",
+        suggestedAction: "Provide a valid token after 'Bearer '",
+      });
+    }
+
+    // Validate token against the token store
+    const tokenRepoInstance = getTokenRepository();
+    const validationResult = tokenRepoInstance.validate(token);
+
+    if (!validationResult.valid || !validationResult.user) {
+      return reply.status(401).send({
+        error: validationResult.error ?? "Invalid or expired token",
+        code: "UNAUTHORIZED",
+        suggestedAction: "Log in again to get a new token",
+      });
+    }
+
+    logger.info("User authenticated via token", { username: validationResult.user.username });
+    return reply.send(validationResult.user);
+  });
+
+  /**
+   * POST /api/auth/logout - Invalidate current token
+   *
+   * Headers:
+   *   - Authorization: Bearer <token>
+   *
+   * Response:
+   *   - Success (200): { message: "Logged out successfully" }
+   *   - Unauthorized (401): { error, code }
+   */
+  fastify.post("/api/auth/logout", async (request, reply) => {
+    const authHeader = request.headers.authorization;
+
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return reply.status(401).send({
+        error: "Authorization header required",
+        code: "UNAUTHORIZED",
+        suggestedAction: "Include 'Authorization: Bearer <token>' header",
+      });
+    }
+
+    const token = authHeader.substring(7);
+
+    if (!token) {
+      return reply.status(401).send({
+        error: "Token is required",
+        code: "UNAUTHORIZED",
+      });
+    }
+
+    // Delete the token from the store
+    const tokenRepoInstance = getTokenRepository();
+    tokenRepoInstance.delete(token);
+
+    logger.info("User logged out via API");
+    return reply.send({ message: "Logged out successfully" });
   });
 }
