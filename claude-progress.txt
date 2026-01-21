@@ -605,3 +605,159 @@ These features can now be worked on by other agents.
 ### Next Steps
 - Continue with other pending features
 - WebSocket hook can be extended for real-time updates from agent orchestrator
+[Testing] 2026-01-20 21:07:15 Feature #150 verified - still passing (Required fields prevent submission)
+  - Step 1: Form opened via 'Add New Feature' button on /projects/open-autocoder ✓
+  - Step 2: All fields left empty ✓
+  - Step 3: Clicked 'Create Feature' button ✓
+  - Step 4: Submission blocked - form still visible, URL unchanged ✓
+  - Step 5: Validation errors displayed:
+    - 'Name is required' ✓
+    - 'Category is required' ✓
+    - 'Description is required' ✓
+    - 'At least one step is required' ✓
+    - Summary: 'Please fix the errors above before submitting.' ✓
+  - No console errors detected ✓
+  - Screenshots: feature-150-regression-validation-errors.png, feature-150-regression-full-form-errors.png
+  - Regression test completed successfully - no regression found
+
+### Completed: Feature #154 - Numeric fields reject letters
+
+**Description:** Concurrency field only accepts numbers
+
+**Implementation:**
+- Created SettingsForm component (packages/web/src/components/SettingsForm.tsx)
+- Concurrency field (1-5) with numeric-only validation:
+  - onKeyDown handler blocks letter keys at input level
+  - onChange handler filters non-numeric input
+  - onPaste handler strips non-numeric characters
+  - Range validation with error messages (1-5)
+- Testing Agent Ratio field (0-3) with same validation
+- Model and Provider text fields
+- YOLO Mode toggle checkbox
+- Form integrates with PUT /api/projects/:name API
+- Updated SettingsPage in App.tsx to use SettingsForm
+
+**Testing Results (verified via Playwright browser automation):**
+- Step 1: Opened settings form at http://localhost:3000/settings ✓
+- Step 2: Tried entering letters "abc" in concurrency field - REJECTED ✓
+- Step 3: Input "a1b2c" resulted in "125" (letters filtered, only digits kept) ✓
+- Step 4: Entered number "4" - ACCEPTED, value updated correctly ✓
+- Range validation error appeared when value was out of bounds (125 > 5)
+- Save button disabled when validation errors present
+- Console errors: Only favicon 404 (non-critical)
+- Screenshots captured:
+  - .playwright-mcp/feature-154-step1-settings-open.png
+  - .playwright-mcp/feature-154-step2-letters-rejected.png
+  - .playwright-mcp/feature-154-step4-numbers-accepted.png
+
+**Commit:** 39e36f4 - feat: add SettingsForm with numeric validation for concurrency field
+
+### Current Progress
+- Passing: 17/230 features (7.4%)
+- Feature #154 marked as passing
+
+### Next Steps
+- Session complete for Feature #154
+- Other agents continue with remaining features
+[Testing] 2026-01-20 21:08:27 Feature #34 verified - still passing (List providers via API)
+  - Step 1: GET /api/providers request completed successfully ✓
+  - Step 2: Response status HTTP 200 ✓
+  - Step 3: Response is valid JSON array: [] ✓
+  - Step 4: Empty array is expected for fresh database (no providers configured)
+  - Console errors: Only favicon 404 (non-critical)
+  - Screenshot: .playwright-mcp/.playwright-mcp/feature-34-regression-api-response.png
+  - Regression test completed successfully - no regression found
+[Testing] 2026-01-20 21:09:44 Feature #185 verified - still passing (Feature list handles 100 features)
+  - Step 1: Created 100+ features (currently 125 total features in database) ✓
+  - Step 2: Opened Kanban view at http://localhost:3000/kanban ✓
+  - Step 3: Verified renders without lag:
+    - Page loaded 125 features in ~3 seconds ✓
+    - DOM elements: 615 (well under 5000 threshold) ✓
+    - Memory usage: 9MB heap used (minimal) ✓
+    - Scroll performance: 0ms average (instantaneous) ✓
+  - Step 4: Verified scrolling is smooth:
+    - Multiple scroll operations completed in <1ms each ✓
+    - Page scroll to bottom: 0.1ms ✓
+    - Keyboard navigation (End key) worked smoothly ✓
+  - Additional: Refresh button works correctly, re-renders all 125 features ✓
+  - Console errors: Only favicon 404 (non-critical)
+  - Regression test completed successfully - no regression found
+
+### Completed: Feature #173 - Timestamps display in local timezone
+
+**Description:** Dates shown in user's timezone
+
+**Implementation:**
+- Updated Feature interface in KanbanBoard.tsx to include createdAt and updatedAt fields
+- Created formatLocalTimestamp utility function that:
+  - Shows "just now" for timestamps < 1 minute old
+  - Shows relative time (Xm ago, Xh ago, Xd ago) for timestamps < 7 days old
+  - Shows full local date/time format for older timestamps
+- Updated FeatureCard component to display "Created: {localTime}" for each feature
+- Added title attribute with full local datetime for accessibility
+- Uses JavaScript Date.toLocaleString() which automatically uses browser's local timezone
+
+**Testing Results (verified via Playwright browser automation):**
+- Step 1: Created test feature "Test Timezone Feature" via API
+- Step 2: Server returned UTC timestamp: 2026-01-21T03:09:56.280Z
+- Step 3: Viewed feature in UI - displays "Created: just now"
+- Step 4: Verified local timezone conversion via browser:
+  - UTC: 2026-01-21T03:09:56.280Z
+  - Local: 1/20/2026, 9:09:56 PM (America/Chicago, UTC-6)
+- All feature cards now show relative timestamps in local timezone
+- No JavaScript console errors detected
+
+**Screenshots captured:**
+- .playwright-mcp/feature-173-timestamps-verified.png
+
+**Commit:** b3acf7b - feat: display timestamps in local timezone on feature cards
+
+### Current Progress
+- Passing: 20/230 features (8.7%)
+- Feature #173 marked as passing
+
+### Next Steps
+- Session complete for Feature #173
+- Timestamps now display in local timezone format throughout the Kanban board
+
+### Completed: Feature #167 - Tab navigation works
+
+**Description:** Can navigate with Tab key
+
+**Category:** accessible
+
+**Testing Results (verified via Playwright browser automation):**
+- Step 1: Focused on page by clicking main content area
+- Step 2: Pressed Tab repeatedly to navigate through interactive elements
+- Step 3: Verified all interactive elements are reachable:
+  - Homepage: 5 navigation links (Dashboard, Kanban, Graph, Projects, Settings)
+  - Kanban page: 6 nav links + Refresh button + 2 filter comboboxes
+  - Project detail page: Nav links + Search textbox + Add Feature button + Form fields
+  - Settings page: Nav links + Form inputs (Model, Provider, Concurrency, YOLO checkbox, Testing Ratio) + Save button
+- Step 4: Verified logical tab order on all pages:
+  - Navigation links: top-to-bottom (Dashboard → Kanban → Graph → Projects → Terminal → Settings)
+  - Main content: left-to-right, top-to-bottom
+  - Forms: field order matches visual layout (Name → Category → Description → Steps → Create → Cancel)
+  - Focus cycles correctly back to first element
+
+**Key Findings:**
+- All interactive elements (links, buttons, textboxes, comboboxes, checkboxes) are focusable via Tab
+- Tab order follows DOM order which matches visual layout
+- Shift+Tab navigates backwards correctly
+- Form validation errors display when tabbing through empty required fields
+- Focus indicators are visible (though styling has known Tailwind CSS v4 issues)
+
+**Screenshots captured:**
+- .playwright-mcp/.playwright-mcp/feature-167-homepage-tab-nav.png
+- .playwright-mcp/.playwright-mcp/feature-167-form-tab-navigation.png
+- .playwright-mcp/.playwright-mcp/feature-167-kanban-final.png
+
+**Note:** Visual styling has oversized icons due to known Tailwind CSS v4 configuration issue (documented in progress notes). This is a styling issue unrelated to Tab navigation accessibility.
+
+### Current Progress
+- Passing: 18/230 features (~7.8%)
+- Feature #167 marked as passing
+
+### Next Steps
+- Session complete for Feature #167
+- Tab navigation accessibility is working correctly across all tested pages
