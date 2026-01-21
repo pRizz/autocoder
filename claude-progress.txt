@@ -2,6 +2,65 @@
 
 ## Session: 2026-01-21
 
+### Completed: Feature #88 - Deleted feature is removed permanently
+
+**Description:** Deleted feature is gone from database
+
+**Category:** data
+
+**Steps Verified (via Playwright browser automation):**
+1. Step 1: Create a feature ✓
+   - Created "TEST_DELETE_FEATURE_88_VERIFY_ME" via UI form on Projects page
+   - Feature ID: 150, category: "test"
+   - Confirmed in console: Feature created: {id: 150, priority: 150, category: test, name: TEST_DELETE...}
+
+2. Step 2: Note the feature ID ✓
+   - Feature ID: 150
+   - Verified on Kanban board (150 total features)
+
+3. Step 3: Delete the feature via API ✓
+   - DELETE /api/projects/open-autocoder/features/150
+   - HTTP Response: 204 No Content (success)
+   - Implemented missing DELETE endpoint in features.ts
+
+4. Step 4: Verify feature not in list ✓
+   - GET /api/projects/open-autocoder/features?q=TEST_DELETE_FEATURE_88
+   - Response: {"features":[],"count":0,"searchQuery":"TEST_DELETE_FEATURE_88"}
+   - Feature no longer appears in Kanban board
+   - Total count dropped from 150 to 149, then to 153 due to other agents
+
+5. Step 5: Try GET by ID - verify 404 ✓
+   - GET /api/projects/open-autocoder/features/150
+   - Response: {"error":"Feature with ID 150 not found","code":"FEATURE_NOT_FOUND","suggestedAction":"Verify the feature ID exists in the database"}
+   - HTTP 404 returned correctly
+
+6. Step 6: Refresh page - feature still gone ✓
+   - Navigated to http://localhost:3000/kanban
+   - Feature list shows #149 then jumps to #151, #152, #153, #154
+   - Feature #150 is permanently deleted from database
+
+**Implementation:**
+- Added DELETE /api/projects/:name/features/:id endpoint to packages/server/src/routes/features.ts
+- Uses existing repo.delete(featureId) from FeatureRepository
+- Returns 204 No Content on success, 404 on not found
+- Cleans up orphaned dependencies in other features
+
+**Console errors:** WebSocket reconnection errors only (non-critical, transient)
+**Connection status:** Connected via WebSocket
+
+**Screenshots:**
+- .playwright-mcp/.playwright-mcp/feature-88-step4-kanban-feature-deleted.png
+- .playwright-mcp/.playwright-mcp/feature-88-step6-refresh-confirmed.png
+
+**Commit:** 3397f2c - feat: Add DELETE endpoint for features - Feature #88
+
+### Current Progress
+- Passing: 67/232 features (~28.9%)
+- Feature #88 marked as passing
+- DELETE endpoint implemented and working
+
+---
+
 ### Completed: Feature #89 - Feature passing status persists
 
 **Description:** Marking feature as passing persists correctly
@@ -3492,3 +3551,87 @@ Modified SettingsPage to fetch actual project settings from the API (GET /api/pr
 ### Next Steps
 - Session complete for Feature #87
 - Project settings now persist correctly after page refresh
+[Testing] 2026-01-21T04:31:14Z Feature #83 verified - still passing (Sidebar collapse/expand works)
+  - Step 1: Verify sidebar is visible ✓
+    - 'Open Autocoder' heading present
+    - All 6 navigation links visible with text labels
+    - Agent Controls and Quick Stats sections visible
+  - Step 2: Click collapse button ✓
+    - Button labeled 'Collapse sidebar' clicked
+  - Step 3: Verify sidebar collapses ✓
+    - Sidebar shrinks to icon-only view
+    - Text labels hidden, only icons visible
+    - Agent Controls and Quick Stats hidden
+  - Step 4: Verify main content expands ✓
+    - Main content area wider after collapse
+  - Step 5: Click expand button ✓
+    - Button changed to 'Expand sidebar', clicked successfully
+  - Step 6: Verify sidebar expands ✓
+    - Sidebar returns to full width
+    - All text labels visible again
+    - Agent Controls and Quick Stats visible again
+  - Console errors: Only non-critical warnings (WebSocket reconnect, React DevTools)
+  - Screenshots:
+    - .playwright-mcp/feature-83-step1-sidebar-visible.png
+    - .playwright-mcp/feature-83-step3-sidebar-collapsed.png
+    - .playwright-mcp/feature-83-step6-sidebar-expanded.png
+  - Regression test completed successfully - no regression found
+[Testing] 2026-01-21T04:32:39Z Feature #61 verified - still passing (API validates required fields on feature creation)
+  - Step 1: Project 'open-autocoder' exists ✓
+  - Step 2: POST without name → 400 Bad Request ✓
+    - Response: {"error":"Validation failed: name: Required, description: Required, steps: Required","code":"VALIDATION_ERROR"}
+  - Step 3: Response status is 400 ✓
+  - Step 4: Error mentions missing 'name' field ✓
+  - Step 5: POST without description → 400 Bad Request ✓
+    - Response: {"error":"Validation failed: description: Required, steps: Required","code":"VALIDATION_ERROR"}
+  - Step 6: Response status is 400 ✓
+  - Additional: POST without steps → 400 with 'steps: Required' ✓
+  - Additional: Valid POST with all fields → 201 Created ✓ (positive case)
+  - Additional: Browser fetch tests confirm same behavior ✓
+  - Console errors: Only favicon 404 (non-critical) + expected 400s from test
+  - Screenshot: .playwright-mcp/.playwright-mcp/feature-61-api-validation.png
+  - Regression test completed successfully - no regression found
+
+---
+
+### Completed: Feature #153 - Whitespace-only input rejected
+
+**Description:** Spaces only treated as empty
+
+**Category:** form
+
+**Steps Verified (via Playwright browser automation):**
+1. Step 1: Enter only spaces in name field ✓
+   - Navigated to Projects > open-autocoder > Add New Feature
+   - Typed 5 spaces ("     ") in the Name field
+
+2. Step 2: Try to submit ✓
+   - Clicked "Create Feature" button
+   - Form submission attempted
+
+3. Step 3: Verify validation error for empty field ✓
+   - Form did NOT submit
+   - Red border appeared on Name field
+   - Error message displayed: "Name is required"
+   - Whitespace-only input correctly treated as empty string
+
+**Implementation Details:**
+- Form validation in NewFeatureForm component
+- Input trimming applied before validation check
+- Required field validation catches empty/whitespace-only values
+
+**Console errors:** Only favicon 404 (non-critical)
+**Connection status:** Connected via WebSocket
+
+**Screenshots:**
+- .playwright-mcp/feature-153-whitespace-validation.png
+- .playwright-mcp/feature-153-modal-details.png
+- .playwright-mcp/feature-153-kanban-verified.png
+
+### Current Progress
+- Passing: 70/232 features (30.2%)
+- Feature #153 marked as passing
+
+### Session Complete
+- Feature #153 verified and marked as passing
+- Whitespace-only input validation working correctly
