@@ -2,6 +2,55 @@
 
 ## Session: 2026-01-21
 
+### Completed: Feature #103 - Skip blocked feature workflow
+
+**Description:** Skip feature that cannot be implemented yet
+
+**Category:** workflow
+
+**Steps Verified (via API testing):**
+1. Step 1: Create feature with unsatisfied dependency ✓
+   - Created Feature A (ID 178, priority 179) - no dependencies
+   - Created Feature B (ID 179, priority 180) - depends on Feature A (178)
+   - API: POST /api/projects/open-autocoder/features
+
+2. Step 2: Feature appears in blocked list ✓
+   - GET /api/projects/open-autocoder/features/blocked returned Feature B
+   - Feature 179 listed with blockedBy: [178]
+
+3. Step 3: Skip the feature ✓
+   - POST /api/projects/open-autocoder/features/179/skip executed
+   - Response confirmed skip was successful
+
+4. Step 4: Verify priority moved to end ✓
+   - Before skip: priority 180
+   - After skip: priority 181 (max + 1)
+
+5. Step 5: Verify no longer in blocked list (it's pending at end) ✓
+   - Dependencies cleared to null (no longer blocked)
+   - grep for ID 179 in blocked list returns 0 matches
+   - Feature is now "pending" at end of queue
+
+**Implementation Details:**
+- Skip operation implemented in packages/core/src/repositories/features.ts
+- Skip method: gets max priority, sets new priority to max+1, clears dependencies and in_progress
+- API endpoint: POST /api/projects/:name/features/:id/skip (added in Feature #102)
+
+**Technical Verification:**
+- Feature 179 priority changed: 180 → 181
+- Feature 179 dependencies changed: [178] → null
+- Feature 179 in_progress cleared to 0
+- updatedAt timestamp updated to reflect change
+
+**Console errors:** None
+**Connection status:** API server healthy
+
+### Current Progress
+- Passing: 85/234 features (36.3%)
+- Feature #103 marked as passing
+
+---
+
 ### Completed: Feature #105 - Invalid form input shows field errors
 
 **Description:** Form validation errors appear inline
