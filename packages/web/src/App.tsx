@@ -7,6 +7,7 @@ import { Routes, Route, useParams } from "react-router-dom";
 import { FeatureSearch } from "./components/FeatureSearch";
 import { NewFeatureForm } from "./components/NewFeatureForm";
 import { Sidebar } from "./components/Sidebar";
+import { Footer } from "./components/Footer";
 import { KanbanBoard } from "./components/KanbanBoard";
 import { SettingsForm } from "./components/SettingsForm";
 import { Terminal } from "./components/Terminal";
@@ -19,21 +20,34 @@ export function App(): JSX.Element {
       style={{ minHeight: "100vh", backgroundColor: "#f9fafb" }}
     >
       <Sidebar />
-      <main
-        className="ml-64 min-h-screen"
-        style={{ marginLeft: "256px", minHeight: "100vh" }}
+      <div
+        className="ml-64 min-h-screen flex flex-col"
+        style={{
+          marginLeft: "256px",
+          minHeight: "100vh",
+          display: "flex",
+          flexDirection: "column",
+        }}
       >
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/dashboard" element={<HomePage />} />
-          <Route path="/kanban" element={<KanbanPage />} />
-          <Route path="/graph" element={<GraphPage />} />
-          <Route path="/terminal" element={<TerminalPage />} />
-          <Route path="/projects" element={<ProjectsPage />} />
-          <Route path="/projects/:name" element={<ProjectDetailPage />} />
-          <Route path="/settings" element={<SettingsPage />} />
-        </Routes>
-      </main>
+        <main
+          className="flex-1"
+          style={{ flex: 1 }}
+        >
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/dashboard" element={<HomePage />} />
+            <Route path="/kanban" element={<KanbanPage />} />
+            <Route path="/graph" element={<GraphPage />} />
+            <Route path="/terminal" element={<TerminalPage />} />
+            <Route path="/projects" element={<ProjectsPage />} />
+            <Route path="/projects/:name" element={<ProjectDetailPage />} />
+            <Route path="/settings" element={<SettingsPage />} />
+          </Routes>
+        </main>
+
+        {/* Footer with status bar */}
+        <Footer />
+      </div>
 
       {/* Assistant Chat Panel - available on all pages */}
       <AssistantChatPanel />
