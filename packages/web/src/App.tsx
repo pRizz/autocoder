@@ -2,8 +2,10 @@
  * Main application component
  */
 
+import { useState } from "react";
 import { Routes, Route, useParams } from "react-router-dom";
 import { FeatureSearch } from "./components/FeatureSearch";
+import { NewFeatureForm } from "./components/NewFeatureForm";
 
 export function App(): JSX.Element {
   return (
@@ -41,6 +43,7 @@ function ProjectsPage(): JSX.Element {
 
 function ProjectDetailPage(): JSX.Element {
   const { name } = useParams<{ name: string }>();
+  const [showNewFeatureForm, setShowNewFeatureForm] = useState(false);
 
   return (
     <div className="p-8">
@@ -60,6 +63,30 @@ function ProjectDetailPage(): JSX.Element {
             onSearchResults={(features, query) => {
               console.log(`Search for "${query}" returned ${features.length} results`);
             }}
+          />
+        ) : (
+          <p className="text-gray-500">No project selected</p>
+        )}
+      </section>
+
+      {/* New Feature Section */}
+      <section className="mb-8">
+        {!showNewFeatureForm ? (
+          <button
+            onClick={() => setShowNewFeatureForm(true)}
+            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          >
+            Add New Feature
+          </button>
+        ) : name ? (
+          <NewFeatureForm
+            projectName={name}
+            apiBaseUrl="http://localhost:3001/api"
+            onFeatureCreated={(feature) => {
+              console.log("Feature created:", feature);
+              setShowNewFeatureForm(false);
+            }}
+            onCancel={() => setShowNewFeatureForm(false)}
           />
         ) : (
           <p className="text-gray-500">No project selected</p>

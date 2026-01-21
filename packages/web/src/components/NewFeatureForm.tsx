@@ -1,0 +1,429 @@
+/**
+ * New Feature Form Component
+ *
+ * A form for creating new features with required field validation.
+ * Validates that name, category, description, and at least one step are provided.
+ */
+
+import { useState, useCallback, type FormEvent } from "react";
+
+interface NewFeatureFormProps {
+  projectName: string;
+  onFeatureCreated?: (feature: Feature) => void;
+  onCancel?: () => void;
+  apiBaseUrl?: string;
+}
+
+interface Feature {
+  id: number;
+  name: string;
+  description: string;
+  category: string;
+  passes: number;
+  inProgress: number;
+  priority: number;
+  steps: string[];
+}
+
+interface FormErrors {
+  name?: string;
+  category?: string;
+  description?: string;
+  steps?: string;
+  submit?: string;
+}
+
+export function NewFeatureForm({
+  projectName,
+  onFeatureCreated,
+  onCancel,
+  apiBaseUrl = "/api",
+}: NewFeatureFormProps): JSX.Element {
+  const [name, setName] = useState("");
+  const [category, setCategory] = useState("");
+  const [description, setDescription] = useState("");
+  const [stepsText, setStepsText] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+
+  /**
+   * Validates all form fields and returns validation errors
+   */
+  const validateForm = useCallback((): FormErrors => {
+    const newErrors: FormErrors = {};
+
+    if (!name.trim()) {
+      newErrors.name = "Name is required";
+    }
+
+    if (!category.trim()) {
+      newErrors.category = "Category is required";
+    }
+
+    if (!description.trim()) {
+      newErrors.description = "Description is required";
+    }
+
+    const steps = stepsText
+      .split("\n")
+      .map((s) => s.trim())
+      .filter((s) => s.length > 0);
+    if (steps.length === 0) {
+      newErrors.steps = "At least one step is required";
+    }
+
+    return newErrors;
+  }, [name, category, description, stepsText]);
+
+  /**
+   * Validates a single field
+   */
+  const validateField = useCallback(
+    (fieldName: string): string | undefined => {
+      switch (fieldName) {
+        case "name":
+          return !name.trim() ? "Name is required" : undefined;
+        case "category":
+          return !category.trim() ? "Category is required" : undefined;
+        case "description":
+          return !description.trim() ? "Description is required" : undefined;
+        case "steps": {
+          const steps = stepsText
+            .split("\n")
+            .map((s) => s.trim())
+            .filter((s) => s.length > 0);
+          return steps.length === 0 ? "At least one step is required" : undefined;
+        }
+        default:
+          return undefined;
+      }
+    },
+    [name, category, description, stepsText]
+  );
+
+  /**
+   * Handles field blur to show validation errors for touched fields
+   */
+  const handleBlur = (fieldName: string) => {
+    setTouched((prev) => ({ ...prev, [fieldName]: true }));
+    const error = validateField(fieldName);
+    setErrors((prev) => ({ ...prev, [fieldName]: error }));
+  };
+
+  /**
+   * Handles form submission
+   */
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+
+    // Mark all fields as touched
+    setTouched({
+      name: true,
+      category: true,
+      description: true,
+      steps: true,
+    });
+
+    // Validate all fields
+    const validationErrors = validateForm();
+    setErrors(validationErrors);
+
+    // Don't submit if there are validation errors
+    if (Object.keys(validationErrors).length > 0) {
+      return;
+    }
+
+    setIsSubmitting(true);
+    setErrors({});
+
+    try {
+      const steps = stepsText
+        .split("\n")
+        .map((s) => s.trim())
+        .filter((s) => s.length > 0);
+
+      const response = await fetch(
+        `${apiBaseUrl}/projects/${encodeURIComponent(projectName)}/features`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: name.trim(),
+            category: category.trim(),
+            description: description.trim(),
+            steps,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error ?? `Failed to create feature: ${response.statusText}`);
+      }
+
+      const feature = await response.json();
+
+      // Clear form
+      setName("");
+      setCategory("");
+      setDescription("");
+      setStepsText("");
+      setTouched({});
+
+      if (onFeatureCreated) {
+        onFeatureCreated(feature);
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to create feature";
+      setErrors({ submit: message });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const hasErrors = Object.keys(errors).some(
+    (key) => errors[key as keyof FormErrors] !== undefined
+  );
+
+  return (
+    <form onSubmit={handleSubmit} className="new-feature-form space-y-4 max-w-lg">
+      <h2 className="text-xl font-bold text-gray-900 dark:text-white">Add New Feature</h2>
+
+      {/* Name field */}
+      <div>
+        <label
+          htmlFor="feature-name"
+          className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+        >
+          Name <span className="text-red-500">*</span>
+        </label>
+        <input
+          id="feature-name"
+          type="text"
+          value={name}
+          onChange={(e) => {
+            setName(e.target.value);
+            if (touched.name) {
+              setErrors((prev) => ({
+                ...prev,
+                name: !e.target.value.trim() ? "Name is required" : undefined,
+              }));
+            }
+          }}
+          onBlur={() => handleBlur("name")}
+          aria-invalid={touched.name && !!errors.name}
+          aria-describedby={errors.name ? "name-error" : undefined}
+          className={`mt-1 block w-full px-3 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${
+            touched.name && errors.name
+              ? "border-red-500 focus:ring-red-500"
+              : "border-gray-300 dark:border-gray-600"
+          }`}
+          placeholder="Feature name"
+        />
+        {touched.name && errors.name && (
+          <p id="name-error" className="mt-1 text-sm text-red-600 dark:text-red-400" role="alert">
+            {errors.name}
+          </p>
+        )}
+      </div>
+
+      {/* Category field */}
+      <div>
+        <label
+          htmlFor="feature-category"
+          className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+        >
+          Category <span className="text-red-500">*</span>
+        </label>
+        <input
+          id="feature-category"
+          type="text"
+          value={category}
+          onChange={(e) => {
+            setCategory(e.target.value);
+            if (touched.category) {
+              setErrors((prev) => ({
+                ...prev,
+                category: !e.target.value.trim() ? "Category is required" : undefined,
+              }));
+            }
+          }}
+          onBlur={() => handleBlur("category")}
+          aria-invalid={touched.category && !!errors.category}
+          aria-describedby={errors.category ? "category-error" : undefined}
+          className={`mt-1 block w-full px-3 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${
+            touched.category && errors.category
+              ? "border-red-500 focus:ring-red-500"
+              : "border-gray-300 dark:border-gray-600"
+          }`}
+          placeholder="e.g., functional, style, security"
+        />
+        {touched.category && errors.category && (
+          <p
+            id="category-error"
+            className="mt-1 text-sm text-red-600 dark:text-red-400"
+            role="alert"
+          >
+            {errors.category}
+          </p>
+        )}
+      </div>
+
+      {/* Description field */}
+      <div>
+        <label
+          htmlFor="feature-description"
+          className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+        >
+          Description <span className="text-red-500">*</span>
+        </label>
+        <textarea
+          id="feature-description"
+          value={description}
+          onChange={(e) => {
+            setDescription(e.target.value);
+            if (touched.description) {
+              setErrors((prev) => ({
+                ...prev,
+                description: !e.target.value.trim() ? "Description is required" : undefined,
+              }));
+            }
+          }}
+          onBlur={() => handleBlur("description")}
+          rows={3}
+          aria-invalid={touched.description && !!errors.description}
+          aria-describedby={errors.description ? "description-error" : undefined}
+          className={`mt-1 block w-full px-3 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${
+            touched.description && errors.description
+              ? "border-red-500 focus:ring-red-500"
+              : "border-gray-300 dark:border-gray-600"
+          }`}
+          placeholder="Describe what this feature should do"
+        />
+        {touched.description && errors.description && (
+          <p
+            id="description-error"
+            className="mt-1 text-sm text-red-600 dark:text-red-400"
+            role="alert"
+          >
+            {errors.description}
+          </p>
+        )}
+      </div>
+
+      {/* Steps field */}
+      <div>
+        <label
+          htmlFor="feature-steps"
+          className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+        >
+          Steps <span className="text-red-500">*</span>
+          <span className="ml-1 font-normal text-gray-500">(one per line)</span>
+        </label>
+        <textarea
+          id="feature-steps"
+          value={stepsText}
+          onChange={(e) => {
+            setStepsText(e.target.value);
+            if (touched.steps) {
+              const steps = e.target.value
+                .split("\n")
+                .map((s) => s.trim())
+                .filter((s) => s.length > 0);
+              setErrors((prev) => ({
+                ...prev,
+                steps: steps.length === 0 ? "At least one step is required" : undefined,
+              }));
+            }
+          }}
+          onBlur={() => handleBlur("steps")}
+          rows={4}
+          aria-invalid={touched.steps && !!errors.steps}
+          aria-describedby={errors.steps ? "steps-error" : undefined}
+          className={`mt-1 block w-full px-3 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-mono text-sm ${
+            touched.steps && errors.steps
+              ? "border-red-500 focus:ring-red-500"
+              : "border-gray-300 dark:border-gray-600"
+          }`}
+          placeholder="Step 1: Do something&#10;Step 2: Verify result&#10;Step 3: Check outcome"
+        />
+        {touched.steps && errors.steps && (
+          <p id="steps-error" className="mt-1 text-sm text-red-600 dark:text-red-400" role="alert">
+            {errors.steps}
+          </p>
+        )}
+      </div>
+
+      {/* Submit error */}
+      {errors.submit && (
+        <div
+          className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg"
+          role="alert"
+        >
+          <p className="text-sm text-red-600 dark:text-red-400">{errors.submit}</p>
+        </div>
+      )}
+
+      {/* Form actions */}
+      <div className="flex gap-3 pt-2">
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className={`flex-1 px-4 py-2 text-sm font-medium text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
+            isSubmitting
+              ? "bg-blue-400 cursor-not-allowed"
+              : "bg-blue-600 hover:bg-blue-700"
+          }`}
+        >
+          {isSubmitting ? (
+            <span className="flex items-center justify-center gap-2">
+              <svg
+                className="animate-spin h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                />
+              </svg>
+              Creating...
+            </span>
+          ) : (
+            "Create Feature"
+          )}
+        </button>
+        {onCancel && (
+          <button
+            type="button"
+            onClick={onCancel}
+            disabled={isSubmitting}
+            className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          >
+            Cancel
+          </button>
+        )}
+      </div>
+
+      {/* Validation summary when attempting to submit with errors */}
+      {hasErrors && Object.keys(touched).length === 4 && (
+        <p className="text-sm text-gray-500 dark:text-gray-400" aria-live="polite">
+          Please fix the errors above before submitting.
+        </p>
+      )}
+    </form>
+  );
+}
