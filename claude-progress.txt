@@ -2,6 +2,56 @@
 
 ## Session: 2026-01-21
 
+### Completed: Feature #5 - Auth Check (Token Validation)
+
+**Description:** Verify authentication with token validation
+
+**Implementation:**
+- Created TokenRepository (packages/core/src/repositories/tokens.ts)
+  - create() - Create token with configurable expiration (default 24 hours)
+  - validate() - Validate token and return associated user
+  - delete() - Delete token (logout)
+  - deleteAllForUser() - Logout from all sessions
+  - cleanupExpired() - Maintenance task to remove expired tokens
+  - getActiveForUser() - List active sessions
+- Updated /api/auth/login to persist tokens in database via TokenRepository
+- Implemented /api/auth/me endpoint with real token validation
+  - Returns user info on valid token (HTTP 200)
+  - Returns 401 with error message on invalid/expired token
+  - Returns 401 if no Authorization header provided
+- Added /api/auth/logout endpoint for token invalidation
+  - Removes token from database
+  - Token becomes invalid immediately
+- Exported TokenRepository from @open-autocoder/core
+
+**Testing Results (verified via curl and Playwright browser automation):**
+- Step 1: Register user (testuser5) - HTTP 201 Created ✓
+- Step 2: Login to get token - HTTP 200 with token ✓
+- Step 3: Call /api/auth/me with valid token - HTTP 200, returns user info ✓
+- Step 4: Call /api/auth/me with invalid token - HTTP 401, "Invalid or expired token" ✓
+- Step 5: Call /api/auth/me without token - HTTP 401, "Authorization header required" ✓
+- Step 6: Logout with token - HTTP 200, "Logged out successfully" ✓
+- Step 7: Call /api/auth/me with same token after logout - HTTP 401, "Invalid or expired token" ✓
+
+**Browser Automation Tests:**
+- All 5 auth scenarios verified via browser fetch API
+- Token works before logout, invalid after logout confirmed
+- Screenshots: feature-5-health-check.png, feature-5-auth-check-verified.png
+
+**Console errors:** Only favicon 404 (non-critical) and expected 401 errors from auth tests
+
+**Commit:** 4b176cf - feat: implement auth token validation - Feature #5
+
+### Current Progress
+- Passing: 30/230 features (13.0%)
+- Feature #5 marked as passing
+
+### Next Steps
+- Session complete for Feature #5
+- Authentication token validation is now fully functional
+
+---
+
 ### Completed: Feature #4 - Login API
 
 **Description:** User login functionality
@@ -1183,4 +1233,35 @@ Feature #2 marked as passing
   - Step 4: Dependency Graph view displayed with heading and description ✓
   - Console errors: Only favicon 404 (non-critical)
   - Screenshot: .playwright-mcp/.playwright-mcp/feature-72-regression-graph-view.png
+  - Regression test completed successfully - no regression found
+[Testing] 2026-01-21T03:27:13 Feature #148 verified - still passing (Filter by status works)
+  - Step 1: Features with different statuses exist ✓ (To Do: 120, In Progress: 1, Done: 6)
+  - Step 2: Filtered by 'Passing (Done)' ✓
+  - Step 3: Verified only 6 passing features shown in Done column ✓
+  - Step 4: Filtered by 'Pending (To Do)' ✓
+  - Step 5: Verified only 120 pending features shown in To Do column ✓
+  - Additional: Filtered by 'In Progress' - shows 1 feature correctly ✓
+  - Console errors: Only favicon 404 (non-critical)
+  - Screenshots: feature-148-regression-pending-filter.png, feature-148-regression-inprogress-filter.png
+  - Regression test completed successfully - no regression found
+[Testing] 2026-01-21T03:27:33 Feature #1 verified - still passing (App loads without errors)
+  - Step 1: Navigated to application root URL (http://localhost:3007) ✓
+  - Step 2: Page fully loaded with welcome message ✓
+  - Step 3: No JavaScript errors in console (only favicon.ico 404 - non-critical) ✓
+  - Step 4: Main content area renders with heading and description ✓
+  - Step 5: Header visible with 'Open Autocoder' logo and navigation sidebar ✓
+  - Additional: Connection status shows 'Connected' with green indicator ✓
+  - Additional: Version v0.1.0 displayed ✓
+  - Additional: Assistant FAB button visible at bottom-right ✓
+  - Screenshot: .playwright-mcp/.playwright-mcp/feature-1-regression-app-loads.png
+  - Regression test completed successfully - no regression found
+[Testing] 2026-01-21T03:28:00 Feature #142 verified - still passing (Search by feature name)
+  - Step 1: Features with unique names exist (Login API, Test Feature 1, Auth Check, etc.) ✓
+  - Step 2: Searched for partial name "Login" - returned 1 result ✓
+  - Step 3: Matching feature shown (Login API with category functional, Priority: 4) ✓
+  - Step 4: Verified non-matching hidden - "nonexistent" returned "No features found" ✓
+  - Additional: Search for "Feature" returned 50 matching results ✓
+  - Note: Initial 500 error was transient; retests all passed
+  - Console errors: Only favicon 404 and WebSocket warnings (non-critical)
+  - Screenshots: feature-142-search-by-name.png, feature-142-search-results.png
   - Regression test completed successfully - no regression found
