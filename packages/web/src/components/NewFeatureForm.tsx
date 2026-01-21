@@ -3,9 +3,12 @@
  *
  * A form for creating new features with required field validation.
  * Validates that name, category, description, and at least one step are provided.
+ * Shows unsaved changes warning when navigating away with unsaved data.
  */
 
-import { useState, useCallback, type FormEvent } from "react";
+import { useState, useCallback, useMemo, type FormEvent } from "react";
+import { useUnsavedChanges } from "../hooks/useUnsavedChanges";
+import { UnsavedChangesDialog } from "./UnsavedChangesDialog";
 
 interface NewFeatureFormProps {
   projectName: string;
@@ -58,6 +61,27 @@ export function NewFeatureForm({
     description: string;
     steps: string[];
   } | null>(null);
+
+  // Track if form has unsaved changes (any field has content)
+  const hasUnsavedChanges = useMemo(() => {
+    return (
+      name.trim().length > 0 ||
+      category.trim().length > 0 ||
+      description.trim().length > 0 ||
+      stepsText.trim().length > 0
+    );
+  }, [name, category, description, stepsText]);
+
+  // Use the unsaved changes hook for navigation blocking
+  const {
+    showDialog: showUnsavedDialog,
+    confirmLeave,
+    cancelLeave,
+    dialogMessage,
+  } = useUnsavedChanges({
+    hasUnsavedChanges,
+    message: "You have unsaved changes in the feature form. Are you sure you want to leave? Your changes will be lost.",
+  });
 
   /**
    * Validates all form fields and returns validation errors
@@ -289,8 +313,17 @@ export function NewFeatureForm({
   );
 
   return (
-    <form onSubmit={handleSubmit} className="new-feature-form space-y-4 max-w-lg">
-      <h2 className="text-xl font-bold text-gray-900 dark:text-white">Add New Feature</h2>
+    <>
+      {/* Unsaved changes confirmation dialog */}
+      <UnsavedChangesDialog
+        isOpen={showUnsavedDialog}
+        onStay={cancelLeave}
+        onLeave={confirmLeave}
+        message={dialogMessage}
+      />
+
+      <form onSubmit={handleSubmit} className="new-feature-form space-y-4 max-w-lg">
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white">Add New Feature</h2>
 
       {/* Name field */}
       <div>
@@ -575,6 +608,7 @@ export function NewFeatureForm({
           Please fix the errors above before submitting.
         </p>
       )}
-    </form>
+      </form>
+    </>
   );
 }
