@@ -96,6 +96,7 @@ export function App(): JSX.Element {
             <Route path="/projects" element={<ProjectsPage />} />
             <Route path="/projects/:name" element={<ProjectDetailPage />} />
             <Route path="/settings" element={<SettingsPage />} />
+            <Route path="/error-test" element={<ErrorTestPage />} />
           </Routes>
         </main>
 
@@ -604,6 +605,81 @@ function SettingsPage(): JSX.Element {
             />
           </div>
         )}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Error Test Page - For testing ErrorBoundary functionality
+ *
+ * This page allows triggering different types of errors to verify
+ * that the ErrorBoundary catches them and displays recovery options.
+ */
+function ErrorTestPage(): JSX.Element {
+  const { isDark } = useTheme();
+  const [shouldThrow, setShouldThrow] = useState(false);
+
+  // If shouldThrow is true, throw an error during render
+  if (shouldThrow) {
+    throw new Error("Test error: Simulated 500 server error for ErrorBoundary testing");
+  }
+
+  return (
+    <div className="p-8">
+      <div
+        className="max-w-2xl mx-auto"
+        style={{ maxWidth: "42rem", margin: "0 auto" }}
+      >
+        <h1
+          className="text-2xl font-bold text-gray-900 dark:text-white mb-6"
+          style={{
+            fontSize: "1.5rem",
+            fontWeight: 700,
+            color: isDark ? "#fff" : "#111827",
+            marginBottom: "24px",
+          }}
+        >
+          Error Boundary Test
+        </h1>
+
+        <div
+          className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6"
+          style={{
+            backgroundColor: isDark ? "#1f2937" : "#fff",
+            borderRadius: "8px",
+            border: `1px solid ${isDark ? "#374151" : "#e5e7eb"}`,
+            padding: "24px",
+          }}
+        >
+          <p
+            className="text-gray-600 dark:text-gray-400 mb-4"
+            style={{
+              color: isDark ? "#9ca3af" : "#4b5563",
+              marginBottom: "16px",
+            }}
+          >
+            Click the button below to trigger a test error and verify the ErrorBoundary
+            catches it and displays recovery options (Retry and Go Home buttons).
+          </p>
+
+          <button
+            onClick={() => setShouldThrow(true)}
+            className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
+            style={{
+              padding: "8px 16px",
+              fontSize: "0.875rem",
+              fontWeight: 500,
+              color: "#fff",
+              backgroundColor: "#dc2626",
+              border: "none",
+              borderRadius: "8px",
+              cursor: "pointer",
+            }}
+          >
+            Trigger Test Error
+          </button>
+        </div>
       </div>
     </div>
   );

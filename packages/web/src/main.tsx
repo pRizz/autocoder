@@ -9,6 +9,7 @@ import ReactDOM from "react-dom/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter } from "react-router-dom";
 import { ThemeProvider } from "./hooks/useTheme";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 import { App } from "./App";
 import "./index.css";
 
@@ -30,9 +31,17 @@ ReactDOM.createRoot(rootElement).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
+        <ErrorBoundary
+          onError={(error, errorInfo) => {
+            // Log errors for debugging
+            console.error("Application error:", error);
+            console.error("Component stack:", errorInfo.componentStack);
+          }}
+        >
+          <BrowserRouter>
+            <App />
+          </BrowserRouter>
+        </ErrorBoundary>
       </ThemeProvider>
     </QueryClientProvider>
   </React.StrictMode>
