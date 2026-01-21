@@ -504,6 +504,9 @@ def feature_skip(
 
             feature.priority = new_priority
             feature.in_progress = False
+            # Clear dependencies so the feature is no longer blocked
+            # This matches the TypeScript implementation in packages/core/src/repositories/features.ts
+            feature.dependencies = None
             session.commit()
 
         session.refresh(feature)
