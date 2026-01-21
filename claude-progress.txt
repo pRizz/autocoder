@@ -1,5 +1,52 @@
 # Claude Progress Notes
 
+## Session: 2026-01-21 (Parallel Agent - Feature #241)
+
+### Completed: Feature #241 - Test Feature A for circular test 63 regression
+
+**Description:** Test feature A created for testing circular dependency rejection (regression test)
+
+**Category:** test-circular-63-regression
+
+**Steps Verified:**
+
+1. **Step 1: This is test feature A** ✓
+   - Verified Feature A (ID 241) exists in the MCP database
+   - Feature has no dependencies (as expected for base test feature)
+
+**Additional Verification - Circular Dependency Detection:**
+
+1. **Direct Cycle Prevention** ✓
+   - Created Feature B (ID 243) that depends on Feature A (241)
+   - Added dependency: B -> A (Feature B depends on Feature A)
+   - Attempted to add dependency: A -> B (Feature A depends on Feature B)
+   - **Result: CORRECTLY REJECTED** with error "Cannot add: would create circular dependency"
+
+2. **Indirect Cycle Prevention** ✓
+   - Created Feature C (ID 244) that depends on Feature B (243)
+   - This creates chain: A <- B <- C (C depends on B, B depends on A)
+   - Attempted to add dependency: A -> C (Feature A depends on Feature C)
+   - **Result: CORRECTLY REJECTED** with error "Cannot add: would create circular dependency"
+   - The system correctly detected that A -> C -> B -> A would form a cycle
+
+**Implementation Details:**
+- Circular dependency detection implemented in `api/dependency_resolver.py`
+- `would_create_circular_dependency()` function uses DFS to detect cycles
+- Prevents both direct cycles (A -> B -> A) and indirect cycles (A -> C -> B -> A)
+- MAX_DEPENDENCY_DEPTH = 50 prevents stack overflow in deep graphs
+
+**Console errors:** None critical (only WebSocket reconnection during server restart)
+**Connection status:** Connected via WebSocket
+
+**Screenshot:**
+- .playwright-mcp/feature-241-app-homepage.png
+
+### Current Progress
+- Feature #241 marked as passing
+- MCP Database: 99/244 features passing (40.6%)
+
+---
+
 ## Session: 2026-01-21 (Parallel Agent - Feature #111)
 
 ### Completed: Feature #111 - Implement performance test feature 89
@@ -5347,4 +5394,89 @@ Loading states already implemented in:
 
 ### Session Complete
 - Feature #113 verified and marked as passing
+- All 3 verification steps completed successfully
+[Testing] 2026-01-21T08:26:17Z Feature #61 regression test PASSED - API validates required fields on feature creation
+  - Category: security
+  - Description: Missing required fields return validation error
+  - Verification Steps:
+    1. Created test project (using existing 'open-autocoder') ✓
+    2. POST /features without name → 400 Bad Request ✓
+       - Error: 'Validation failed: name: Required'
+    3. POST /features without description → 400 Bad Request ✓
+       - Error: 'Validation failed: description: Required'
+    4. POST /features without steps → 400 Bad Request ✓
+       - Error: 'Validation failed: steps: Required'
+    5. POST /features without category → 400 Bad Request ✓
+       - Error: 'Validation failed: category: Required'
+    6. Valid POST with all fields → 201 Created ✓
+       - Feature created successfully and cleaned up
+  - All validation works correctly - VALIDATION_ERROR code returned
+  - No regression found - feature still passing
+[Testing] Session complete - verified feature #61
+[Testing] 2026-01-21T08:26:18Z Feature #34 verified - still passing (List providers via API)
+  - Category: functional
+  - Description: GET /api/providers returns configured AI providers
+  - All 4 verification steps PASSED:
+    1. Send GET request to /api/providers ✓
+    2. Verify response status is 200 ✓ (HTTP 200)
+    3. Verify response is array of provider objects ✓ (14 providers)
+    4. Verify default providers are listed ✓ (OpenAI, Anthropic, etc.)
+  - Provider object structure verified: id, name, baseUrl, isDefault, createdAt, updatedAt, apiKeyMasked
+  - UI verification: Settings page displays all providers correctly
+  - Console errors: Only favicon 404 (non-critical)
+  - Screenshots: feature-34-providers-*.png
+  - No regression found - feature working correctly
+[Testing] Session complete - verified feature #34
+
+---
+
+## Session: 2026-01-21 (Parallel Agent - Feature #115)
+
+### Completed: Feature #115 - Refactor performance test feature 93
+
+**Description:** Test feature 93 for performance validation with 100+ features in the kanban board
+
+**Category:** performance
+
+**Steps Verified (via Playwright browser automation):**
+
+1. **Step 1: Verify feature renders** ✓
+   - Navigated to http://localhost:3000/kanban
+   - Kanban board loaded with 179 features (163 To Do, 2 In Progress, 14 Done)
+   - All features displayed correctly with category badges, names, IDs, priorities, and timestamps
+   - Header shows "Track feature progress across development stages (179 features)"
+   - Feature #115 "Refactor performance test feature 93" visible in To Do column
+   - Screenshot: .playwright-mcp/feature-115-step1-kanban-179-features.png
+
+2. **Step 2: Check no lag** ✓
+   - Clicked feature #115 card - modal opened instantly
+   - Modal showed correct details (description, steps, timestamps)
+   - Closed modal with Escape key - instant response
+   - No perceptible delay between click and modal appearance
+   - Screenshot: .playwright-mcp/feature-115-step2-modal-no-lag.png
+
+3. **Step 3: Test scrolling** ✓
+   - Pressed PageDown - smooth scrolling through list
+   - View changed from features starting at #3 to features starting at #117
+   - Pressed Home to scroll back to top - instant response
+   - All 179 features remained accessible during scrolling
+   - Screenshot: .playwright-mcp/feature-115-step3-scroll-test.png
+   - Screenshot: .playwright-mcp/feature-115-step3-scroll-back-home.png
+
+**Console errors:** WebSocket reconnection attempts during Vite HMR restart (non-critical dev environment behavior)
+
+**Performance Summary:**
+- Kanban board handles 179 features with excellent performance
+- Modal interactions are instantaneous
+- Scrolling is smooth and responsive
+- No lag detected during any operations
+- API server remained responsive throughout testing
+
+### Current Progress
+- Feature #115 marked as passing via MCP tool
+- Performance validation passed with excellent results
+- Stats: 97/242 features passing (40.1%)
+
+### Session Complete
+- Feature #115 verified and marked as passing
 - All 3 verification steps completed successfully
