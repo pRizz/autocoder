@@ -2,6 +2,40 @@
 
 ## Session: 2026-01-21
 
+### Completed: Feature #62 - API key is not exposed in provider list
+
+**Description:** GET /api/providers masks API keys
+
+**Category:** security
+
+**Steps Verified:**
+1. Step 1: Add provider with API key ✓
+   - Created provider "test-feature-62" with API key "sk-secret-test-key-12345"
+   - POST /api/providers returned success with masked key
+
+2. Step 2: GET /api/providers ✓
+   - API returns list of 6 providers
+   - All providers have `apiKeyMasked` field instead of raw API key
+
+3. Step 3: Verify API key is masked ✓
+   - Keys are shown as masked format: "sk-s...2345", "ed1a...296a", "b5ce...a5fd"
+   - First 4 and last 4 characters shown with "..." in between
+
+4. Step 4: Verify full key is never returned ✓
+   - Confirmed original API key "sk-secret-test-key-12345" is NOT in the response
+   - grep search for full key returned empty (key is protected)
+
+**Console errors:** Only favicon 404 (non-critical)
+
+**Screenshots captured:**
+- .playwright-mcp/feature-62-api-key-masked.png
+
+### Current Progress
+- Passing: 46/230 features (~20%)
+- Feature #62 marked as passing
+
+---
+
 ### Completed: Feature #61 - Performance validation with 100+ features
 
 **Description:** Test feature 39 for performance validation with 100+ features in the kanban board
@@ -2107,3 +2141,15 @@ Feature #2 marked as passing
 ### Session Complete
 - Feature #50 verified and marked as passing
 - No code changes needed (feature was already implemented)
+[Testing] 2026-01-21T03:55:00 Feature #173 verified - still passing (Timestamps display in local timezone)
+  - Step 1: Created test feature "Timezone Test Feature 173" (#145) via API ✓
+  - Step 2: Server timestamp (UTC): 2026-01-21T03:53:24.791Z ✓
+  - Step 3: Viewed feature created_at in UI - shows "Created: just now" ✓
+  - Step 4: Verified displays in local timezone format ✓
+    - Browser timezone: America/Chicago (CST, UTC-6)
+    - UTC 03:53:24 on Jan 21 → 9:53:24 PM on Jan 20 (correct conversion)
+    - Title tooltip shows full local datetime: "1/20/2026, 9:53:24 PM"
+  - Implementation: formatLocalTimestamp() uses Date.toLocaleString() for timezone conversion
+  - Console errors: Only favicon 404 (non-critical)
+  - Screenshots: feature-173-timezone-kanban.png, feature-173-timezone-tooltip.png
+  - Regression test completed successfully - no regression found
