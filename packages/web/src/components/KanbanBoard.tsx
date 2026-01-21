@@ -4,13 +4,18 @@
  * Fetches features from the API and renders them in appropriate columns based on status.
  * Optimized for performance with many features using virtualization-ready patterns.
  * Supports filtering by category.
+ * Filter state is persisted in URL search params for preservation across navigation.
  */
 
 import { useState, useEffect, useMemo, useCallback, memo } from "react";
-import { Download } from "lucide-react";
+import { useSearchParams } from "react-router-dom";
+import { Download, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
 import { CategoryFilter } from "./CategoryFilter";
 import { StatusFilter } from "./StatusFilter";
 import { FeatureDetailModal, type Feature } from "./FeatureDetailModal";
+
+// Pagination configuration
+const FEATURES_PER_PAGE = 20;
 
 // Re-export Feature type from FeatureDetailModal
 export type { Feature };
@@ -199,15 +204,31 @@ export function KanbanBoard({
   projectName = "open-autocoder",
   apiBaseUrl = "http://localhost:3001/api",
 }: KanbanBoardProps): JSX.Element {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [features, setFeatures] = useState<Feature[]>([]);
+  const [totalFeatures, setTotalFeatures] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<string>("");
-  const [selectedStatus, setSelectedStatus] = useState<string>("");
+  // Initialize filter state from URL search params for state preservation
+  const [selectedCategory, setSelectedCategory] = useState<string>(
+    () => searchParams.get("category") ?? ""
+  );
+  const [selectedStatus, setSelectedStatus] = useState<string>(
+    () => searchParams.get("status") ?? ""
+  );
+  // Initialize page from URL search params for pagination state preservation
+  const [currentPage, setCurrentPage] = useState<number>(() => {
+    const pageParam = searchParams.get("page");
+    const page = pageParam ? parseInt(pageParam, 10) : 1;
+    return isNaN(page) || page < 1 ? 1 : page;
+  });
   const [selectedFeature, setSelectedFeature] = useState<Feature | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Fetch features from API with optional category and status filters
+  // Calculate total pages based on total features
+  const totalPages = Math.max(1, Math.ceil(totalFeatures / FEATURES_PER_PAGE));
+
+  // Fetch features from API with optional category, status, and pagination filters
   const fetchFeatures = useCallback(async () => {
     setIsLoading(true);
     setError(null);
@@ -226,6 +247,10 @@ export function KanbanBoard({
       } else if (selectedStatus === "in-progress") {
         params.set("inProgress", "true");
       }
+      // Add pagination parameters
+      const offset = (currentPage - 1) * FEATURES_PER_PAGE;
+      params.set("limit", String(FEATURES_PER_PAGE));
+      params.set("offset", String(offset));
 
       let url = `${apiBaseUrl}/projects/${encodeURIComponent(projectName)}/features`;
       const queryString = params.toString();
@@ -243,30 +268,76 @@ export function KanbanBoard({
 
       const data = await response.json();
       setFeatures(data.features ?? []);
+      // Set total count from API response (or use features array length as fallback)
+      setTotalFeatures(data.total ?? data.features?.length ?? 0);
     } catch (err) {
       const message =
         err instanceof Error ? err.message : "Failed to fetch features";
       setError(message);
       setFeatures([]);
+      setTotalFeatures(0);
     } finally {
       setIsLoading(false);
     }
-  }, [projectName, apiBaseUrl, selectedCategory, selectedStatus]);
+  }, [projectName, apiBaseUrl, selectedCategory, selectedStatus, currentPage]);
 
   // Fetch on mount and when project/category changes
   useEffect(() => {
     fetchFeatures();
   }, [fetchFeatures]);
 
-  // Handle category change
+  // Handle category change - updates both state and URL params
   const handleCategoryChange = useCallback((category: string) => {
     setSelectedCategory(category);
-  }, []);
+    // Reset to page 1 when filter changes
+    setCurrentPage(1);
+    // Update URL search params for state preservation across navigation
+    setSearchParams((prev) => {
+      const newParams = new URLSearchParams(prev);
+      if (category) {
+        newParams.set("category", category);
+      } else {
+        newParams.delete("category");
+      }
+      newParams.delete("page"); // Reset page when filter changes
+      return newParams;
+    }, { replace: true });
+  }, [setSearchParams]);
 
-  // Handle status change
+  // Handle status change - updates both state and URL params
   const handleStatusChange = useCallback((status: string) => {
     setSelectedStatus(status);
-  }, []);
+    // Reset to page 1 when filter changes
+    setCurrentPage(1);
+    // Update URL search params for state preservation across navigation
+    setSearchParams((prev) => {
+      const newParams = new URLSearchParams(prev);
+      if (status) {
+        newParams.set("status", status);
+      } else {
+        newParams.delete("status");
+      }
+      newParams.delete("page"); // Reset page when filter changes
+      return newParams;
+    }, { replace: true });
+  }, [setSearchParams]);
+
+  // Handle page change - updates both state and URL params for pagination state preservation
+  const handlePageChange = useCallback((page: number) => {
+    // Clamp page to valid range
+    const validPage = Math.max(1, Math.min(page, totalPages));
+    setCurrentPage(validPage);
+    // Update URL search params for state preservation across navigation
+    setSearchParams((prev) => {
+      const newParams = new URLSearchParams(prev);
+      if (validPage > 1) {
+        newParams.set("page", String(validPage));
+      } else {
+        newParams.delete("page"); // Don't show page=1 in URL
+      }
+      return newParams;
+    }, { replace: true });
+  }, [setSearchParams, totalPages]);
 
   // Memoize filtered features for each column
   const todoFeatures = useMemo(
@@ -441,6 +512,51 @@ export function KanbanBoard({
           />
         ))}
       </div>
+
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <div className="mt-4 flex items-center justify-center gap-2 flex-shrink-0" data-testid="pagination-controls">
+          <button
+            onClick={() => handlePageChange(1)}
+            disabled={currentPage === 1 || isLoading}
+            className="p-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            aria-label="Go to first page"
+            title="First page"
+          >
+            <ChevronsLeft className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1 || isLoading}
+            className="p-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            aria-label="Go to previous page"
+            title="Previous page"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+          <span className="px-4 py-2 text-sm text-gray-700 dark:text-gray-300" data-testid="pagination-info">
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages || isLoading}
+            className="p-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            aria-label="Go to next page"
+            title="Next page"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => handlePageChange(totalPages)}
+            disabled={currentPage === totalPages || isLoading}
+            className="p-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            aria-label="Go to last page"
+            title="Last page"
+          >
+            <ChevronsRight className="w-4 h-4" />
+          </button>
+        </div>
+      )}
 
       {/* Feature Detail Modal */}
       <FeatureDetailModal
