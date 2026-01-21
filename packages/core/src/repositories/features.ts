@@ -28,6 +28,13 @@ export class FeatureRepository {
     steps: string[];
     dependencies?: number[];
   }): Promise<Feature> {
+    // Validate dependency limit
+    if (input.dependencies && input.dependencies.length > MAX_DEPENDENCIES) {
+      throw new ValidationError(
+        `Feature has ${input.dependencies.length} dependencies, max is ${MAX_DEPENDENCIES}`
+      );
+    }
+
     const now = new Date().toISOString();
 
     // Get max priority
