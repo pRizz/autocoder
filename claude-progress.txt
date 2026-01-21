@@ -2,6 +2,48 @@
 
 ## Session: 2026-01-21
 
+### Completed: Feature #105 - Invalid form input shows field errors
+
+**Description:** Form validation errors appear inline
+
+**Category:** error
+
+**Steps Verified (via Playwright browser automation):**
+1. Step 1: Open new feature form ✓
+   - Navigated to http://localhost:3000/projects/open-autocoder
+   - Clicked "Add New Feature" button
+   - Form displayed with Name, Category, Description, and Steps fields
+
+2. Step 2: Submit without filling required fields ✓
+   - Clicked "Create Feature" button with all fields empty
+   - Form did not submit (prevented by client-side validation)
+
+3. Step 3: Verify error messages appear under fields ✓
+   - "Name is required" displayed under Name field
+   - "Category is required" displayed under Category field
+   - "Description is required" displayed under Description field
+   - "At least one step is required" displayed under Steps field
+   - All errors shown in red text with role="alert" for accessibility
+
+4. Step 4: Verify specific missing field is identified ✓
+   - Each field has a specific, clear error message
+   - Summary message "Please fix the errors above before submitting." shown at bottom
+   - Input fields have red borders when invalid (border-red-500)
+   - ARIA attributes properly set (aria-invalid, aria-describedby)
+
+**Console errors:** None (only favicon 404 which is non-critical)
+**Connection status:** Connected via WebSocket
+
+**Screenshots:**
+- .playwright-mcp/feature-105-form-validation-errors.png
+- .playwright-mcp/feature-105-form-validation-all-errors.png
+
+### Current Progress
+- Passing: 85/234 features (36.3%)
+- Feature #105 marked as passing
+
+---
+
 ### Completed: Feature #102 - Regression testing workflow
 
 **Description:** Get and test random passing features
@@ -4442,4 +4484,38 @@ Modified SettingsPage to fetch actual project settings from the API (GET /api/pr
     - .playwright-mcp/feature-97-step1-initial-state.png
     - .playwright-mcp/feature-97-step3-status-running.png
     - .playwright-mcp/feature-97-step6-status-stopped.png
+  - Regression test completed successfully - no regression found
+[Testing] 2026-01-21T07:03:06Z Feature #80 verified - still passing (Feature modal closes on Escape key)
+  - Step 1: Open feature detail modal ✓
+    - Clicked on 'Test Feature 1' feature card in Done column
+    - Modal opened with feature details (description, steps, timestamps)
+  - Step 2: Press Escape key ✓
+    - Pressed Escape key on keyboard
+  - Step 3: Verify modal closes ✓
+    - Modal disappeared from the page
+    - Kanban board visible without overlay
+  - Console errors: Only favicon 404 (non-critical)
+  - Screenshots:
+    - .playwright-mcp/.playwright-mcp/feature-80-step1-modal-open.png
+    - .playwright-mcp/.playwright-mcp/feature-80-step3-modal-closed.png
+  - Regression test completed successfully - no regression found
+[Testing] 2026-01-21T07:07:58Z Feature #63 verified - still passing (Circular dependency is rejected)
+  - Step 1: Create feature A ✓
+    - Created Feature #235 (Test Feature A for circular test 63)
+    - No dependencies
+  - Step 2: Create feature B depending on A ✓
+    - Created Feature #236 (Test Feature B for circular test 63)
+    - Added dependency B → A using feature_add_dependency
+    - Dependencies: [235]
+  - Step 3: Try to add A depending on B (circular) ✓
+    - Attempted feature_add_dependency(235, 236)
+    - This would create: A → B → A (circular)
+  - Step 4: Verify error about circular dependency ✓
+    - Error returned: 'Cannot add: would create circular dependency'
+    - Request properly rejected
+  - Step 5: Verify no partial update occurred ✓
+    - Feature A (235) still has no dependencies
+    - Feature B (236) correctly has [235] as dependency
+    - Data integrity maintained
+  - Tested via MCP tools (feature_add_dependency)
   - Regression test completed successfully - no regression found
