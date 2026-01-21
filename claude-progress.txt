@@ -46,8 +46,42 @@
 
 **Commit:** 83de2c7 - feat: enforce MAX_DEPENDENCIES limit in single feature creation - Feature #64
 
+### Completed: Feature #65 - Project path traversal is blocked
+
+**Description:** Cannot create project with path traversal attack
+
+**Category:** security
+
+**Steps Verified:**
+1. Step 1: Send POST with path containing ../ ✓
+   - Request: `POST /api/projects {"name":"test-traversal","path":"../../../etc/passwd"}`
+   - Response: `{"error":"Project path cannot contain '..'","code":"VALIDATION_ERROR","suggestedAction":"Check the input data and try again"}`
+
+2. Step 2: Verify request is rejected ✓
+   - Correctly rejected with VALIDATION_ERROR code
+   - Clear error message explaining why path is invalid
+
+3. Step 3: Send POST with path containing .. ✓
+   - Request: `POST /api/projects {"name":"test-traversal2","path":"/safe/path/../secret"}`
+   - Response: `{"error":"Project path cannot contain '..'","code":"VALIDATION_ERROR","suggestedAction":"Check the input data and try again"}`
+
+4. Step 4: Verify request is rejected ✓
+   - Also correctly rejected
+
+**Additional Verification:**
+- Performance validation also verified with Kanban board showing 147 features
+- Scroll performance: 0.10ms for both scroll to bottom and scroll to top
+- No UI lag with 100+ features displayed
+
+**Screenshots:**
+- .playwright-mcp/feature-65-step1-kanban-renders.png (147 features loaded)
+- .playwright-mcp/feature-65-step2-scroll-bottom.png (showing features #144-147)
+- .playwright-mcp/feature-65-step3-scroll-back-top.png (back to top)
+
+**Console errors:** Only favicon 404 (non-critical)
+
 ### Current Progress
-- Passing: 48/232 features (~20.7%)
+- Passing: 49/232 features (~21.1%)
 - Feature #64 marked as passing
 
 ---
@@ -2280,4 +2314,13 @@ Feature #2 marked as passing
   - Additional: Web UI verified functional at http://localhost:3000 ✓
   - Console errors: Only favicon 404 and WebSocket reconnect (non-critical)
   - Screenshot: .playwright-mcp/feature-10-typescript-compilation-web-ui.png
+  - Regression test completed successfully - no regression found
+[Testing] 2026-01-21T03:57:41 Feature #154 verified - still passing (Numeric fields reject letters)
+  - Step 1: Opened settings form ✓
+  - Step 2: Tried to enter 'abc' in Concurrency field - letters rejected ✓
+  - Step 3: Field retained original value '3' after letter input ✓
+  - Step 4: Numbers accepted - typed '4' successfully ✓
+  - Also tested Testing Agent Ratio field with 'xyz' - letters rejected ✓
+  - Console errors: Only favicon 404 (non-critical)
+  - Screenshot: .playwright-mcp/feature-154-numeric-field-verification.png
   - Regression test completed successfully - no regression found
