@@ -2,6 +2,89 @@
 
 ## Session: 2026-01-21
 
+### Completed: Feature #67 - XSS in feature name is escaped
+
+**Description:** Feature name with script tags is safely escaped in UI
+
+**Category:** security
+
+**Steps Verified:**
+1. Step 1: Create feature with name containing `<script>alert(1)</script>` ✓
+   - Created feature #148 via POST /api/projects/open-autocoder/features
+   - Name: `<script>alert(1)</script>`
+
+2. Step 2: Open Kanban view ✓
+   - Navigated to http://localhost:3000/kanban
+   - Filtered by "xss-test" category
+
+3. Step 3: Verify script is not executed ✓
+   - No alert dialog appeared
+   - No JavaScript errors related to XSS in console
+
+4. Step 4: Verify text is escaped and displayed safely ✓
+   - Script tags displayed as literal text in heading: `<script>alert(1)</script>`
+   - Not rendered as HTML, safely escaped by React
+
+**Additional XSS Vectors Tested:**
+- `<img src=x onerror=alert(2)>` - escaped and displayed as text
+- `<svg onload=alert(3)>` - escaped and displayed as text
+
+**Why It Works:**
+- React automatically escapes content in JSX expressions by default
+- Feature names are rendered as text content in `<h4>` elements
+- No `dangerouslySetInnerHTML` is used for user-provided content
+
+**Screenshots:**
+- .playwright-mcp/.playwright-mcp/feature-67-xss-kanban-filtered.png
+- .playwright-mcp/.playwright-mcp/feature-67-xss-all-vectors.png
+
+**Console errors:** Only favicon 404 (non-critical)
+
+### Current Progress
+- Passing: 51/232 features (~22.0%)
+- Feature #67 marked as passing
+
+---
+
+### Completed: Feature #68 - WebSocket requires valid project
+
+**Description:** WebSocket connection to invalid project fails
+
+**Category:** security
+
+**Steps Verified:**
+1. Step 1: Attempt WebSocket connection to /ws/projects/nonexistent ✓
+   - Connected to `ws://localhost:3001/ws/projects/nonexistent-project-xyz123`
+
+2. Step 2: Verify connection is rejected or closed ✓
+   - Connection was closed with code `4004` (custom "not found" code)
+   - Close reason: `"Project 'nonexistent-project-xyz123' not found"`
+
+3. Step 3: Verify appropriate error message ✓
+   - Received JSON error message before close:
+     - `type: "error"`
+     - `code: "PROJECT_NOT_FOUND"`
+     - `message: "Project 'nonexistent-project-xyz123' not found"`
+     - `timestamp` included for logging purposes
+
+**Additional Verification:**
+- Valid project ('open-autocoder') accepts connection successfully
+- Receives `connection_established` message with `projectName`
+- Connection stays open until client closes it
+
+**Implementation:**
+- Added project-specific WebSocket endpoint at `/ws/projects/:projectName`
+- Added `projectExists()` helper function to projects routes
+- Validates project exists before accepting connection
+- Returns clear error message and closes with code 4004 for non-existent projects
+
+**Screenshots:**
+- .playwright-mcp/.playwright-mcp/feature-68-websocket-validation.png
+
+**Commit:** 3d4897f (included in ProjectsPage commit)
+
+---
+
 ### Completed: Feature #64 - Maximum dependencies limit enforced
 
 **Description:** Cannot add more than 20 dependencies per feature
@@ -2380,4 +2463,99 @@ Both were used to verify that circular dependencies are properly detected and re
   - Step 4: Multiple providers are listed (openai-test, anthropic-test, test-feature-35, etc.) ✓
   - Console errors: None critical (only WebSocket reconnection warnings - non-critical)
   - Screenshot: .playwright-mcp/feature-34-regression-settings-page.png
+  - Regression test completed successfully - no regression found
+[Testing] 2026-01-21T04:02:05 Feature #35 verified - still passing (Add provider via API)
+  - Step 1: POST /api/providers with id, name, apiKey ✓
+    - Tested via curl and browser fetch
+    - Created providers: regression-test-1768968053, browser-test-1768968101263
+  - Step 2: Response status is 201 ✓
+  - Step 3: Provider appears in GET list ✓
+    - Verified provider exists after creation
+  - Step 4: API key is stored encrypted ✓
+    - Code review: encryptApiKey() uses AES-256-GCM (lines 56-68 in providers.ts)
+    - Response shows apiKeyMasked (e.g., 'secr...2345'), not raw key
+    - apiKey and apiKeyEncrypted are NOT exposed in API response
+  - Console errors: Only favicon 404 (non-critical)
+  - Screenshot: .playwright-mcp/.playwright-mcp/feature-35-regression-settings-page.png
+  - Regression test completed successfully - no regression found
+
+---
+
+### Completed: Feature #66 - SQL injection in project name blocked
+
+**Description:** Project name with SQL injection is safely handled
+
+**Category:** security
+
+**Steps Verified:**
+1. Step 1: Sent POST with name containing SQL injection payloads
+   - Tested 6 different SQL injection attacks
+   - DROP TABLE, DELETE, UPDATE, and OR-based attacks
+
+2. Step 2: Verified request either rejected or safely escaped
+   - All payloads returned HTTP 201 (created successfully)
+   - Payloads stored as literal strings, NOT executed as SQL
+   - Drizzle ORM parameterized queries provide automatic escaping
+
+3. Step 3: Verified database is not corrupted
+   - Tables still intact (projects, features, providers, sessions)
+   - Project count increased from 13 to 20 (original + injection tests)
+   - GET /api/projects returns all projects correctly
+
+4. Step 4: Verified normal operations still work
+   - Created test-normal-project-66 successfully
+   - Kanban board loads 148 features correctly
+   - WebSocket connection established
+   - All API endpoints respond properly
+
+**Security Analysis:**
+- Protection: Drizzle ORM parameterized queries
+- ORM automatically escapes all user-provided values
+- SQL injection payloads become harmless string literals
+
+**Screenshots:**
+- .playwright-mcp/feature-66-kanban-working.png
+- .playwright-mcp/feature-66-projects-page.png
+
+**Commit:** 47a6c1d - docs: verify Feature #66 - SQL injection in project name blocked
+
+### Current Progress
+- Passing: 49/232 features (21.1%)
+- Feature #66 marked as passing
+
+### Next Steps
+- Session complete for Feature #66
+- SQL injection protection verified and working
+[Testing] 2026-01-21T04:05:00 Feature #12 regression FIXED - List all projects via API
+  - Initial test: Projects page showed only heading 'Projects' with no list
+  - Regression: ProjectsPage was a placeholder, did not fetch from API
+  - Fix: Implemented ProjectsPage to fetch from GET /api/projects
+  - Step 1: Already had multiple test projects in database ✓
+  - Step 2: GET /api/projects endpoint returns data correctly ✓
+  - Step 3: Response status is 200 ✓
+  - Step 4: Response contains array of 20 projects ✓
+  - Step 5: Each project has name, path, createdAt fields displayed ✓
+  - Screenshot: .playwright-mcp/feature-12-projects-list-fixed.png
+  - Commit: 3d4897f - fix: Implement ProjectsPage to display project list - Feature #12
+  - Regression fixed and verified with browser automation
+[Testing] 2026-01-21T04:05:00 Feature #150 verified - still passing (Required fields prevent submission)
+  - Step 1: Opened new feature form via "Add New Feature" button on Projects page ✓
+  - Step 2: Left name field empty (all fields empty) ✓
+  - Step 3: Clicked "Create Feature" button to try to submit ✓
+  - Step 4: Submission blocked ✓
+    - Form remains visible (not submitted)
+    - Error messages displayed for all 4 required fields
+    - Summary message: "Please fix the errors above before submitting."
+  - Step 5: Name field error verified ✓
+    - Red error text "Name is required" displayed below Name field
+    - aria-invalid attribute set on input
+  - Additional validations confirmed:
+    - "Category is required" error shown
+    - "Description is required" error shown  
+    - "At least one step is required" error shown
+  - Console errors: None critical (only WebSocket reconnect warnings during navigation)
+  - Screenshots: 
+    - .playwright-mcp/feature-150-validation-errors.png
+    - .playwright-mcp/feature-150-validation-errors-full.png
+  - Implementation: NewFeatureForm.tsx with validateForm() and per-field validation
   - Regression test completed successfully - no regression found
