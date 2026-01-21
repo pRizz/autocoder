@@ -178,6 +178,16 @@ function getWebSocketUrl(): string {
   return `${protocol}//${host}/ws`;
 }
 
+// Collapsed width and expanded width constants
+const SIDEBAR_COLLAPSED_WIDTH = 64;
+const SIDEBAR_EXPANDED_WIDTH = 256;
+
+// Export sidebar width state for use by other components
+export interface SidebarState {
+  isCollapsed: boolean;
+  width: number;
+}
+
 export function Sidebar(): JSX.Element {
   const { status, reconnectAttempts } = useWebSocket({
     url: getWebSocketUrl(),
@@ -185,6 +195,30 @@ export function Sidebar(): JSX.Element {
     maxReconnectAttempts: 5,
   });
   const { isDark, toggleTheme } = useTheme();
+
+  // Collapsed state - persisted in localStorage
+  const [isCollapsed, setIsCollapsed] = useState<boolean>(() => {
+    const stored = localStorage.getItem("sidebar-collapsed");
+    return stored === "true";
+  });
+
+  // Toggle collapse state
+  const toggleCollapse = () => {
+    setIsCollapsed((prev) => {
+      const newValue = !prev;
+      localStorage.setItem("sidebar-collapsed", String(newValue));
+      // Dispatch custom event so App.tsx can respond
+      window.dispatchEvent(new CustomEvent("sidebar-toggle", { detail: { isCollapsed: newValue } }));
+      return newValue;
+    });
+  };
+
+  // Notify App.tsx of initial state on mount
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent("sidebar-toggle", { detail: { isCollapsed } }));
+  }, []);
+
+  const sidebarWidth = isCollapsed ? SIDEBAR_COLLAPSED_WIDTH : SIDEBAR_EXPANDED_WIDTH;
 
   // Agent status state
   const [agentStatus, setAgentStatus] = useState<AgentStatus>({
@@ -319,56 +353,103 @@ export function Sidebar(): JSX.Element {
 
   return (
     <aside
-      className="fixed left-0 top-0 h-full w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col"
+      className="fixed left-0 top-0 h-full bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col transition-all duration-300"
       style={{
         position: "fixed",
         left: 0,
         top: 0,
         height: "100%",
-        width: "256px",
+        width: `${sidebarWidth}px`,
         backgroundColor: isDark ? "#1f2937" : "#fff",
         borderRight: `1px solid ${isDark ? "#374151" : "#e5e7eb"}`,
         display: "flex",
         flexDirection: "column",
+        transition: "width 0.3s ease",
+        overflow: "hidden",
       }}
     >
       {/* Logo/Header */}
       <div
         className="p-4 border-b border-gray-200 dark:border-gray-700"
         style={{
-          padding: "16px",
+          padding: isCollapsed ? "16px 12px" : "16px",
           borderBottom: `1px solid ${isDark ? "#374151" : "#e5e7eb"}`,
           display: "flex",
           alignItems: "center",
-          justifyContent: "space-between",
+          justifyContent: isCollapsed ? "center" : "space-between",
+          minHeight: "56px",
         }}
       >
-        <h1
-          className="text-xl font-bold text-gray-900 dark:text-white"
-          style={{ fontSize: "1.25rem", fontWeight: 700, color: isDark ? "#fff" : "#111827" }}
-        >
-          Open Autocoder
-        </h1>
+        {!isCollapsed && (
+          <h1
+            className="text-xl font-bold text-gray-900 dark:text-white"
+            style={{ fontSize: "1.25rem", fontWeight: 700, color: isDark ? "#fff" : "#111827" }}
+          >
+            Open Autocoder
+          </h1>
+        )}
 
-        {/* Settings Modal Button */}
-        <SettingsModal
-          projectName="open-autocoder"
-          apiBaseUrl="http://localhost:3001/api"
-        />
+        {/* Collapse/Expand Button */}
+        <button
+          onClick={toggleCollapse}
+          aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+          style={{
+            padding: "6px",
+            borderRadius: "6px",
+            backgroundColor: isDark ? "#374151" : "#f3f4f6",
+            color: isDark ? "#d1d5db" : "#6b7280",
+            border: "none",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            style={{
+              width: "20px",
+              height: "20px",
+              transform: isCollapsed ? "rotate(180deg)" : "rotate(0deg)",
+              transition: "transform 0.3s ease",
+            }}
+          >
+            <polyline points="11 17 6 12 11 7" />
+            <polyline points="18 17 13 12 18 7" />
+          </svg>
+        </button>
+
+        {/* Settings Modal Button - only when expanded */}
+        {!isCollapsed && (
+          <SettingsModal
+            projectName="open-autocoder"
+            apiBaseUrl="http://localhost:3001/api"
+          />
+        )}
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-4" style={{ flex: 1, padding: "16px", overflow: "auto" }}>
+      <nav className="flex-1 p-4" style={{ flex: 1, padding: isCollapsed ? "16px 8px" : "16px", overflow: "auto" }}>
         <ul className="space-y-2" style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
           {navItems.map((item) => (
             <li key={item.to}>
               <NavLink
                 to={item.to}
+                title={isCollapsed ? item.label : undefined}
                 style={({ isActive }) => ({
                   display: "flex",
                   alignItems: "center",
-                  gap: "12px",
-                  padding: "8px 12px",
+                  justifyContent: isCollapsed ? "center" : "flex-start",
+                  gap: isCollapsed ? "0" : "12px",
+                  padding: isCollapsed ? "10px" : "8px 12px",
                   borderRadius: "8px",
                   fontSize: "14px",
                   fontWeight: 500,
@@ -382,7 +463,7 @@ export function Sidebar(): JSX.Element {
                 })}
               >
                 {item.icon}
-                {item.label}
+                {!isCollapsed && item.label}
               </NavLink>
             </li>
           ))}
@@ -392,28 +473,32 @@ export function Sidebar(): JSX.Element {
         <div
           style={{
             marginTop: "24px",
-            padding: "12px",
+            padding: isCollapsed ? "8px" : "12px",
             backgroundColor: isDark ? "#374151" : "#f3f4f6",
             borderRadius: "8px",
           }}
         >
-          <h3
-            style={{
-              fontSize: "12px",
-              fontWeight: 600,
-              color: isDark ? "#9ca3af" : "#6b7280",
-              textTransform: "uppercase",
-              letterSpacing: "0.05em",
-              marginBottom: "8px",
-            }}
-          >
-            Agent Controls
-          </h3>
+          {!isCollapsed && (
+            <h3
+              style={{
+                fontSize: "12px",
+                fontWeight: 600,
+                color: isDark ? "#9ca3af" : "#6b7280",
+                textTransform: "uppercase",
+                letterSpacing: "0.05em",
+                marginBottom: "8px",
+              }}
+            >
+              Agent Controls
+            </h3>
+          )}
           <div
             style={{
               display: "flex",
+              flexDirection: isCollapsed ? "column" : "row",
               gap: "8px",
               alignItems: "center",
+              justifyContent: isCollapsed ? "center" : "flex-start",
             }}
           >
             {/* Play/Resume Button */}
@@ -515,27 +600,30 @@ export function Sidebar(): JSX.Element {
             )}
 
             {/* Status Indicator */}
-            <span
-              style={{
-                marginLeft: "auto",
-                fontSize: "12px",
-                fontWeight: 500,
-                color: agentStatus.status === "running"
-                  ? "#22c55e"
-                  : agentStatus.status === "paused"
-                    ? "#f59e0b"
-                    : agentStatus.status === "crashed"
-                      ? "#ef4444"
-                      : (isDark ? "#9ca3af" : "#6b7280"),
-                textTransform: "capitalize",
-              }}
-            >
-              {agentStatus.status}
-            </span>
+            {!isCollapsed && (
+              <span
+                style={{
+                  marginLeft: "auto",
+                  fontSize: "12px",
+                  fontWeight: 500,
+                  color: agentStatus.status === "running"
+                    ? "#22c55e"
+                    : agentStatus.status === "paused"
+                      ? "#f59e0b"
+                      : agentStatus.status === "crashed"
+                        ? "#ef4444"
+                        : (isDark ? "#9ca3af" : "#6b7280"),
+                  textTransform: "capitalize",
+                }}
+              >
+                {agentStatus.status}
+              </span>
+            )}
           </div>
         </div>
 
-        {/* Quick Stats */}
+        {/* Quick Stats - hidden when collapsed */}
+        {!isCollapsed && (
         <div
           style={{
             marginTop: "16px",
@@ -622,24 +710,27 @@ export function Sidebar(): JSX.Element {
             </div>
           </div>
         </div>
+        )}
       </nav>
 
       {/* Footer */}
       <div
         className="p-4 border-t border-gray-200 dark:border-gray-700 space-y-3"
-        style={{ padding: "16px", borderTop: `1px solid ${isDark ? "#374151" : "#e5e7eb"}` }}
+        style={{ padding: isCollapsed ? "12px 8px" : "16px", borderTop: `1px solid ${isDark ? "#374151" : "#e5e7eb"}` }}
       >
         {/* Theme Toggle Button */}
         <button
           onClick={toggleTheme}
           aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+          title={isCollapsed ? (isDark ? "Switch to light mode" : "Switch to dark mode") : undefined}
           className="flex items-center gap-2 w-full px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
           style={{
             display: "flex",
             alignItems: "center",
-            gap: "8px",
+            justifyContent: isCollapsed ? "center" : "flex-start",
+            gap: isCollapsed ? "0" : "8px",
             width: "100%",
-            padding: "8px 12px",
+            padding: isCollapsed ? "10px" : "8px 12px",
             fontSize: "14px",
             fontWeight: 500,
             color: isDark ? "#e5e7eb" : "#374151",
@@ -690,23 +781,45 @@ export function Sidebar(): JSX.Element {
               <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
             </svg>
           )}
-          {isDark ? "Light Mode" : "Dark Mode"}
+          {!isCollapsed && (isDark ? "Light Mode" : "Dark Mode")}
         </button>
 
-        {/* WebSocket Connection Status */}
-        <ConnectionStatusIndicator
-          status={status}
-          reconnectAttempts={reconnectAttempts}
-          maxReconnectAttempts={5}
-        />
+        {/* WebSocket Connection Status - compact when collapsed */}
+        {!isCollapsed ? (
+          <ConnectionStatusIndicator
+            status={status}
+            reconnectAttempts={reconnectAttempts}
+            maxReconnectAttempts={5}
+          />
+        ) : (
+          <div
+            title={`Connection: ${status}`}
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              padding: "4px",
+            }}
+          >
+            <div
+              style={{
+                width: "8px",
+                height: "8px",
+                borderRadius: "50%",
+                backgroundColor: status === "connected" ? "#22c55e" : status === "connecting" || status === "reconnecting" ? "#f59e0b" : "#ef4444",
+              }}
+            />
+          </div>
+        )}
 
-        {/* Version */}
-        <p
-          className="text-xs text-gray-500 dark:text-gray-400"
-          style={{ fontSize: "12px", color: isDark ? "#9ca3af" : "#6b7280", marginTop: "12px" }}
-        >
-          v0.1.0
-        </p>
+        {/* Version - hidden when collapsed */}
+        {!isCollapsed && (
+          <p
+            className="text-xs text-gray-500 dark:text-gray-400"
+            style={{ fontSize: "12px", color: isDark ? "#9ca3af" : "#6b7280", marginTop: "12px" }}
+          >
+            v0.1.0
+          </p>
+        )}
       </div>
     </aside>
   );

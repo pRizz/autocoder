@@ -15,9 +15,29 @@ import { AssistantChatPanel } from "./components/AssistantChatPanel";
 import { KeyboardShortcutsModal } from "./components/KeyboardShortcutsModal";
 import { useTheme } from "./hooks/useTheme";
 
+// Sidebar width constants (must match Sidebar.tsx)
+const SIDEBAR_COLLAPSED_WIDTH = 64;
+const SIDEBAR_EXPANDED_WIDTH = 256;
+
 export function App(): JSX.Element {
   const { isDark } = useTheme();
   const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(() => {
+    const stored = localStorage.getItem("sidebar-collapsed");
+    return stored === "true";
+  });
+
+  // Listen for sidebar toggle events
+  useEffect(() => {
+    const handleSidebarToggle = (event: CustomEvent<{ isCollapsed: boolean }>) => {
+      setSidebarCollapsed(event.detail.isCollapsed);
+    };
+
+    window.addEventListener("sidebar-toggle", handleSidebarToggle as EventListener);
+    return () => window.removeEventListener("sidebar-toggle", handleSidebarToggle as EventListener);
+  }, []);
+
+  const sidebarWidth = sidebarCollapsed ? SIDEBAR_COLLAPSED_WIDTH : SIDEBAR_EXPANDED_WIDTH;
 
   // Global keyboard shortcut for ? to show help modal
   const handleKeyDown = useCallback((event: KeyboardEvent) => {
@@ -52,12 +72,13 @@ export function App(): JSX.Element {
     >
       <Sidebar />
       <div
-        className="ml-64 min-h-screen flex flex-col"
+        className="min-h-screen flex flex-col transition-all duration-300"
         style={{
-          marginLeft: "256px",
+          marginLeft: `${sidebarWidth}px`,
           minHeight: "100vh",
           display: "flex",
           flexDirection: "column",
+          transition: "margin-left 0.3s ease",
         }}
       >
         <main
