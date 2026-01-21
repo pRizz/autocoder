@@ -2,6 +2,57 @@
 
 ## Session: 2026-01-21
 
+### Completed: Feature #49 - Settings modal opens and saves
+
+**Description:** Settings button opens modal with configuration options
+
+**Implementation:**
+- Created SettingsModal component (packages/web/src/components/SettingsModal.tsx)
+  - Uses Radix UI Dialog for modal functionality
+  - Fetches current settings from API when modal opens
+  - Wraps SettingsForm component with modal UI
+  - Closes modal after successful save via onSave callback
+  - Shows loading state while fetching settings
+  - Displays error messages on save failure
+- Added SettingsModal to Sidebar header (next to "Open Autocoder" logo)
+  - Gear icon button opens the modal
+  - Settings button is prominent in the header area
+- Fixed yoloMode boolean conversion from SQLite integer (0/1) to JavaScript boolean
+
+**Testing Results (verified via Playwright browser automation):**
+- Step 1: Click settings button in header ✓
+  - Gear icon button visible next to "Open Autocoder" title
+- Step 2: Verify settings modal opens ✓
+  - Modal dialog appears with "Settings" title
+  - Form fields: Model, Provider, Concurrency, YOLO Mode, Testing Agent Ratio
+- Step 3: Change concurrency setting ✓
+  - Changed concurrency from 3 to 5
+- Step 4: Click save button ✓
+  - "Save Settings" button clicked
+  - API call to PUT /api/projects/open-autocoder succeeded
+- Step 5: Verify modal closes ✓
+  - Modal automatically closed after save
+- Step 6: Reopen settings and verify change persisted ✓
+  - Reopened modal shows concurrency = 5
+  - API confirmed: "concurrency":5 in project data
+
+**Screenshots captured:**
+- .playwright-mcp/feature-49-step1-settings-button-visible.png
+- .playwright-mcp/feature-49-step2-modal-opens.png
+- .playwright-mcp/feature-49-step3-concurrency-changed.png
+- .playwright-mcp/feature-49-step5-modal-closes.png
+- .playwright-mcp/feature-49-step6-change-persisted.png
+
+**Console errors:** None critical (favicon 404 only)
+
+**Commit:** 318ccf9 - feat: implement Settings Modal component - Feature #49
+
+### Current Progress
+- Passing: 36/230 features (~15.7%)
+- Feature #49 marked as passing
+
+---
+
 ### Completed: Feature #48 - Dark mode toggle works
 
 **Description:** Theme toggle switches between light and dark mode
