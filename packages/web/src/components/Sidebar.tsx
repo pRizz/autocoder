@@ -1,12 +1,32 @@
 /**
- * Sidebar component with navigation links
+ * Sidebar component with navigation links, agent controls, and quick stats
  */
 
+import { useState, useEffect, useCallback } from "react";
 import { NavLink } from "react-router-dom";
 import { useWebSocket } from "../hooks/useWebSocket";
 import { useTheme } from "../hooks/useTheme";
 import { ConnectionStatusIndicator } from "./ConnectionStatusIndicator";
 import { SettingsModal } from "./SettingsModal";
+
+// API base URL for agent and stats endpoints
+const API_BASE_URL = "http://localhost:3001/api";
+
+// Default project name (in production, this would come from context/props)
+const DEFAULT_PROJECT = "open-autocoder";
+
+interface AgentStatus {
+  status: "idle" | "stopped" | "running" | "paused" | "crashed";
+  activeAgents: number;
+  completedFeatures: number;
+}
+
+interface FeatureStats {
+  passing: number;
+  in_progress: number;
+  total: number;
+  percentage: number;
+}
 
 interface NavItem {
   label: string;
@@ -166,6 +186,137 @@ export function Sidebar(): JSX.Element {
   });
   const { isDark, toggleTheme } = useTheme();
 
+  // Agent status state
+  const [agentStatus, setAgentStatus] = useState<AgentStatus>({
+    status: "idle",
+    activeAgents: 0,
+    completedFeatures: 0,
+  });
+  const [agentLoading, setAgentLoading] = useState(false);
+
+  // Feature stats state
+  const [featureStats, setFeatureStats] = useState<FeatureStats>({
+    passing: 0,
+    in_progress: 0,
+    total: 0,
+    percentage: 0,
+  });
+
+  // Fetch agent status
+  const fetchAgentStatus = useCallback(async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/projects/${DEFAULT_PROJECT}/agent/status`);
+      if (response.ok) {
+        const data = await response.json();
+        setAgentStatus({
+          status: data.status || "stopped",
+          activeAgents: data.activeAgents || 0,
+          completedFeatures: data.completedFeatures || 0,
+        });
+      }
+    } catch {
+      // Silently handle fetch errors - status will remain as last known
+    }
+  }, []);
+
+  // Fetch feature stats
+  const fetchFeatureStats = useCallback(async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/projects/${DEFAULT_PROJECT}/features/stats`);
+      if (response.ok) {
+        const data = await response.json();
+        setFeatureStats({
+          passing: data.passing || 0,
+          in_progress: data.inProgress || data.in_progress || 0,
+          total: data.total || 0,
+          percentage: data.percentage || 0,
+        });
+      }
+    } catch {
+      // Silently handle fetch errors - stats will remain as last known
+    }
+  }, []);
+
+  // Poll for status updates
+  useEffect(() => {
+    fetchAgentStatus();
+    fetchFeatureStats();
+
+    const interval = setInterval(() => {
+      fetchAgentStatus();
+      fetchFeatureStats();
+    }, 5000); // Poll every 5 seconds
+
+    return () => clearInterval(interval);
+  }, [fetchAgentStatus, fetchFeatureStats]);
+
+  // Agent control handlers
+  const handleStartAgent = async () => {
+    setAgentLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/projects/${DEFAULT_PROJECT}/agent/start`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+      });
+      if (response.ok) {
+        await fetchAgentStatus();
+      }
+    } catch {
+      // Handle error silently
+    } finally {
+      setAgentLoading(false);
+    }
+  };
+
+  const handlePauseAgent = async () => {
+    setAgentLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/projects/${DEFAULT_PROJECT}/agent/pause`, {
+        method: "POST",
+      });
+      if (response.ok) {
+        await fetchAgentStatus();
+      }
+    } catch {
+      // Handle error silently
+    } finally {
+      setAgentLoading(false);
+    }
+  };
+
+  const handleResumeAgent = async () => {
+    setAgentLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/projects/${DEFAULT_PROJECT}/agent/resume`, {
+        method: "POST",
+      });
+      if (response.ok) {
+        await fetchAgentStatus();
+      }
+    } catch {
+      // Handle error silently
+    } finally {
+      setAgentLoading(false);
+    }
+  };
+
+  const handleStopAgent = async () => {
+    setAgentLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/projects/${DEFAULT_PROJECT}/agent/stop`, {
+        method: "POST",
+      });
+      if (response.ok) {
+        await fetchAgentStatus();
+      }
+    } catch {
+      // Handle error silently
+    } finally {
+      setAgentLoading(false);
+    }
+  };
+
   return (
     <aside
       className="fixed left-0 top-0 h-full w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col"
@@ -207,7 +358,7 @@ export function Sidebar(): JSX.Element {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-4" style={{ flex: 1, padding: "16px" }}>
+      <nav className="flex-1 p-4" style={{ flex: 1, padding: "16px", overflow: "auto" }}>
         <ul className="space-y-2" style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
           {navItems.map((item) => (
             <li key={item.to}>
@@ -236,6 +387,241 @@ export function Sidebar(): JSX.Element {
             </li>
           ))}
         </ul>
+
+        {/* Agent Controls */}
+        <div
+          style={{
+            marginTop: "24px",
+            padding: "12px",
+            backgroundColor: isDark ? "#374151" : "#f3f4f6",
+            borderRadius: "8px",
+          }}
+        >
+          <h3
+            style={{
+              fontSize: "12px",
+              fontWeight: 600,
+              color: isDark ? "#9ca3af" : "#6b7280",
+              textTransform: "uppercase",
+              letterSpacing: "0.05em",
+              marginBottom: "8px",
+            }}
+          >
+            Agent Controls
+          </h3>
+          <div
+            style={{
+              display: "flex",
+              gap: "8px",
+              alignItems: "center",
+            }}
+          >
+            {/* Play/Resume Button */}
+            {agentStatus.status === "idle" || agentStatus.status === "stopped" || agentStatus.status === "crashed" ? (
+              <button
+                onClick={handleStartAgent}
+                disabled={agentLoading}
+                aria-label="Start agent"
+                style={{
+                  padding: "8px",
+                  borderRadius: "6px",
+                  backgroundColor: "#22c55e",
+                  color: "white",
+                  border: "none",
+                  cursor: agentLoading ? "not-allowed" : "pointer",
+                  opacity: agentLoading ? 0.5 : 1,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+              </button>
+            ) : agentStatus.status === "paused" ? (
+              <button
+                onClick={handleResumeAgent}
+                disabled={agentLoading}
+                aria-label="Resume agent"
+                style={{
+                  padding: "8px",
+                  borderRadius: "6px",
+                  backgroundColor: "#22c55e",
+                  color: "white",
+                  border: "none",
+                  cursor: agentLoading ? "not-allowed" : "pointer",
+                  opacity: agentLoading ? 0.5 : 1,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+              </button>
+            ) : null}
+
+            {/* Pause Button */}
+            {agentStatus.status === "running" && (
+              <button
+                onClick={handlePauseAgent}
+                disabled={agentLoading}
+                aria-label="Pause agent"
+                style={{
+                  padding: "8px",
+                  borderRadius: "6px",
+                  backgroundColor: "#f59e0b",
+                  color: "white",
+                  border: "none",
+                  cursor: agentLoading ? "not-allowed" : "pointer",
+                  opacity: agentLoading ? 0.5 : 1,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <rect x="6" y="4" width="4" height="16" />
+                  <rect x="14" y="4" width="4" height="16" />
+                </svg>
+              </button>
+            )}
+
+            {/* Stop Button */}
+            {(agentStatus.status === "running" || agentStatus.status === "paused") && (
+              <button
+                onClick={handleStopAgent}
+                disabled={agentLoading}
+                aria-label="Stop agent"
+                style={{
+                  padding: "8px",
+                  borderRadius: "6px",
+                  backgroundColor: "#ef4444",
+                  color: "white",
+                  border: "none",
+                  cursor: agentLoading ? "not-allowed" : "pointer",
+                  opacity: agentLoading ? 0.5 : 1,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <rect x="6" y="6" width="12" height="12" />
+                </svg>
+              </button>
+            )}
+
+            {/* Status Indicator */}
+            <span
+              style={{
+                marginLeft: "auto",
+                fontSize: "12px",
+                fontWeight: 500,
+                color: agentStatus.status === "running"
+                  ? "#22c55e"
+                  : agentStatus.status === "paused"
+                    ? "#f59e0b"
+                    : agentStatus.status === "crashed"
+                      ? "#ef4444"
+                      : (isDark ? "#9ca3af" : "#6b7280"),
+                textTransform: "capitalize",
+              }}
+            >
+              {agentStatus.status}
+            </span>
+          </div>
+        </div>
+
+        {/* Quick Stats */}
+        <div
+          style={{
+            marginTop: "16px",
+            padding: "12px",
+            backgroundColor: isDark ? "#374151" : "#f3f4f6",
+            borderRadius: "8px",
+          }}
+        >
+          <h3
+            style={{
+              fontSize: "12px",
+              fontWeight: 600,
+              color: isDark ? "#9ca3af" : "#6b7280",
+              textTransform: "uppercase",
+              letterSpacing: "0.05em",
+              marginBottom: "8px",
+            }}
+          >
+            Quick Stats
+          </h3>
+          <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                fontSize: "13px",
+                color: isDark ? "#d1d5db" : "#374151",
+              }}
+            >
+              <span>Passing</span>
+              <span style={{ color: "#22c55e", fontWeight: 600 }}>{featureStats.passing}</span>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                fontSize: "13px",
+                color: isDark ? "#d1d5db" : "#374151",
+              }}
+            >
+              <span>In Progress</span>
+              <span style={{ color: "#f59e0b", fontWeight: 600 }}>{featureStats.in_progress}</span>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                fontSize: "13px",
+                color: isDark ? "#d1d5db" : "#374151",
+              }}
+            >
+              <span>Total</span>
+              <span style={{ fontWeight: 600 }}>{featureStats.total}</span>
+            </div>
+            {/* Progress bar */}
+            <div
+              style={{
+                marginTop: "8px",
+                height: "6px",
+                backgroundColor: isDark ? "#4b5563" : "#e5e7eb",
+                borderRadius: "3px",
+                overflow: "hidden",
+              }}
+            >
+              <div
+                style={{
+                  height: "100%",
+                  width: `${featureStats.percentage}%`,
+                  backgroundColor: "#22c55e",
+                  borderRadius: "3px",
+                  transition: "width 0.3s ease",
+                }}
+              />
+            </div>
+            <div
+              style={{
+                fontSize: "11px",
+                color: isDark ? "#9ca3af" : "#6b7280",
+                textAlign: "center",
+                marginTop: "4px",
+              }}
+            >
+              {featureStats.percentage.toFixed(1)}% Complete
+            </div>
+          </div>
+        </div>
       </nav>
 
       {/* Footer */}
