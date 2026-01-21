@@ -3,9 +3,11 @@
  *
  * Fetches features from the API and renders them in appropriate columns based on status.
  * Optimized for performance with many features using virtualization-ready patterns.
+ * Supports filtering by category.
  */
 
 import { useState, useEffect, useMemo, useCallback, memo } from "react";
+import { CategoryFilter } from "./CategoryFilter";
 
 interface Feature {
   id: number;
@@ -135,14 +137,18 @@ export function KanbanBoard({
   const [features, setFeatures] = useState<Feature[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
 
-  // Fetch features from API
+  // Fetch features from API with optional category filter
   const fetchFeatures = useCallback(async () => {
     setIsLoading(true);
     setError(null);
 
     try {
-      const url = `${apiBaseUrl}/projects/${encodeURIComponent(projectName)}/features`;
+      let url = `${apiBaseUrl}/projects/${encodeURIComponent(projectName)}/features`;
+      if (selectedCategory) {
+        url += `?category=${encodeURIComponent(selectedCategory)}`;
+      }
       const response = await fetch(url);
 
       if (!response.ok) {
@@ -162,12 +168,17 @@ export function KanbanBoard({
     } finally {
       setIsLoading(false);
     }
-  }, [projectName, apiBaseUrl]);
+  }, [projectName, apiBaseUrl, selectedCategory]);
 
-  // Fetch on mount and when project changes
+  // Fetch on mount and when project/category changes
   useEffect(() => {
     fetchFeatures();
   }, [fetchFeatures]);
+
+  // Handle category change
+  const handleCategoryChange = useCallback((category: string) => {
+    setSelectedCategory(category);
+  }, []);
 
   // Memoize filtered features for each column
   const todoFeatures = useMemo(
@@ -214,14 +225,14 @@ export function KanbanBoard({
   return (
     <div className="h-full flex flex-col">
       <div className="mb-6 flex-shrink-0">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between mb-4">
           <div>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
               Kanban Board
             </h1>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
               Track feature progress across development stages
-              {features.length > 0 && ` (${features.length} features)`}
+              {features.length > 0 && ` (${features.length} features${selectedCategory ? ` in "${selectedCategory}"` : ""})`}
             </p>
           </div>
           <button
@@ -232,6 +243,14 @@ export function KanbanBoard({
           >
             {isLoading ? "Loading..." : "Refresh"}
           </button>
+        </div>
+        <div className="max-w-xs">
+          <CategoryFilter
+            projectName={projectName}
+            selectedCategory={selectedCategory}
+            onCategoryChange={handleCategoryChange}
+            apiBaseUrl={apiBaseUrl}
+          />
         </div>
       </div>
 
