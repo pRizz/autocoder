@@ -6,16 +6,23 @@ import { useState } from "react";
 import { Routes, Route, useParams } from "react-router-dom";
 import { FeatureSearch } from "./components/FeatureSearch";
 import { NewFeatureForm } from "./components/NewFeatureForm";
+import { Sidebar } from "./components/Sidebar";
+import { KanbanBoard } from "./components/KanbanBoard";
 
 export function App(): JSX.Element {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/projects" element={<ProjectsPage />} />
-        <Route path="/projects/:name" element={<ProjectDetailPage />} />
-        <Route path="/settings" element={<SettingsPage />} />
-      </Routes>
+      <Sidebar />
+      <main className="ml-64 min-h-screen">
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/kanban" element={<KanbanPage />} />
+          <Route path="/graph" element={<GraphPage />} />
+          <Route path="/projects" element={<ProjectsPage />} />
+          <Route path="/projects/:name" element={<ProjectDetailPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
+        </Routes>
+      </main>
     </div>
   );
 }
@@ -24,9 +31,70 @@ export function App(): JSX.Element {
 function HomePage(): JSX.Element {
   return (
     <div className="flex items-center justify-center h-screen">
-      <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-        Open Autocoder
-      </h1>
+      <div className="text-center">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+          Welcome to Open Autocoder
+        </h1>
+        <p className="text-gray-600 dark:text-gray-400">
+          Select a view from the sidebar to get started
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function KanbanPage(): JSX.Element {
+  return (
+    <div className="p-8 h-screen">
+      <KanbanBoard />
+    </div>
+  );
+}
+
+function GraphPage(): JSX.Element {
+  return (
+    <div className="p-8 h-screen">
+      <div className="h-full">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+            Dependency Graph
+          </h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            Visualize feature dependencies and relationships
+          </p>
+        </div>
+
+        {/* Graph visualization area */}
+        <div className="h-[calc(100%-5rem)] bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 flex items-center justify-center">
+          <div className="text-center">
+            {/* Graph icon */}
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-16 w-16 mx-auto text-gray-400 dark:text-gray-500 mb-4"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <circle cx="5" cy="6" r="3" />
+              <circle cx="19" cy="6" r="3" />
+              <circle cx="12" cy="18" r="3" />
+              <line x1="8" y1="6" x2="16" y2="6" />
+              <line x1="5" y1="9" x2="12" y2="15" />
+              <line x1="19" y1="9" x2="12" y2="15" />
+            </svg>
+            <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">
+              Dependency Graph View
+            </h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400 max-w-md">
+              This view will display an interactive graph showing how features depend on each other.
+              Select a project to view its dependency graph.
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
