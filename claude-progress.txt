@@ -6920,3 +6920,121 @@ if (deletedSessions.length > 0) {
 - Feature #136 implemented and verified
 - Unit tests added for session cascade delete
 - All verification steps completed successfully
+[Testing] 2026-01-21T10:30:31Z Feature #52 verified - still passing (CLI --help shows usage information)
+  - Category: functional
+  - Description: Running with --help shows all available commands
+  - All 4 verification steps PASSED:
+    1. Run open-autocoder --help ✓ (node packages/cli/dist/index.js --help)
+    2. Verify usage information is displayed ✓ ("Usage: open-autocoder [options] [command]")
+    3. Verify all commands are listed ✓ (10 commands: serve, web, init, start, status, features, provider, projects, service, config)
+    4. Verify options are documented ✓ (-V/--version, -p/--port, -H/--host, -h/--help)
+  - Additional verifications:
+    - Subcommand help works (features --help, init --help)
+    - Command descriptions are clear and helpful
+  - Screenshot: feature-52-cli-help-verified.png
+  - No regression found - feature working correctly
+[Testing] Session complete - verified feature #52
+[Testing] 2026-01-21T10:41:24Z Feature #20 verified - still passing (Mark feature as passing via API)
+  - Category: functional
+  - Description: POST /api/projects/:name/features/:id/pass marks feature complete
+  - All 5 verification steps PASSED:
+    1. Create a feature that is not passing ✓ (ID 210, passes=0)
+    2. Send POST request to mark as passing ✓ (POST /pass endpoint)
+    3. Verify response shows passes=true ✓ (passes: 1)
+    4. Verify in_progress is cleared ✓ (inProgress: 0)
+    5. GET feature to verify persistence ✓ (GET confirmed passes: 1)
+  - Additional verification:
+    - Edge case: Feature with inProgress=1 was correctly cleared to 0 after marking passing
+  - Console errors: None
+  - No regression found - feature working correctly
+[Testing] Session complete - verified feature #20
+
+---
+
+## Session: 2026-01-21 (Parallel Agent - Feature #138)
+
+### Completed: Feature #138 - New project has sensible defaults
+
+**Description:** New project starts with default settings
+
+**Category:** defaults
+
+**Verification:**
+
+Verified that new projects are created with correct default settings through multiple methods:
+
+**1. Code Review:**
+- Schema (packages/core/src/db/schema.ts):
+  - `concurrency: integer("concurrency").default(3)`
+  - `yoloMode: integer("yolo_mode").default(0)` 
+  - `testingAgentRatio: integer("testing_agent_ratio").default(1)`
+- Repository (packages/core/src/repositories/projects.ts):
+  - `concurrency: input.concurrency ?? 3`
+  - `yoloMode: input.yoloMode ? 1 : 0`
+  - `testingAgentRatio: input.testingAgentRatio ?? 1`
+
+**2. API Test:**
+Created project with minimal info (name + path only):
+```bash
+curl -X POST http://localhost:3001/api/projects \
+  -H "Content-Type: application/json" \
+  -d '{"name": "test-defaults-138", "path": "/tmp/test-defaults-138"}'
+```
+Response:
+```json
+{
+  "name": "test-defaults-138",
+  "path": "/tmp/test-defaults-138",
+  "concurrency": 3,
+  "yoloMode": 0,
+  "testingAgentRatio": 1,
+  ...
+}
+```
+
+**3. Browser UI Verification (Playwright):**
+- Navigated to Projects page
+- Clicked "New Project" button
+- Step 1: Entered project name "test-defaults-138-ui"
+- Step 2: Entered path "/tmp/test-defaults-138-ui"
+- Step 3: Configure Settings - verified defaults shown:
+  - Concurrency (1-5): `3` (visible in spinbutton)
+  - YOLO Mode checkbox: unchecked (false)
+- Screenshot: feature-138-defaults-verification.png
+- Created project and verified via API:
+  - concurrency: 3 ✓
+  - yoloMode: 0 ✓
+  - testingAgentRatio: 1 ✓
+- Screenshot: feature-138-project-created.png
+
+**Steps Verified:**
+
+1. **Step 1: Create new project with minimal info** ✓
+   - Created via API with only name + path
+   - Created via UI wizard
+
+2. **Step 2: Verify concurrency defaults to 3** ✓
+   - API response: `"concurrency": 3`
+   - UI spinbutton showed "3"
+
+3. **Step 3: Verify yolo_mode defaults to false** ✓
+   - API response: `"yoloMode": 0`
+   - UI checkbox was unchecked
+
+4. **Step 4: Verify testing_agent_ratio defaults to 1** ✓
+   - API response: `"testingAgentRatio": 1`
+   - (Not shown in UI wizard, but verified via API)
+
+**Test Cleanup:**
+- Deleted test projects after verification
+
+**Console errors:** None (only favicon 404)
+
+### Current Progress
+- Feature #138 marked as passing via MCP tool
+- Stats: 120/244 features passing (49.2%)
+
+### Session Complete
+- Feature #138 verified and marked as passing
+- All 4 verification steps completed successfully
+- Commit: ed30080
