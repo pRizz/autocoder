@@ -2,6 +2,47 @@
 
 ## Session: 2026-01-21
 
+### Completed: Feature #58 - API returns 404 for non-existent project
+
+**Description:** Accessing non-existent project returns proper 404
+
+**Steps Verified:**
+1. Step 1: Send GET request to /api/projects/nonexistent ✓
+   - Executed: `curl http://localhost:3001/api/projects/nonexistent`
+2. Step 2: Verify response status is 404 ✓
+   - Response: HTTP 404
+3. Step 3: Verify error message is clear ✓
+   - Message: "Project 'nonexistent' not found"
+   - Code: "PROJECT_NOT_FOUND"
+4. Step 4: Verify no sensitive information leaked ✓
+   - Only contains: error message, error code, suggestedAction
+   - No stack traces, internal paths, or sensitive data exposed
+
+**Response Format:**
+```json
+{
+  "error": "Project 'nonexistent' not found",
+  "code": "PROJECT_NOT_FOUND",
+  "suggestedAction": "Verify the project name or create a new project"
+}
+```
+
+**Additional Testing:**
+- Also verified Kanban board performance with 144 features:
+  - Page loads all 144 features successfully
+  - Scrolling performance: 0.1ms for full scroll (no lag)
+  - WebSocket connection shows "Connected" status
+
+**Screenshots captured:**
+- .playwright-mcp/feature-58-kanban-144-features.png
+- .playwright-mcp/feature-58-kanban-scrolled.png
+
+### Current Progress
+- Passing: 41/230 features (~17.8%)
+- Feature #58 marked as passing
+
+---
+
 ### Completed: Feature #52 - CLI --help shows usage information
 
 **Description:** Running with --help shows all available commands
