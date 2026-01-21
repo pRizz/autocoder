@@ -2,6 +2,47 @@
 
 ## Session: 2026-01-21
 
+### Completed: Feature #60 - API validates required fields on project creation
+
+**Description:** Missing required fields return validation error
+
+**Category:** security
+
+**Steps Verified:**
+1. Step 1: Send POST to /api/projects without name ✓
+   - Sent: `{"path": "/tmp/test-project"}`
+2. Step 2: Verify response status is 400 ✓
+   - Response: HTTP 400
+3. Step 3: Verify error mentions missing field ✓
+   - Error: "Validation failed: name: Required"
+   - Code: "VALIDATION_ERROR"
+4. Step 4: Send POST without path ✓
+   - Sent: `{"name": "test-project"}`
+5. Step 5: Verify response status is 400 ✓
+   - Response: HTTP 400
+   - Error: "Validation failed: path: Required"
+
+**Additional Testing:**
+- Tested empty body `{}` → Returns both errors: "Validation failed: name: Required, path: Required"
+- Validation implemented using Zod schemas in packages/server/src/routes/projects.ts
+- createProjectSchema requires name (min 1 char) and path (min 1 char)
+
+**Browser Automation Verification:**
+- Verified API calls from browser using fetch()
+- All tests return expected 400 status codes
+- Error messages are clear and actionable
+
+**Screenshots captured:**
+- .playwright-mcp/.playwright-mcp/feature-60-validation-test.png
+
+**Console errors:** Only favicon 404 (non-critical) and expected 400 validation errors
+
+### Current Progress
+- Passing: 44/230 features (~19.1%)
+- Feature #60 marked as passing
+
+---
+
 ### Completed: Feature #58 - API returns 404 for non-existent project
 
 **Description:** Accessing non-existent project returns proper 404
@@ -1942,4 +1983,33 @@ Feature #2 marked as passing
     - Regex confirms format: /^[a-f0-9]+:[a-f0-9]+:[a-f0-9]+$/i
   - Console errors: None (only React DevTools info - non-critical)
   - Screenshot: .playwright-mcp/.playwright-mcp/feature-35-regression-providers-api.png
+  - Regression test completed successfully - no regression found
+[Testing] 2026-01-21T03:48:52 Feature #50 regression fixed - Keyboard shortcut ? shows help
+  - Regression found: ? key did not open keyboard shortcuts modal (feature was passing but code wasn't implemented)
+  - Step 1: Navigated to main page ✓
+  - Step 2: Pressed ? key ✓
+  - Step 3: Keyboard shortcuts modal appeared with title 'Keyboard Shortcuts' ✓
+  - Step 4: Common shortcuts are listed (?, A, D, G, K, N, ,, Esc) ✓
+  - Step 5: Pressed Escape to close modal ✓
+  - Fix: Created KeyboardShortcutsModal component and added global keydown listener in App.tsx
+  - Console errors: None
+  - Screenshot: .playwright-mcp/feature-50-keyboard-shortcuts-modal.png
+  - Regression fixed and verified with browser automation
+[Testing] 2026-01-21T03:50:51 Feature #58 verified - still passing (API returns 404 for non-existent project)
+  - Step 1: Sent GET request to /api/projects/nonexistent-project-xyz123 ✓
+  - Step 2: Response status is 404 ✓
+  - Step 3: Error message is clear with error, code, and suggestedAction fields ✓
+  - Step 4: No sensitive information leaked - only safe fields exposed ✓
+  - Screenshot: .playwright-mcp/feature-58-regression-404-response.png
+  - Regression test completed successfully - no regression found
+[Testing] 2026-01-21T03:51:16 Feature #48 verified - still passing (Dark mode toggle works)
+  - Step 1: Opened main page in light mode ✓
+  - Step 2: Clicked theme toggle button ✓
+  - Step 3: Verified background changes to dark color (dark navy/blue) ✓
+  - Step 4: Verified text changes to light color (white text) ✓
+  - Step 5: Clicked toggle again ✓
+  - Step 6: Verified returns to light mode (light background restored) ✓
+  - Step 7: Verified preference persists after refresh (localStorage working) ✓
+  - Console errors: None (only non-critical warnings)
+  - Screenshots: feature-48-step1-light-mode.png, feature-48-step3-dark-mode.png, feature-48-step6-light-mode-again.png, feature-48-step7-persistence-after-refresh.png
   - Regression test completed successfully - no regression found
