@@ -183,6 +183,9 @@ export function NewFeatureForm({
 
   /**
    * Submits the feature data to the API
+   *
+   * Note: For normal form submit, isSubmitting is already set by handleSubmit.
+   * For retry, it's set here. Either way, we ensure it's set.
    */
   const submitFeature = async (featureData: {
     name: string;
@@ -255,9 +258,19 @@ export function NewFeatureForm({
 
   /**
    * Handles form submission
+   *
+   * IMPORTANT: Sets isSubmitting immediately to prevent double-click creating duplicates.
+   * This is the idempotency guard - the button is disabled synchronously before any async work.
    */
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+
+    // Prevent double-click: immediately disable the button before any async work
+    // This must happen synchronously to guard against rapid clicks
+    if (isSubmitting) {
+      return;
+    }
+    setIsSubmitting(true);
 
     // Mark all fields as touched
     setTouched({
@@ -273,6 +286,7 @@ export function NewFeatureForm({
 
     // Don't submit if there are validation errors
     if (Object.keys(validationErrors).length > 0) {
+      setIsSubmitting(false);
       return;
     }
 
