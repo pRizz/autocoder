@@ -54,7 +54,7 @@ Each task was committed atomically:
 2. **Task 2: Author docs-only execution guardrails** - `140c5ad` (docs)
 3. **Task 3: Create canonical specs index shell** - `2f6947b` (docs)
 
-**Plan metadata:** pending
+**Plan metadata:** `c4cfeba` (docs)
 
 ## Files Created/Modified
 - `.planning/specs/POLICY.md` - Canonical inclusion/exclusion boundaries and rationale.
