@@ -56,7 +56,7 @@ Each task was committed atomically:
 2. **Task 2: Produce canonical inventory baseline** - `ce44ba2` (docs)
 3. **Task 3: Wire inventory into canonical index** - `0489796` (docs)
 
-**Plan metadata:** pending
+**Plan metadata:** `168eeff` (docs)
 
 ## Files Created/Modified
 - `.planning/specs/INVENTORY-RULES.md` - Deterministic inventory generation/classification and ID rules.
