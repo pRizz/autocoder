@@ -33,11 +33,11 @@ Phase 1 completion required inputs for Phase 2+ work:
 - [Canonical Inventory](./INVENTORY.md)
 - [Coverage Baseline](./COVERAGE-BASELINE.md)
 
-## File and Surface Contract Sections (Planned)
+## File and Surface Contract Sections
 
-- File-level contracts (Phase 3-4)
-- API/WebSocket surface contracts (Phase 5)
-- Data/process/security contracts (Phase 6)
+- File-level contracts (Phase 3-4) — complete
+- API/WebSocket surface contracts (Phase 5) — active
+- Data/process/security contracts (Phase 6) — next
 
 ## File Contract Framework
 
@@ -79,6 +79,21 @@ Phase 4 required prerequisites for Phase 5:
 - Full File Contract Corpus lane matrices and directories
 - `FILE-CONTRACT-COVERAGE.md` (canonical 237/237 reconciliation evidence)
 - `FILE-CONTRACT-QUALITY-AUDIT.md` (required section quality evidence)
+
+## Surface Contract Corpus
+
+- [REST API Endpoint Matrix](./surfaces/REST-API-ENDPOINT-MATRIX.md)
+- [REST API Contracts](./surfaces/REST-API-CONTRACTS.md)
+- [WebSocket Endpoint Matrix](./surfaces/WEBSOCKET-ENDPOINT-MATRIX.md)
+- [WebSocket Contracts](./surfaces/WEBSOCKET-CONTRACTS.md)
+- [Surface Traceability](./surfaces/SURFACE-TRACEABILITY.md)
+- [Surface Acceptance Checks](./surfaces/SURFACE-ACCEPTANCE-CHECKS.md)
+
+Phase 5 required prerequisites for Phase 6:
+- `REST-API-ENDPOINT-MATRIX.md` and `REST-API-CONTRACTS.md` as canonical HTTP surface contracts
+- `WEBSOCKET-ENDPOINT-MATRIX.md` and `WEBSOCKET-CONTRACTS.md` as canonical realtime protocol contracts
+- `SURFACE-TRACEABILITY.md` for implementation/consumer artifact linkage (`ART-0102`..`ART-0115`, `ART-0131`, `ART-0225`, `ART-0226`, `ART-0229`)
+- `SURFACE-ACCEPTANCE-CHECKS.md` for requirement-linked pass/fail gates (`SURF-01`, `SURF-02`)
 
 ## Migration and Parity Sections (Planned)
 
