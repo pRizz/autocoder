@@ -36,4 +36,4 @@ This file is the single navigation entrypoint for the repository regeneration sp
 
 ## Artifact ID Usage
 
-All downstream specs must reference canonical inventory IDs (format: `ART-####`) rather than path-only references to preserve stable cross-links as docs evolve.
+All downstream specs must reference a canonical artifact ID (format: `ART-####`) rather than path-only references to preserve stable cross-links as docs evolve.
