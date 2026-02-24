@@ -48,6 +48,16 @@ Before accepting a file-spec entry:
 3. Dependencies include direct, not transitive-only, references.
 4. Acceptance checks are concrete and objectively testable.
 
+## Regeneration-Agent Checklist
+
+Mandatory information to include so regeneration agents can operate without hidden context:
+
+1. Mandatory artifact identity fields (`ART-####`, path, category, version).
+2. Mandatory boundary statements (what is owned vs not owned).
+3. Mandatory behavior surfaces (inputs/outputs/side effects) with observable language.
+4. Mandatory direct dependencies with explicit rationale.
+5. Quality Gate checks phrased as binary pass/fail criteria.
+
 ## Review Workflow
 
 - Initial authoring pass: create draft from source artifact and linked dependencies.

@@ -59,6 +59,14 @@ Define concise, verifiable checks that prove the contract entry is complete and 
 
 A contract is invalid unless all required sections above are present and non-empty.
 
+## Regeneration-Agent Checklist
+
+- Mandatory identity is present (`ART-####`, path, category, contract version).
+- Mandatory responsibility boundaries are explicit (Purpose + Ownership).
+- Mandatory behavior surfaces are explicit (Inputs, Outputs, Side Effects).
+- Mandatory dependency links identify direct upstream/downstream artifact relationships.
+- Quality Gate acceptance checks are concrete and verifiable from repository evidence.
+
 ## Template
 
 ```markdown
