@@ -208,6 +208,16 @@ Runtime dependency/setup availability endpoint.
 | --- | --- | --- | --- | --- | --- | --- |
 | GET | `/api/setup/status` | Check system setup status. | `none` | `SetupStatus` | `200` | Success: 200 |
 
+## Acceptance Checks
+
+| Check ID | Assertion | Method | pass/fail rule |
+| --- | --- | --- | --- |
+| REST-AC-01 | matrix-to-contract completeness is `68/68` | Compare HTTP rows in `REST-API-ENDPOINT-MATRIX.md` against route rows in this document. | pass when both sets match exactly with no missing/extra entries. |
+| REST-AC-02 | Every route includes `Status Codes` coverage. | Verify each route row has at least one success code and every explicit error code raised by implementation. | pass when all 68 routes have non-empty status code sets and no missing explicit error statuses. |
+| REST-AC-03 | Every route includes `Error Behavior` semantics. | Verify each route row has an `Error Behavior` clause tied to its status code set. | pass when all 68 routes include success behavior plus any applicable 400/403/404/409/500 semantics. |
+| REST-AC-04 | Schema linkage remains explicit and stable. | Confirm request/response fields in route rows reference model/object schemas and `ART-0115` type anchors where applicable. | pass when every route row has non-empty request and response shape fields with stable model/object references. |
+| REST-AC-05 | Frontend REST consumer parity remains intact. | Compare documented paths/methods against client calls in `ART-0226` (`ui/src/lib/api.ts`) and flag intentionally backend-only endpoints. | pass when consumed routes are contract-covered and backend-only routes are explicitly documented in this corpus. |
+
 
 ## Cross-References
 
