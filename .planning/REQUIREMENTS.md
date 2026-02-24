@@ -9,8 +9,8 @@
 
 - [x] **INVT-01**: Spec corpus contains a complete inventory of all in-scope source and ops artifacts in this repository.
 - [x] **INVT-02**: Spec corpus defines explicit inclusion/exclusion rules (source + ops included, generated/runtime artifacts excluded).
-- [ ] **INVT-03**: Excluded generated/runtime artifacts are documented with rationale to prevent ambiguity.
-- [ ] **INVT-04**: Coverage checks prove every in-scope artifact is represented in the specification corpus.
+- [x] **INVT-03**: Excluded generated/runtime artifacts are documented with rationale to prevent ambiguity.
+- [x] **INVT-04**: Coverage checks prove every in-scope artifact is represented in the specification corpus.
 
 ### Execution Guardrails
 
@@ -72,8 +72,8 @@
 | INVT-01 | Phase 1 | Complete |
 | INVT-02 | Phase 1 | Complete |
 | GARD-01 | Phase 1 | Complete |
-| INVT-03 | Phase 2 | Pending |
-| INVT-04 | Phase 2 | Pending |
+| INVT-03 | Phase 2 | Complete |
+| INVT-04 | Phase 2 | Complete |
 | FILE-01 | Phase 3 | Pending |
 | FILE-02 | Phase 3 | Pending |
 | FILE-03 | Phase 4 | Pending |
@@ -101,4 +101,4 @@
 
 ---
 *Requirements defined: 2026-02-24*
-*Last updated: 2026-02-24 after Phase 1 execution/verification*
+*Last updated: 2026-02-24 after Phase 2 execution/verification*

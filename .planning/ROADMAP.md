@@ -13,7 +13,7 @@ This roadmap delivers an execution-ready specification corpus that can regenerat
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Scope Policy, Inventory, and Guardrails** - Lock scope boundaries, docs-only execution guardrails, and canonical artifact inventory.
-- [ ] **Phase 2: Coverage Validation & Classification** - Prove full source+ops coverage and artifact classification.
+- [x] **Phase 2: Coverage Validation & Classification** - Prove full source+ops coverage and artifact classification.
 - [ ] **Phase 3: File Contract Framework & Pilot Pass** - Establish file-spec schema and complete a representative pilot set.
 - [ ] **Phase 4: Full File-Level Contract Capture** - Complete exhaustive per-file contracts across all in-scope artifacts.
 - [ ] **Phase 5: Surface Contracts (API + WebSocket)** - Specify all external API and realtime protocol behavior.
@@ -50,8 +50,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 02-01: Document exclusion classes and rationale
-- [ ] 02-02: Produce repeatable coverage audit and gap remediation pass
+- [x] 02-01: Document exclusion classes and rationale
+- [x] 02-02: Produce repeatable coverage audit and gap remediation pass
 
 ### Phase 3: File Contract Framework & Pilot Pass
 **Goal**: Create robust file-spec contract schema and verify it on representative modules.
@@ -158,7 +158,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Scope Policy, Inventory, and Guardrails | 3/3 | Complete | 2026-02-24 |
-| 2. Coverage Validation & Classification | 0/2 | Not started | - |
+| 2. Coverage Validation & Classification | 2/2 | Complete | 2026-02-24 |
 | 3. File Contract Framework & Pilot Pass | 0/3 | Not started | - |
 | 4. Full File-Level Contract Capture | 0/4 | Not started | - |
 | 5. Surface Contracts (API + WebSocket) | 0/3 | Not started | - |
