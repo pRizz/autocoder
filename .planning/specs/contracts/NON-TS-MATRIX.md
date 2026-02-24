@@ -107,3 +107,10 @@
 
 - Row count must equal 88.
 - Matrix rows must reconcile 1:1 with `contracts/non-ts/ART-*.md`.
+
+## Traceability Check
+
+- Contract files counted: 88
+- Matrix rows counted: 88
+- Status reconciliation: all rows marked `Complete`
+- Verified at: 2026-02-24T11:45:32Z
