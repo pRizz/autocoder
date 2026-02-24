@@ -1,13 +1,14 @@
-# Coverage Baseline (Phase 1)
+# Coverage Baseline (Phase 2)
 
 **Status:** Active  
-**Phase:** 01 (Scope Policy, Inventory, and Guardrails)  
+**Phase:** 02 (Coverage Validation & Classification)  
 **Generated:** 2026-02-24
 
 ## Total in-scope
 
-- Total in-scope artifacts: **224**
+- Total in-scope artifacts: **235**
 - Canonical source: `.planning/specs/INVENTORY.md`
+- Audit reference: `.planning/specs/COVERAGE-AUDIT.md`
 
 ## By category
 
@@ -21,7 +22,7 @@
 | FRONTEND_SOURCE | 83 |
 | OPERATIONS_SCRIPT | 7 |
 | OPS_AUTOMATION | 26 |
-| PLANNING_DOC | 25 |
+| PLANNING_DOC | 36 |
 | TEST | 8 |
 
 ## Excluded
@@ -31,23 +32,21 @@ Excluded classes are intentionally omitted from inventory because they are gener
 | Exclusion Class | Count (current workspace) | Rationale |
 | --- | ---: | --- |
 | `venv/**` | 6,186 files | Environment-local dependency/install output |
-| `*/__pycache__/**` + `*.pyc` | 2,311 files | Interpreter-generated cache/bytecode |
+| `*/__pycache__/**` + `*.pyc` | 4,622 files | Interpreter-generated cache/bytecode |
 | `ui/node_modules/**` | 12,060 files | Installed third-party dependency tree |
 | `ui/dist/**` | 4 files | Build output artifact |
-| `*.log` | 1 file | Runtime/debug emission |
+| `*.log` | 1 files | Runtime/debug emission |
 | lock files (`package-lock.json`, etc.) | 2 files | Generated lock state; excluded by policy |
-| `*.tsbuildinfo` | 1 file | TypeScript incremental build cache |
+| `*.tsbuildinfo` | 1 files | TypeScript incremental build cache |
+
+## Required evidence
+
+- Coverage completeness claims must cite `.planning/specs/COVERAGE-AUDIT.md`.
+- Exclusion rationale claims must cite `.planning/specs/EXCLUSIONS.md`.
 
 ## Reproducibility
 
-Baseline regeneration procedure:
-
-1. Run the discovery command documented in `.planning/specs/INVENTORY-RULES.md`.
-2. Confirm exclusion filters and category mapping rules are unchanged.
-3. Regenerate `.planning/specs/INVENTORY.md` with sequential `ART-####` IDs.
-4. Verify this baseline's `Total in-scope` and `By category` sections match regenerated outputs.
-5. Run docs-only guardrail commands from `.planning/specs/GUARDRAILS.md`.
-
-If totals differ, classify the delta as one of:
-- legitimate repository change (add/remove/rename), or
-- rule drift/regression requiring policy/rules updates.
+1. Run discovery + exclusion filters from `INVENTORY-RULES.md`.
+2. Recompute inventory and category totals.
+3. Re-run coverage diff checks and compare to `COVERAGE-AUDIT.md`.
+4. Confirm docs-only guardrail commands pass before completion.

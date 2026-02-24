@@ -17,6 +17,7 @@ This file is the single navigation entrypoint for the repository regeneration sp
 - [Inventory Rules](./INVENTORY-RULES.md)
 - [Canonical Inventory](./INVENTORY.md)
 - [Coverage Baseline](./COVERAGE-BASELINE.md)
+- [Coverage Audit](./COVERAGE-AUDIT.md)
 
 ## Exclusions
 
@@ -51,3 +52,7 @@ Phase 1 completion required inputs for Phase 2+ work:
 ## Artifact ID Usage
 
 All downstream specs must reference a canonical artifact ID (format: `ART-####`) rather than path-only references to preserve stable cross-links as docs evolve.
+
+## Coverage Evidence
+
+- `COVERAGE-AUDIT.md` is required evidence for completeness claims.
