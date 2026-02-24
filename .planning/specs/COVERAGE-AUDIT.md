@@ -12,9 +12,9 @@
 
 ## Pre-Remediation Findings
 
-- Discovery count: **235**
-- Inventory count: **224**
-- missing_from_inventory: **11**
+- Discovery count: **237**
+- Inventory count: **235**
+- missing_from_inventory: **2**
 - extra_in_inventory: **0**
 
 Status: `needs_remediation` (pre-remediation delta detected)
@@ -23,17 +23,8 @@ Status: `needs_remediation` (pre-remediation delta detected)
 
 | Path | Classification |
 | --- | --- |
-| `.planning/phases/01-scope-policy-inventory-and-guardrails/01-02-SUMMARY.md` | PLANNING_DOC |
-| `.planning/phases/01-scope-policy-inventory-and-guardrails/01-03-SUMMARY.md` | PLANNING_DOC |
-| `.planning/phases/01-scope-policy-inventory-and-guardrails/01-VERIFICATION.md` | PLANNING_DOC |
-| `.planning/phases/02-coverage-validation-and-classification/02-01-PLAN.md` | PLANNING_DOC |
-| `.planning/phases/02-coverage-validation-and-classification/02-01-SUMMARY.md` | PLANNING_DOC |
-| `.planning/phases/02-coverage-validation-and-classification/02-02-PLAN.md` | PLANNING_DOC |
-| `.planning/phases/02-coverage-validation-and-classification/02-RESEARCH.md` | PLANNING_DOC |
-| `.planning/specs/COVERAGE-BASELINE.md` | PLANNING_DOC |
-| `.planning/specs/EXCLUSIONS.md` | PLANNING_DOC |
-| `.planning/specs/INVENTORY-RULES.md` | PLANNING_DOC |
-| `.planning/specs/INVENTORY.md` | PLANNING_DOC |
+| `.planning/phases/02-coverage-validation-and-classification/02-02-SUMMARY.md` | PLANNING_DOC |
+| `.planning/specs/COVERAGE-AUDIT.md` | PLANNING_DOC |
 
 ### extra_in_inventory
 
@@ -47,8 +38,8 @@ None
 
 ## Post-Remediation Validation
 
-- Discovery count: **235**
-- Inventory count: **235**
+- Discovery count: **237**
+- Inventory count: **237**
 - missing_from_inventory: **0**
 - extra_in_inventory: **0**
 

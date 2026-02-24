@@ -6,7 +6,7 @@
 
 ## Total in-scope
 
-- Total in-scope artifacts: **235**
+- Total in-scope artifacts: **237**
 - Canonical source: `.planning/specs/INVENTORY.md`
 - Audit reference: `.planning/specs/COVERAGE-AUDIT.md`
 
@@ -22,7 +22,7 @@
 | FRONTEND_SOURCE | 83 |
 | OPERATIONS_SCRIPT | 7 |
 | OPS_AUTOMATION | 26 |
-| PLANNING_DOC | 36 |
+| PLANNING_DOC | 38 |
 | TEST | 8 |
 
 ## Excluded
