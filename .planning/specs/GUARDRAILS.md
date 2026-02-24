@@ -32,6 +32,8 @@ Verification token: Prohibited paths include any non-`.planning/**` path.
 
 ## Compliance Checklist
 
+Compliance checklist: this sequence is mandatory before any plan is marked complete.
+
 Run this checklist before marking any plan complete.
 
 1. Working tree contains only `.planning/**` changes.
@@ -40,6 +42,8 @@ Run this checklist before marking any plan complete.
 4. Verification evidence is captured in plan summary.
 
 ## Canonical Checks
+
+Canonical checks: run the command sequence exactly as listed.
 
 Run exactly these commands:
 
