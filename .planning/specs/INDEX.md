@@ -58,6 +58,12 @@ Phase 3 completion required prerequisites for Phase 4 full capture:
 - [Pilot Matrix](./pilot/PILOT-MATRIX.md)
 - [File Spec Pilot Review](./FILE-SPEC-REVIEW.md)
 
+## Phase 4 Full File Contracts
+
+- [Backend Runtime Matrix](./contracts/BACKEND-RUNTIME-MATRIX.md)
+- Backend runtime contract directory: `./contracts/backend-runtime/`
+- These lane artifacts are canonical Phase 4 outputs for backend/runtime full file-level coverage.
+
 ## Migration and Parity Sections (Planned)
 
 - TS/Bun/Solid parity matrix (Phase 7)
