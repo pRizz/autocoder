@@ -50,6 +50,14 @@ Phase 1 completion required inputs for Phase 2+ work:
 - [Pilot Matrix](./pilot/PILOT-MATRIX.md)
 - Pilot contracts directory: `./pilot/`
 
+## Phase 3 completion
+
+Phase 3 completion required prerequisites for Phase 4 full capture:
+- [File Spec Schema](./FILE-SPEC-SCHEMA.md)
+- [File Spec Authoring Guide](./FILE-SPEC-AUTHORING.md)
+- [Pilot Matrix](./pilot/PILOT-MATRIX.md)
+- [File Spec Pilot Review](./FILE-SPEC-REVIEW.md)
+
 ## Migration and Parity Sections (Planned)
 
 - TS/Bun/Solid parity matrix (Phase 7)
