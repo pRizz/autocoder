@@ -20,9 +20,9 @@
 
 - [x] **FILE-01**: Every in-scope file has a spec entry describing purpose and ownership/responsibility.
 - [x] **FILE-02**: Every file spec captures inputs, outputs, side effects, and direct dependencies.
-- [ ] **FILE-03**: Every file spec captures invariants, error behavior, and edge-case expectations.
-- [ ] **FILE-04**: Non-TypeScript artifacts (docs, workflows, scripts, configs) are specified with equivalent contract detail.
-- [ ] **FILE-05**: Every file spec includes regeneration-focused acceptance checks.
+- [x] **FILE-03**: Every file spec captures invariants, error behavior, and edge-case expectations.
+- [x] **FILE-04**: Non-TypeScript artifacts (docs, workflows, scripts, configs) are specified with equivalent contract detail.
+- [x] **FILE-05**: Every file spec includes regeneration-focused acceptance checks.
 
 ### Cross-Cutting Surface Contracts
 
@@ -76,9 +76,9 @@
 | INVT-04 | Phase 2 | Complete |
 | FILE-01 | Phase 3 | Complete |
 | FILE-02 | Phase 3 | Complete |
-| FILE-03 | Phase 4 | Pending |
-| FILE-04 | Phase 4 | Pending |
-| FILE-05 | Phase 4 | Pending |
+| FILE-03 | Phase 4 | Complete |
+| FILE-04 | Phase 4 | Complete |
+| FILE-05 | Phase 4 | Complete |
 | SURF-01 | Phase 5 | Pending |
 | SURF-02 | Phase 5 | Pending |
 | SURF-03 | Phase 6 | Pending |
@@ -101,4 +101,4 @@
 
 ---
 *Requirements defined: 2026-02-24*
-*Last updated: 2026-02-24 after Phase 3 execution/verification*
+*Last updated: 2026-02-24 after Phase 4 execution/verification*

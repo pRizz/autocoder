@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Scope Policy, Inventory, and Guardrails** - Lock scope boundaries, docs-only execution guardrails, and canonical artifact inventory.
 - [x] **Phase 2: Coverage Validation & Classification** - Prove full source+ops coverage and artifact classification.
 - [x] **Phase 3: File Contract Framework & Pilot Pass** - Establish file-spec schema and complete a representative pilot set.
-- [ ] **Phase 4: Full File-Level Contract Capture** - Complete exhaustive per-file contracts across all in-scope artifacts.
+- [x] **Phase 4: Full File-Level Contract Capture** - Complete exhaustive per-file contracts across all in-scope artifacts.
 - [ ] **Phase 5: Surface Contracts (API + WebSocket)** - Specify all external API and realtime protocol behavior.
 - [ ] **Phase 6: Surface Contracts (Data + Process + Security)** - Specify persistence, orchestration lifecycle, and policy contracts.
 - [ ] **Phase 7: TS/Bun/Solid Parity Matrix & Discrepancies** - Map all current units to target stack with risk/discrepancy tracking.
@@ -80,10 +80,10 @@ Plans:
 **Plans**: 4 plans
 
 Plans:
-- [ ] 04-01: Capture application/runtime source file contracts
-- [ ] 04-02: Capture UI and frontend contract set
-- [ ] 04-03: Capture docs/workflows/scripts/config contract set
-- [ ] 04-04: Run completeness and quality audit on all file specs
+- [x] 04-01: Capture application/runtime source file contracts
+- [x] 04-02: Capture UI and frontend contract set
+- [x] 04-03: Capture docs/workflows/scripts/config contract set
+- [x] 04-04: Run completeness and quality audit on all file specs
 
 ### Phase 5: Surface Contracts (API + WebSocket)
 **Goal**: Specify all API and realtime protocol behavior as authoritative contracts.
@@ -160,7 +160,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 1. Scope Policy, Inventory, and Guardrails | 3/3 | Complete | 2026-02-24 |
 | 2. Coverage Validation & Classification | 2/2 | Complete | 2026-02-24 |
 | 3. File Contract Framework & Pilot Pass | 3/3 | Complete | 2026-02-24 |
-| 4. Full File-Level Contract Capture | 0/4 | Not started | - |
+| 4. Full File-Level Contract Capture | 4/4 | Complete | 2026-02-24 |
 | 5. Surface Contracts (API + WebSocket) | 0/3 | Not started | - |
 | 6. Surface Contracts (Data + Process + Security) | 0/4 | Not started | - |
 | 7. TS/Bun/Solid Parity Matrix & Discrepancies | 0/4 | Not started | - |
