@@ -112,3 +112,10 @@
 
 - Row count must equal 93.
 - Matrix rows must reconcile 1:1 with `contracts/frontend-ui/ART-*.md`.
+
+## Traceability Check
+
+- Contract files counted: 93
+- Matrix rows counted: 93
+- Status reconciliation: all rows marked `Complete`
+- Verified at: 2026-02-24T11:45:32Z
