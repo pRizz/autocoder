@@ -12,6 +12,10 @@
 - [ ] **INVT-03**: Excluded generated/runtime artifacts are documented with rationale to prevent ambiguity.
 - [ ] **INVT-04**: Coverage checks prove every in-scope artifact is represented in the specification corpus.
 
+### Execution Guardrails
+
+- [ ] **GARD-01**: No source implementation files are modified during this initiative; outputs are limited to markdown/spec artifacts.
+
 ### File-Level Contract Specs
 
 - [ ] **FILE-01**: Every in-scope file has a spec entry describing purpose and ownership/responsibility.
@@ -59,40 +63,42 @@
 | Behavior-breaking redesigns of product surface | Initiative is parity-first reconstruction, not product redesign |
 | Immediate implementation rewrite | Current phase is specification and planning, not execution/migration |
 | Preservation of accidental quirks as hard requirements | Fidelity target is intended behavior with discrepancies explicitly triaged |
+| Source code edits to existing implementation files | Initiative scope is markdown/spec generation only |
 
 ## Traceability
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| INVT-01 | TBD | Pending |
-| INVT-02 | TBD | Pending |
-| INVT-03 | TBD | Pending |
-| INVT-04 | TBD | Pending |
-| FILE-01 | TBD | Pending |
-| FILE-02 | TBD | Pending |
-| FILE-03 | TBD | Pending |
-| FILE-04 | TBD | Pending |
-| FILE-05 | TBD | Pending |
-| SURF-01 | TBD | Pending |
-| SURF-02 | TBD | Pending |
-| SURF-03 | TBD | Pending |
-| SURF-04 | TBD | Pending |
-| SURF-05 | TBD | Pending |
-| MIGR-01 | TBD | Pending |
-| MIGR-02 | TBD | Pending |
-| MIGR-03 | TBD | Pending |
-| MIGR-04 | TBD | Pending |
-| MIGR-05 | TBD | Pending |
-| VERI-01 | TBD | Pending |
-| VERI-02 | TBD | Pending |
-| VERI-03 | TBD | Pending |
-| VERI-04 | TBD | Pending |
+| INVT-01 | Phase 1 | Pending |
+| INVT-02 | Phase 1 | Pending |
+| GARD-01 | Phase 1 | Pending |
+| INVT-03 | Phase 2 | Pending |
+| INVT-04 | Phase 2 | Pending |
+| FILE-01 | Phase 3 | Pending |
+| FILE-02 | Phase 3 | Pending |
+| FILE-03 | Phase 4 | Pending |
+| FILE-04 | Phase 4 | Pending |
+| FILE-05 | Phase 4 | Pending |
+| SURF-01 | Phase 5 | Pending |
+| SURF-02 | Phase 5 | Pending |
+| SURF-03 | Phase 6 | Pending |
+| SURF-04 | Phase 6 | Pending |
+| SURF-05 | Phase 6 | Pending |
+| MIGR-01 | Phase 7 | Pending |
+| MIGR-02 | Phase 7 | Pending |
+| MIGR-03 | Phase 7 | Pending |
+| MIGR-04 | Phase 7 | Pending |
+| MIGR-05 | Phase 7 | Pending |
+| VERI-01 | Phase 8 | Pending |
+| VERI-02 | Phase 8 | Pending |
+| VERI-03 | Phase 8 | Pending |
+| VERI-04 | Phase 8 | Pending |
 
 **Coverage:**
-- v1 requirements: 23 total
-- Mapped to phases: 0
-- Unmapped: 23 ⚠️
+- v1 requirements: 24 total
+- Mapped to phases: 24
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-02-24*
-*Last updated: 2026-02-24 after initial definition*
+*Last updated: 2026-02-24 after roadmap feedback adjustment*

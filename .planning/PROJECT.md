@@ -29,6 +29,7 @@ From an empty repo, an implementation agent can systematically rebuild all inten
 - [ ] Document migration guidance that preserves current product/API/command surface behavior while changing implementation stack
 - [ ] Encode the corpus in AI-first, deterministic checklists and execution-ready markdown structure
 - [ ] Capture explicit non-goals, risk areas, and known behavior ambiguities to prevent incorrect regeneration assumptions
+- [ ] Enforce a no-source-modification rule: this initiative may only add/update markdown/spec artifacts
 
 ### Out of Scope
 
@@ -36,6 +37,7 @@ From an empty repo, an implementation agent can systematically rebuild all inten
 - Behavior-breaking redesign of product surface (APIs, workflows, commands, core UX flows) — scope is parity-first regeneration
 - Immediate code migration in this phase — this initiative defines specs/checklists for later implementation phases
 - Preservation of accidental quirks/bugs solely because they currently exist — fidelity target is intended behavior, with discrepancies called out
+- Any source-code edits in existing implementation files — initiative scope is documentation/spec generation only
 
 ## Context
 
@@ -48,6 +50,7 @@ This is a brownfield codebase with a completed `.planning/codebase/` map describ
 - **Coverage boundary**: Include source + ops artifacts, exclude generated artifacts — keeps corpus exhaustive yet stable and maintainable
 - **Spec format**: AI-first checklists and explicit contracts — optimize for deterministic regeneration by autonomous agents
 - **Migration framing**: Dual-track documentation (current behavior + target mapping) — prevents loss of implementation intent during stack transition
+- **Execution guardrail**: Do not modify source implementation files in this initiative — only create/update markdown/spec artifacts
 
 ## Key Decisions
 
@@ -59,6 +62,7 @@ This is a brownfield codebase with a completed `.planning/codebase/` map describ
 | Spec audience is AI-first | Main deliverable is regeneration guidance for implementation agents | — Pending |
 | Product/API/command surface remains 1:1 in target implementation | Minimize migration risk and regression scope | — Pending |
 | Definition of done is full spec corpus + parity matrix + migration notes + acceptance checklist | Ensures execution-ready completeness instead of partial documentation | — Pending |
+| No source files may be modified during this initiative | Keep this project strictly documentation/spec generation | — Pending |
 
 ---
-*Last updated: 2026-02-24 after initialization*
+*Last updated: 2026-02-24 after roadmap feedback adjustment*
