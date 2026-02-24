@@ -18,8 +18,8 @@
 
 ### File-Level Contract Specs
 
-- [ ] **FILE-01**: Every in-scope file has a spec entry describing purpose and ownership/responsibility.
-- [ ] **FILE-02**: Every file spec captures inputs, outputs, side effects, and direct dependencies.
+- [x] **FILE-01**: Every in-scope file has a spec entry describing purpose and ownership/responsibility.
+- [x] **FILE-02**: Every file spec captures inputs, outputs, side effects, and direct dependencies.
 - [ ] **FILE-03**: Every file spec captures invariants, error behavior, and edge-case expectations.
 - [ ] **FILE-04**: Non-TypeScript artifacts (docs, workflows, scripts, configs) are specified with equivalent contract detail.
 - [ ] **FILE-05**: Every file spec includes regeneration-focused acceptance checks.
@@ -74,8 +74,8 @@
 | GARD-01 | Phase 1 | Complete |
 | INVT-03 | Phase 2 | Complete |
 | INVT-04 | Phase 2 | Complete |
-| FILE-01 | Phase 3 | Pending |
-| FILE-02 | Phase 3 | Pending |
+| FILE-01 | Phase 3 | Complete |
+| FILE-02 | Phase 3 | Complete |
 | FILE-03 | Phase 4 | Pending |
 | FILE-04 | Phase 4 | Pending |
 | FILE-05 | Phase 4 | Pending |
@@ -101,4 +101,4 @@
 
 ---
 *Requirements defined: 2026-02-24*
-*Last updated: 2026-02-24 after Phase 2 execution/verification*
+*Last updated: 2026-02-24 after Phase 3 execution/verification*

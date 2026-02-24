@@ -14,7 +14,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Scope Policy, Inventory, and Guardrails** - Lock scope boundaries, docs-only execution guardrails, and canonical artifact inventory.
 - [x] **Phase 2: Coverage Validation & Classification** - Prove full source+ops coverage and artifact classification.
-- [ ] **Phase 3: File Contract Framework & Pilot Pass** - Establish file-spec schema and complete a representative pilot set.
+- [x] **Phase 3: File Contract Framework & Pilot Pass** - Establish file-spec schema and complete a representative pilot set.
 - [ ] **Phase 4: Full File-Level Contract Capture** - Complete exhaustive per-file contracts across all in-scope artifacts.
 - [ ] **Phase 5: Surface Contracts (API + WebSocket)** - Specify all external API and realtime protocol behavior.
 - [ ] **Phase 6: Surface Contracts (Data + Process + Security)** - Specify persistence, orchestration lifecycle, and policy contracts.
@@ -64,9 +64,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 03-01: Define file-spec schema and authoring conventions
-- [ ] 03-02: Apply schema to pilot artifacts across subsystem types
-- [ ] 03-03: Review pilot outputs and finalize template
+- [x] 03-01: Define file-spec schema and authoring conventions
+- [x] 03-02: Apply schema to pilot artifacts across subsystem types
+- [x] 03-03: Review pilot outputs and finalize template
 
 ### Phase 4: Full File-Level Contract Capture
 **Goal**: Complete exhaustive file-level specs for every in-scope artifact.
@@ -159,7 +159,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 |-------|----------------|--------|-----------|
 | 1. Scope Policy, Inventory, and Guardrails | 3/3 | Complete | 2026-02-24 |
 | 2. Coverage Validation & Classification | 2/2 | Complete | 2026-02-24 |
-| 3. File Contract Framework & Pilot Pass | 0/3 | Not started | - |
+| 3. File Contract Framework & Pilot Pass | 3/3 | Complete | 2026-02-24 |
 | 4. Full File-Level Contract Capture | 0/4 | Not started | - |
 | 5. Surface Contracts (API + WebSocket) | 0/3 | Not started | - |
 | 6. Surface Contracts (Data + Process + Security) | 0/4 | Not started | - |
