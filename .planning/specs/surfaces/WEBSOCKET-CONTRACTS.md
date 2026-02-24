@@ -226,6 +226,16 @@
 - `4004`: project not found in registry/directory missing/terminal metadata missing.
 - `4500`: terminal session failed to start after initial resize.
 
+## Acceptance Checks
+
+| Check ID | Assertion | Method | pass/fail rule |
+| --- | --- | --- | --- |
+| WS-AC-01 | Endpoint completeness is `5/5`. | Compare endpoint rows in `WEBSOCKET-ENDPOINT-MATRIX.md` against protocol sections in this document. | pass when all 5 matrix endpoints have matching contract sections with no extra/missing endpoint contracts. |
+| WS-AC-02 | Message-type coverage is complete per endpoint. | For each endpoint, compare `Client -> Server` and `Server -> Client` type sets between matrix and contract tables. | pass when message sets are equal for every endpoint and all required fields are documented. |
+| WS-AC-03 | `ordering` semantics are explicit for each channel. | Validate each endpoint section includes an `Ordering` subsection with deterministic event/lifecycle sequencing statements. | pass when all five endpoint sections include at least one ordering rule tied to concrete message types. |
+| WS-AC-04 | `failure` semantics and `Close Codes` are explicit for each channel. | Validate each endpoint section includes `Failure Modes` and `Close Codes` with typed outcomes. | pass when all five endpoints document recoverable error paths and terminal close-code behavior. |
+| WS-AC-05 | `frontend consumer parity` remains intact for project updates channel. | Compare documented project-updates message payloads against `ART-0225` (`ui/src/hooks/useWebSocket.ts`) and `ART-0229` message unions. | pass when every consumed message type/field in frontend consumer paths is represented in this contract set. |
+
 
 ## Cross-References
 
