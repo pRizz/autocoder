@@ -39,6 +39,12 @@ Phase 1 completion required inputs for Phase 2+ work:
 - API/WebSocket surface contracts (Phase 5)
 - Data/process/security contracts (Phase 6)
 
+## File Contract Framework
+
+- [File Spec Schema](./FILE-SPEC-SCHEMA.md)
+- [File Spec Authoring Guide](./FILE-SPEC-AUTHORING.md)
+- These are required prerequisites for pilot contracts (Phase 3) and full file-level capture (Phase 4).
+
 ## Migration and Parity Sections (Planned)
 
 - TS/Bun/Solid parity matrix (Phase 7)
