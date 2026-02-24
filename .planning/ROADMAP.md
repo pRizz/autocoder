@@ -12,7 +12,7 @@ This roadmap delivers an execution-ready specification corpus that can regenerat
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Scope Policy, Inventory, and Guardrails** - Lock scope boundaries, docs-only execution guardrails, and canonical artifact inventory.
+- [x] **Phase 1: Scope Policy, Inventory, and Guardrails** - Lock scope boundaries, docs-only execution guardrails, and canonical artifact inventory.
 - [ ] **Phase 2: Coverage Validation & Classification** - Prove full source+ops coverage and artifact classification.
 - [ ] **Phase 3: File Contract Framework & Pilot Pass** - Establish file-spec schema and complete a representative pilot set.
 - [ ] **Phase 4: Full File-Level Contract Capture** - Complete exhaustive per-file contracts across all in-scope artifacts.
@@ -35,9 +35,9 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 3 plans
 
 Plans:
-- [ ] 01-01: Define and ratify scope inclusion/exclusion policy
-- [ ] 01-02: Define and enforce docs-only non-modification guardrails
-- [ ] 01-03: Generate baseline inventory index with stable IDs
+- [x] 01-01: Define and ratify scope inclusion/exclusion policy
+- [x] 01-02: Define and enforce docs-only non-modification guardrails
+- [x] 01-03: Generate baseline inventory index with stable IDs
 
 ### Phase 2: Coverage Validation & Classification
 **Goal**: Validate that inventory coverage is complete and exclusions are justified.
@@ -157,7 +157,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Scope Policy, Inventory, and Guardrails | 0/3 | Not started | - |
+| 1. Scope Policy, Inventory, and Guardrails | 3/3 | Complete | 2026-02-24 |
 | 2. Coverage Validation & Classification | 0/2 | Not started | - |
 | 3. File Contract Framework & Pilot Pass | 0/3 | Not started | - |
 | 4. Full File-Level Contract Capture | 0/4 | Not started | - |

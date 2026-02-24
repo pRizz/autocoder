@@ -7,14 +7,14 @@
 
 ### Inventory & Scope
 
-- [ ] **INVT-01**: Spec corpus contains a complete inventory of all in-scope source and ops artifacts in this repository.
-- [ ] **INVT-02**: Spec corpus defines explicit inclusion/exclusion rules (source + ops included, generated/runtime artifacts excluded).
+- [x] **INVT-01**: Spec corpus contains a complete inventory of all in-scope source and ops artifacts in this repository.
+- [x] **INVT-02**: Spec corpus defines explicit inclusion/exclusion rules (source + ops included, generated/runtime artifacts excluded).
 - [ ] **INVT-03**: Excluded generated/runtime artifacts are documented with rationale to prevent ambiguity.
 - [ ] **INVT-04**: Coverage checks prove every in-scope artifact is represented in the specification corpus.
 
 ### Execution Guardrails
 
-- [ ] **GARD-01**: No source implementation files are modified during this initiative; outputs are limited to markdown/spec artifacts.
+- [x] **GARD-01**: No source implementation files are modified during this initiative; outputs are limited to markdown/spec artifacts.
 
 ### File-Level Contract Specs
 
@@ -69,9 +69,9 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| INVT-01 | Phase 1 | Pending |
-| INVT-02 | Phase 1 | Pending |
-| GARD-01 | Phase 1 | Pending |
+| INVT-01 | Phase 1 | Complete |
+| INVT-02 | Phase 1 | Complete |
+| GARD-01 | Phase 1 | Complete |
 | INVT-03 | Phase 2 | Pending |
 | INVT-04 | Phase 2 | Pending |
 | FILE-01 | Phase 3 | Pending |
@@ -101,4 +101,4 @@
 
 ---
 *Requirements defined: 2026-02-24*
-*Last updated: 2026-02-24 after roadmap feedback adjustment*
+*Last updated: 2026-02-24 after Phase 1 execution/verification*

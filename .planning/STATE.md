@@ -5,32 +5,32 @@
 See: .planning/PROJECT.md (updated 2026-02-24)
 
 **Core value:** From an empty repo, an implementation agent can systematically rebuild all intended capabilities of this codebase with no hidden context.
-**Current focus:** Phase 1 — Scope Policy, Inventory, and Guardrails
+**Current focus:** Phase 2 — Coverage Validation & Classification
 
 ## Current Position
 
-Phase: 1 of 8 (Scope Policy, Inventory, and Guardrails)
-Plan: 0 of 3 in current phase
-Status: Ready to plan
-Last activity: 2026-02-24 — ROADMAP revised after docs-only (no source modifications) constraint
+Phase: 2 of 8 (Coverage Validation & Classification)
+Plan: 0 of 2 in current phase
+Status: Ready to discuss
+Last activity: 2026-02-24 — Phase 1 executed and verified (passed)
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [█░░░░░░░░░] 12.5%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 0
-- Average duration: -
-- Total execution time: 0.0 hours
+- Total plans completed: 3
+- Average duration: 10.7 min
+- Total execution time: 0.5 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| - | - | - | - |
+| 1. Scope Policy, Inventory, and Guardrails | 3 | 32 min | 10.7 min |
 
 **Recent Trend:**
-- Last 5 plans: -
+- Last 3 plans: 12 min, 11 min, 9 min
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -42,9 +42,9 @@ Progress: [░░░░░░░░░░] 0%
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
-- Initialization: Dual-track spec strategy approved (current behavior + TS/Bun/Solid target mapping)
-- Initialization: Source + ops coverage approved; generated artifacts excluded
-- Roadmap adjustment: This initiative is docs/spec generation only; no source implementation files may be modified
+- Source + ops artifact coverage is governed by explicit include/exclude policy in `.planning/specs/POLICY.md`.
+- Execution is docs-only; write scope is constrained to `.planning/**` with command-level guardrails.
+- Canonical inventory IDs (`ART-####`) are required for downstream cross-references.
 
 ### Pending Todos
 
@@ -52,10 +52,10 @@ None yet.
 
 ### Blockers/Concerns
 
-- Bun compatibility for PTY/process-heavy parity areas needs focused validation in later planning phases.
+- Bun compatibility for PTY/process-heavy parity areas still needs focused validation in later planning phases.
 
 ## Session Continuity
 
-Last session: 2026-02-24 04:00
-Stopped at: Requirements and roadmap revised with no-source-modification guardrail pending user approval
+Last session: 2026-02-24 10:56 UTC
+Stopped at: Phase 1 complete and verified; ready to start Phase 2 discussion/planning
 Resume file: None
