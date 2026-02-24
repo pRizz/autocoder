@@ -56,7 +56,7 @@ Each task was committed atomically:
 2. **Task 2: Harden guardrail verification section** - `30e8f36` (docs)
 3. **Task 3: Finalize index cross-links and handoff note** - `d723748` (docs)
 
-**Plan metadata:** pending
+**Plan metadata:** `d5994bf` (docs)
 
 ## Files Created/Modified
 - `.planning/specs/COVERAGE-BASELINE.md` - Auditable baseline totals, exclusions, and reproducibility checks.
