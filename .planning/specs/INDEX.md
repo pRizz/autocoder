@@ -64,6 +64,22 @@ Phase 3 completion required prerequisites for Phase 4 full capture:
 - Backend runtime contract directory: `./contracts/backend-runtime/`
 - These lane artifacts are canonical Phase 4 outputs for backend/runtime full file-level coverage.
 
+## Full File Contract Corpus
+
+- [Backend Runtime Matrix](./contracts/BACKEND-RUNTIME-MATRIX.md)
+- [Frontend UI Matrix](./contracts/FRONTEND-UI-MATRIX.md)
+- [Non-TS Matrix](./contracts/NON-TS-MATRIX.md)
+- Backend contracts directory: `./contracts/backend-runtime/`
+- Frontend contracts directory: `./contracts/frontend-ui/`
+- Non-TS contracts directory: `./contracts/non-ts/`
+- [File Contract Coverage Ledger](./contracts/FILE-CONTRACT-COVERAGE.md)
+- [File Contract Quality Audit](./contracts/FILE-CONTRACT-QUALITY-AUDIT.md)
+
+Phase 4 required prerequisites for Phase 5:
+- Full File Contract Corpus lane matrices and directories
+- `FILE-CONTRACT-COVERAGE.md` (canonical 237/237 reconciliation evidence)
+- `FILE-CONTRACT-QUALITY-AUDIT.md` (required section quality evidence)
+
 ## Migration and Parity Sections (Planned)
 
 - TS/Bun/Solid parity matrix (Phase 7)
