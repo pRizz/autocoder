@@ -18,6 +18,15 @@ This file is the single navigation entrypoint for the repository regeneration sp
 - [Canonical Inventory](./INVENTORY.md) *(planned in 01-02)*
 - [Coverage Baseline](./COVERAGE-BASELINE.md) *(planned in 01-03)*
 
+## Phase 1 completion
+
+Phase 1 completion required inputs for Phase 2+ work:
+- [Scope Policy](./POLICY.md)
+- [Execution Guardrails](./GUARDRAILS.md)
+- [Inventory Rules](./INVENTORY-RULES.md)
+- [Canonical Inventory](./INVENTORY.md)
+- [Coverage Baseline](./COVERAGE-BASELINE.md)
+
 ## File and Surface Contract Sections (Planned)
 
 - File-level contracts (Phase 3-4)
