@@ -26,8 +26,8 @@
 
 ### Cross-Cutting Surface Contracts
 
-- [ ] **SURF-01**: REST/API contracts are fully specified (routes, payload shapes, status/error behavior).
-- [ ] **SURF-02**: WebSocket and streaming message contracts are fully specified (event types, payloads, ordering assumptions).
+- [x] **SURF-01**: REST/API contracts are fully specified (routes, payload shapes, status/error behavior).
+- [x] **SURF-02**: WebSocket and streaming message contracts are fully specified (event types, payloads, ordering assumptions).
 - [ ] **SURF-03**: Data and persistence contracts are fully specified (schemas, migrations, lifecycle rules).
 - [ ] **SURF-04**: Process/session/orchestration lifecycle contracts are fully specified (start/stop/retry/lock/cleanup semantics).
 - [ ] **SURF-05**: Security and policy contracts are fully specified (command/path constraints, trust boundaries, safe defaults).
@@ -79,8 +79,8 @@
 | FILE-03 | Phase 4 | Complete |
 | FILE-04 | Phase 4 | Complete |
 | FILE-05 | Phase 4 | Complete |
-| SURF-01 | Phase 5 | Pending |
-| SURF-02 | Phase 5 | Pending |
+| SURF-01 | Phase 5 | Complete |
+| SURF-02 | Phase 5 | Complete |
 | SURF-03 | Phase 6 | Pending |
 | SURF-04 | Phase 6 | Pending |
 | SURF-05 | Phase 6 | Pending |
@@ -101,4 +101,4 @@
 
 ---
 *Requirements defined: 2026-02-24*
-*Last updated: 2026-02-24 after Phase 4 execution/verification*
+*Last updated: 2026-02-24 after Phase 5 execution/verification*

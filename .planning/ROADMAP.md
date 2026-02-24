@@ -16,7 +16,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Coverage Validation & Classification** - Prove full source+ops coverage and artifact classification.
 - [x] **Phase 3: File Contract Framework & Pilot Pass** - Establish file-spec schema and complete a representative pilot set.
 - [x] **Phase 4: Full File-Level Contract Capture** - Complete exhaustive per-file contracts across all in-scope artifacts.
-- [ ] **Phase 5: Surface Contracts (API + WebSocket)** - Specify all external API and realtime protocol behavior.
+- [x] **Phase 5: Surface Contracts (API + WebSocket)** - Specify all external API and realtime protocol behavior.
 - [ ] **Phase 6: Surface Contracts (Data + Process + Security)** - Specify persistence, orchestration lifecycle, and policy contracts.
 - [ ] **Phase 7: TS/Bun/Solid Parity Matrix & Discrepancies** - Map all current units to target stack with risk/discrepancy tracking.
 - [ ] **Phase 8: Reconstruction Checklist & Acceptance Gates** - Create dependency-ordered implementation waves and final readiness gate.
@@ -96,9 +96,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 05-01: Document REST/API endpoint contracts
-- [ ] 05-02: Document websocket/event stream contracts
-- [ ] 05-03: Link protocol contracts to file specs and checks
+- [x] 05-01: Document REST/API endpoint contracts
+- [x] 05-02: Document websocket/event stream contracts
+- [x] 05-03: Link protocol contracts to file specs and checks
 
 ### Phase 6: Surface Contracts (Data + Process + Security)
 **Goal**: Specify persistence, orchestration lifecycle, and security/policy behavior contracts.
@@ -161,7 +161,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 2. Coverage Validation & Classification | 2/2 | Complete | 2026-02-24 |
 | 3. File Contract Framework & Pilot Pass | 3/3 | Complete | 2026-02-24 |
 | 4. Full File-Level Contract Capture | 4/4 | Complete | 2026-02-24 |
-| 5. Surface Contracts (API + WebSocket) | 0/3 | Not started | - |
+| 5. Surface Contracts (API + WebSocket) | 3/3 | Complete | 2026-02-24 |
 | 6. Surface Contracts (Data + Process + Security) | 0/4 | Not started | - |
 | 7. TS/Bun/Solid Parity Matrix & Discrepancies | 0/4 | Not started | - |
 | 8. Reconstruction Checklist & Acceptance Gates | 0/3 | Not started | - |
