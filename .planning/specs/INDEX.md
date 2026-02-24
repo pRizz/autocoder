@@ -18,6 +18,11 @@ This file is the single navigation entrypoint for the repository regeneration sp
 - [Canonical Inventory](./INVENTORY.md)
 - [Coverage Baseline](./COVERAGE-BASELINE.md)
 
+## Exclusions
+
+- [Exclusion Taxonomy](./EXCLUSIONS.md)
+- Phase 2 coverage audit artifacts must cite `EXCLUSIONS.md` when reporting omitted classes.
+
 ## Phase 1 completion
 
 Phase 1 completion required inputs for Phase 2+ work:
