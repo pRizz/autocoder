@@ -125,10 +125,18 @@ Phase 7 required prerequisites for Phase 8:
 - `PARITY-ACCEPTANCE-CHECKS.md` as requirement-linked pass/fail gates for all MIGR requirements
 - Existing surface acceptance/traceability corpus as dependency anchors for reconstruction-wave planning in Phase 8
 
-## Verification and Reconstruction Sections (Planned)
+## Reconstruction and Readiness Corpus
 
-- Reconstruction waves/checklist (Phase 8)
-- Requirement-linked acceptance gates (Phase 8)
+- [Reconstruction Waves](./reconstruction/RECONSTRUCTION-WAVES.md)
+- [Requirement Acceptance Traceability](./reconstruction/REQUIREMENT-ACCEPTANCE-TRACEABILITY.md)
+- [Parity E2E Scenarios](./reconstruction/PARITY-E2E-SCENARIOS.md)
+- [Ready-to-Regenerate Gate](./reconstruction/READY-TO-REGENERATE-GATE.md)
+
+Phase 8 milestone completion prerequisite inputs:
+- `RECONSTRUCTION-WAVES.md` as canonical dependency-ordered implementation wave authority (`VERI-01`)
+- `REQUIREMENT-ACCEPTANCE-TRACEABILITY.md` as authoritative all-requirements acceptance mapping (`VERI-02`)
+- `PARITY-E2E-SCENARIOS.md` as end-to-end workflow and operational scenario evidence model (`VERI-03`)
+- `READY-TO-REGENERATE-GATE.md` as final objective go/no-go readiness decision rubric (`VERI-04`)
 
 ## Artifact ID Usage
 
