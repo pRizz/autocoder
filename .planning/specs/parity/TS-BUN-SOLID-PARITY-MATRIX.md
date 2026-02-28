@@ -6,6 +6,24 @@
 
 Total parity mappings: **237**
 
+## Coverage Rules
+
+- Canonical source-of-truth row sets:
+  - `.planning/specs/contracts/FILE-CONTRACT-COVERAGE.md`
+  - `.planning/specs/contracts/BACKEND-RUNTIME-MATRIX.md`
+  - `.planning/specs/contracts/FRONTEND-UI-MATRIX.md`
+  - `.planning/specs/contracts/NON-TS-MATRIX.md`
+- Completeness rule: exactly one row per `ART-####` from the canonical lane matrices.
+- Uniqueness rule: one-row-per-ART (no duplicate artifact IDs in this matrix).
+- Allowed target lanes: `bun-backend`, `solid-frontend`, `bun-ops`, `docs-config`.
+- External behavior anchor requirement:
+  - `REST-API-CONTRACTS.md`
+  - `WEBSOCKET-CONTRACTS.md`
+  - `DATA-PERSISTENCE-CONTRACTS.md`
+  - `PROCESS-LIFECYCLE-CONTRACTS.md`
+  - `SECURITY-POLICY-CONTRACTS.md`
+- Any proposed migration mapping that conflicts with these surface contracts is invalid.
+
 ## Matrix
 
 | ART ID | Source Path | Source Lane | Source Category | Current Concern | Target Stack Lane | Target Module/Cluster | Surface Preservation Note |
