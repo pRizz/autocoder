@@ -32,3 +32,16 @@
 | VERI-02 | Acceptance checklist maps to every v1 requirement. | this matrix (`VERI-02-*`) | Verify 24-row requirement coverage and uniqueness. | pass when traceability coverage is `24/24`. |
 | VERI-03 | E2E parity scenarios cover major workflows/ops. | `PARITY-E2E-SCENARIOS.md` + `READY-TO-REGENERATE-GATE.md` (`VERI-03-*`) | Verify scenario inventory and workflow/ops coverage evidence. | pass when scenario suite coverage criteria are met. |
 | VERI-04 | Ready-to-regenerate gate is explicit/objective. | `READY-TO-REGENERATE-GATE.md` (`VERI-04-*`) | Verify go/no-go rubric and blocker criteria. | pass when readiness gate criteria are fully satisfied. |
+
+## Evidence Anchor Rules
+
+- Every requirement row must link to at least one canonical evidence artifact or acceptance check ID.
+- Existing-complete requirement families (`INVT`, `GARD`, `FILE`, `SURF`, `MIGR`) must reference current canonical evidence artifacts.
+- Phase-8 verification requirements (`VERI-01`..`VERI-04`) must reference both:
+  - current planning artifacts, and
+  - expected reconstruction verification evidence artifacts.
+- Cross-family anchor minimums:
+  - `FILE-CONTRACT-COVERAGE.md` for inventory/file coverage evidence.
+  - `SURFACE-ACCEPTANCE-CHECKS.md` for SURF requirements.
+  - `PARITY-ACCEPTANCE-CHECKS.md` for MIGR requirements.
+  - reconstruction corpus artifacts for VERI requirements.
