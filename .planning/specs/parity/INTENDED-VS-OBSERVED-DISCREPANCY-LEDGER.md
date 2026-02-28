@@ -56,3 +56,24 @@ All discrepancy decisions must be reconciled against `TS-BUN-SOLID-PARITY-MATRIX
 | MIGR-03-AC-02 | MIGR-03 | Discrepancy coverage is `16/16` with explicit disposition per row. | Check each discrepancy row has one of `preserve`, `clarify`, `defer-with-guardrail`. | pass when all 16 rows include valid disposition values; fail otherwise. |
 | MIGR-04-AC-01 | MIGR-04 | Each discrepancy links to parity mapping and surface contracts. | Verify each `Q##` has `TS-BUN-SOLID-PARITY-MATRIX.md` linkage and at least one surface anchor. | pass when all rows are linked; fail on any missing link. |
 | MIGR-04-AC-02 | MIGR-04 | External behavior impact is explicitly constrained to `1:1` preservation intent. | Verify `external surface impact (1:1)` notes exist for every `Q##` entry. | pass when all entries include explicit `1:1` impact notes; fail otherwise. |
+
+## Risk Linkage
+
+| Discrepancy ID | Risk Link | Rationale |
+| --- | --- | --- |
+| DQ01 | R01 | Backend runtime translation structure risk dominates this discrepancy. |
+| DQ02 | R03 | Realtime transport protocol drift risk dominates this discrepancy. |
+| DQ03 | R02 | Data migration and backup semantics risk dominates this discrepancy. |
+| DQ04 | R04 | Process/session lifecycle regression risk dominates this discrepancy. |
+| DQ05 | R05 | Security policy enforcement drift risk dominates this discrepancy. |
+| DQ06 | R05 | Auth/rate-limit interpretation maps to security behavior risk. |
+| DQ07 | R06 | SolidJS UI behavior translation risk dominates this discrepancy. |
+| DQ08 | R06 | Component parity risk dominates this discrepancy. |
+| DQ09 | R07 | Frontend reactive model translation risk dominates this discrepancy. |
+| DQ10 | R08 | Test migration coverage risk dominates this discrepancy. |
+| DQ11 | R09 | Ops startup-script migration risk dominates this discrepancy. |
+| DQ12 | R10 | CI/tooling compatibility risk dominates this discrepancy. |
+| DQ13 | R09 | Ops automation runtime replacement risk dominates this discrepancy. |
+| DQ14 | R11 | Config precedence drift risk dominates this discrepancy. |
+| DQ15 | R12 | Planning/spec governance drift risk dominates this discrepancy. |
+| DQ16 | R12 | Documentation/spec drift risk dominates this discrepancy. |
