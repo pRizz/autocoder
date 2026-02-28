@@ -19,6 +19,21 @@
 | W09 | Execute integrated acceptance verification sweep. | W01..W08 complete; surface + parity acceptance matrices. | Requirement-level verification execution order with evidence capture points. | blocker if any required acceptance gate fails. |
 | W10 | Finalize readiness decision and regeneration handoff. | W09 complete; requirement traceability + scenario outcomes + ready gate rubric. | Objective go/no-go decision and handoff checklist. | blocker if final readiness criteria or blocker checks are unmet. |
 
+## Dependency Rules
+
+- Canonical prerequisite corpus is mandatory:
+  - `.planning/specs/INDEX.md`
+  - `.planning/specs/contracts/FILE-CONTRACT-COVERAGE.md`
+  - `.planning/specs/surfaces/SURFACE-ACCEPTANCE-CHECKS.md`
+  - `.planning/specs/parity/PARITY-ACCEPTANCE-CHECKS.md`
+  - `.planning/specs/parity/TS-BUN-SOLID-PARITY-MATRIX.md`
+  - `.planning/specs/parity/INTENDED-VS-OBSERVED-DISCREPANCY-LEDGER.md`
+  - `.planning/specs/parity/PARITY-RISK-REGISTER.md`
+- Wave progression rule: a wave is executable only when all listed prerequisites from prior waves are satisfied.
+- Evidence rule: each wave must produce explicit outputs that can be tied to requirement-level acceptance evidence.
+- Stop rule: any unresolved `blocker` condition halts progression to subsequent waves.
+- Escalation rule: unresolved blockers require explicit remediation documentation before continuing.
+
 ## References
 
 - `.planning/specs/INDEX.md`
