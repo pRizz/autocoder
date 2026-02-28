@@ -42,10 +42,10 @@
 
 ### Reconstruction Checklist & Verification
 
-- [ ] **VERI-01**: Reconstruction checklist provides dependency-ordered implementation waves from an empty repository.
-- [ ] **VERI-02**: Acceptance checklist maps to every v1 requirement.
-- [ ] **VERI-03**: End-to-end parity validation scenarios cover major workflows and operational paths.
-- [ ] **VERI-04**: "Ready to regenerate" completion gate is defined with explicit pass/fail criteria.
+- [x] **VERI-01**: Reconstruction checklist provides dependency-ordered implementation waves from an empty repository.
+- [x] **VERI-02**: Acceptance checklist maps to every v1 requirement.
+- [x] **VERI-03**: End-to-end parity validation scenarios cover major workflows and operational paths.
+- [x] **VERI-04**: "Ready to regenerate" completion gate is defined with explicit pass/fail criteria.
 
 ## v2 Requirements
 
@@ -89,10 +89,10 @@
 | MIGR-03 | Phase 7 | Complete |
 | MIGR-04 | Phase 7 | Complete |
 | MIGR-05 | Phase 7 | Complete |
-| VERI-01 | Phase 8 | Pending |
-| VERI-02 | Phase 8 | Pending |
-| VERI-03 | Phase 8 | Pending |
-| VERI-04 | Phase 8 | Pending |
+| VERI-01 | Phase 8 | Complete |
+| VERI-02 | Phase 8 | Complete |
+| VERI-03 | Phase 8 | Complete |
+| VERI-04 | Phase 8 | Complete |
 
 **Coverage:**
 - v1 requirements: 24 total
@@ -101,4 +101,4 @@
 
 ---
 *Requirements defined: 2026-02-24*
-*Last updated: 2026-02-28 after Phase 7 execution/verification*
+*Last updated: 2026-02-28 after Phase 8 execution/verification*

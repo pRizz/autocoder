@@ -19,7 +19,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 5: Surface Contracts (API + WebSocket)** - Specify all external API and realtime protocol behavior.
 - [x] **Phase 6: Surface Contracts (Data + Process + Security)** - Specify persistence, orchestration lifecycle, and policy contracts.
 - [x] **Phase 7: TS/Bun/Solid Parity Matrix & Discrepancies** - Map all current units to target stack with risk/discrepancy tracking.
-- [ ] **Phase 8: Reconstruction Checklist & Acceptance Gates** - Create dependency-ordered implementation waves and final readiness gate.
+- [x] **Phase 8: Reconstruction Checklist & Acceptance Gates** - Create dependency-ordered implementation waves and final readiness gate.
 
 ## Phase Details
 
@@ -146,9 +146,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 08-01: Define ordered reconstruction waves and prerequisites
-- [ ] 08-02: Map acceptance checks to every v1 requirement
-- [ ] 08-03: Finalize parity scenarios and readiness gate
+- [x] 08-01: Define ordered reconstruction waves and prerequisites
+- [x] 08-02: Map acceptance checks to every v1 requirement
+- [x] 08-03: Finalize parity scenarios and readiness gate
 
 ## Progress
 
@@ -164,4 +164,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 5. Surface Contracts (API + WebSocket) | 3/3 | Complete | 2026-02-24 |
 | 6. Surface Contracts (Data + Process + Security) | 4/4 | Complete | 2026-02-28 |
 | 7. TS/Bun/Solid Parity Matrix & Discrepancies | 4/4 | Complete | 2026-02-28 |
-| 8. Reconstruction Checklist & Acceptance Gates | 0/3 | Not started | - |
+| 8. Reconstruction Checklist & Acceptance Gates | 3/3 | Complete | 2026-02-28 |
