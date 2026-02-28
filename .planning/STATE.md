@@ -2,17 +2,17 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-02-24)
+See: .planning/PROJECT.md (updated 2026-02-28)
 
 **Core value:** From an empty repo, an implementation agent can systematically rebuild all intended capabilities of this codebase with no hidden context.
-**Current focus:** Milestone closeout — audit and archive readiness
+**Current focus:** Plan next milestone (v1.1 governance and drift automation)
 
 ## Current Position
 
-Phase: 8 of 8 (Reconstruction Checklist & Acceptance Gates) - complete
-Plan: 3 of 3 in current phase
-Status: Phase complete (verified passed)
-Last activity: 2026-02-28 — Phase 8 executed and verified (passed)
+Milestone: v1.0 archived (shipped 2026-02-28)
+Phase: none active
+Status: Ready to start next milestone with `$gsd-new-milestone`
+Last activity: 2026-02-28 — v1.0 archived and release tag prepared
 
 Progress: [██████████] 100%
 
@@ -36,36 +36,27 @@ Progress: [██████████] 100%
 | 7. TS/Bun/Solid Parity Matrix & Discrepancies | 4 | 91 min | 22.8 min |
 | 8. Reconstruction Checklist & Acceptance Gates | 3 | 55 min | 18.3 min |
 
-**Recent Trend:**
-- Last 5 plans: 24 min, 23 min, 18 min, 17 min, 20 min
-- Trend: Stable (documentation-heavy closeout phase completed)
-
-*Updated after each plan completion*
-
 ## Accumulated Context
 
 ### Decisions
 
-Decisions are logged in PROJECT.md Key Decisions table.
-Recent decisions affecting current work:
+Decisions are tracked in `.planning/PROJECT.md`.
 
-- Full file contract corpus now exists for all canonical inventory artifacts (237/237 coverage).
-- Coverage ledger and quality audit are canonical pass/fail evidence gates for file-level completeness.
-- Phase 5 REST and WebSocket surface contract corpora are complete and published with traceability and acceptance gates.
-- Phase 6 data/process/security contract corpus is complete with cross-contract consistency and acceptance gating.
-- Phase 7 parity corpus is complete with 237/237 mapping, discrepancy ledger, risk register, and MIGR acceptance gates.
-- Phase 8 reconstruction and readiness corpus is complete and is now the milestone closeout authority.
+Recent outcomes:
+- v1.0 regeneration corpus shipped with full requirement coverage (`24/24`).
+- Milestone archives created under `.planning/milestones/`.
+- Reconstruction readiness gate and E2E parity scenario suite established as canonical handoff controls.
 
 ### Pending Todos
 
-None yet.
+None.
 
 ### Blockers/Concerns
 
-- Bun compatibility for PTY/process-heavy parity areas still needs focused validation in later parity/migration phases.
+- Bun compatibility for PTY/process-heavy parity areas still requires focused validation during implementation milestones.
 
 ## Session Continuity
 
-Last session: 2026-02-28 13:06 UTC
-Stopped at: Phase 8 complete and verified; ready for milestone audit
+Last session: 2026-02-28 13:15 UTC
+Stopped at: Milestone v1.0 completed and archived; next step is new milestone setup
 Resume file: None
