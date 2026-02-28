@@ -151,4 +151,10 @@
 
 ## Acceptance Checks
 
-Task 3 adds explicit SURF-04 pass/fail checks for lifecycle parity and state-transition coverage.
+| Check ID | Requirement | Assertion | Evidence Method | pass/fail Criteria |
+| --- | --- | --- | --- | --- |
+| SURF-04-AC-01 | SURF-04 | Process lifecycle matrix count is exactly `12`. | Count `P##` rows in `PROCESS-LIFECYCLE-MATRIX.md`. | pass when 12 rows exist; fail otherwise. |
+| SURF-04-AC-02 | SURF-04 | Matrix-to-contract parity is `12/12`. | Map each matrix unit (`P01`..`P12`) to lifecycle clauses in this document. | pass when all units are represented with no omissions; fail on any missing unit. |
+| SURF-04-AC-03 | SURF-04 | Agent lifecycle state-transition coverage is explicit. | Verify contracts include `stopped`, `running`, `paused`, `crashed`, graceful pause/resume, and healthcheck transitions. | pass when all required agent states/transitions are documented; fail otherwise. |
+| SURF-04-AC-04 | SURF-04 | Scheduler retry/override/UTC semantics are explicit. | Verify UTC scheduling, midnight handling, manual override rules, and crash retry behavior are documented. | pass when all four scheduler semantics are present; fail otherwise. |
+| SURF-04-AC-05 | SURF-04 | Cleanup and termination behavior is deterministic across components. | Verify `kill_process_tree`, lock cleanup, session cleanup, and shutdown-order guarantees are documented. | pass when all cleanup mechanisms are covered; fail otherwise. |
