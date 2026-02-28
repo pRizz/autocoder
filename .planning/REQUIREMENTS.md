@@ -34,11 +34,11 @@
 
 ### TS/Bun/Solid Parity Mapping
 
-- [ ] **MIGR-01**: A 1:1 old-to-new parity matrix exists for all in-scope implementation units.
-- [ ] **MIGR-02**: Target mapping notes define pure TypeScript + Bun + SolidJS implementation direction for each mapped area.
-- [ ] **MIGR-03**: Intended-vs-observed discrepancy entries are documented for mapped areas where behavior differs from intent.
-- [ ] **MIGR-04**: Preserved external surface is explicit (APIs, workflows, commands, and core product behavior remain 1:1).
-- [ ] **MIGR-05**: Migration risks and mitigations are attached to mapped units.
+- [x] **MIGR-01**: A 1:1 old-to-new parity matrix exists for all in-scope implementation units.
+- [x] **MIGR-02**: Target mapping notes define pure TypeScript + Bun + SolidJS implementation direction for each mapped area.
+- [x] **MIGR-03**: Intended-vs-observed discrepancy entries are documented for mapped areas where behavior differs from intent.
+- [x] **MIGR-04**: Preserved external surface is explicit (APIs, workflows, commands, and core product behavior remain 1:1).
+- [x] **MIGR-05**: Migration risks and mitigations are attached to mapped units.
 
 ### Reconstruction Checklist & Verification
 
@@ -84,11 +84,11 @@
 | SURF-03 | Phase 6 | Complete |
 | SURF-04 | Phase 6 | Complete |
 | SURF-05 | Phase 6 | Complete |
-| MIGR-01 | Phase 7 | Pending |
-| MIGR-02 | Phase 7 | Pending |
-| MIGR-03 | Phase 7 | Pending |
-| MIGR-04 | Phase 7 | Pending |
-| MIGR-05 | Phase 7 | Pending |
+| MIGR-01 | Phase 7 | Complete |
+| MIGR-02 | Phase 7 | Complete |
+| MIGR-03 | Phase 7 | Complete |
+| MIGR-04 | Phase 7 | Complete |
+| MIGR-05 | Phase 7 | Complete |
 | VERI-01 | Phase 8 | Pending |
 | VERI-02 | Phase 8 | Pending |
 | VERI-03 | Phase 8 | Pending |
@@ -101,4 +101,4 @@
 
 ---
 *Requirements defined: 2026-02-24*
-*Last updated: 2026-02-28 after Phase 6 execution/verification*
+*Last updated: 2026-02-28 after Phase 7 execution/verification*

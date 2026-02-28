@@ -18,7 +18,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 4: Full File-Level Contract Capture** - Complete exhaustive per-file contracts across all in-scope artifacts.
 - [x] **Phase 5: Surface Contracts (API + WebSocket)** - Specify all external API and realtime protocol behavior.
 - [x] **Phase 6: Surface Contracts (Data + Process + Security)** - Specify persistence, orchestration lifecycle, and policy contracts.
-- [ ] **Phase 7: TS/Bun/Solid Parity Matrix & Discrepancies** - Map all current units to target stack with risk/discrepancy tracking.
+- [x] **Phase 7: TS/Bun/Solid Parity Matrix & Discrepancies** - Map all current units to target stack with risk/discrepancy tracking.
 - [ ] **Phase 8: Reconstruction Checklist & Acceptance Gates** - Create dependency-ordered implementation waves and final readiness gate.
 
 ## Phase Details
@@ -129,10 +129,10 @@ Plans:
 **Plans**: 4 plans
 
 Plans:
-- [ ] 07-01: Build complete old-to-new parity matrix
-- [ ] 07-02: Author target implementation notes for TS/Bun/Solid
-- [ ] 07-03: Create intended-vs-observed discrepancy ledger
-- [ ] 07-04: Attach risk/mitigation annotations to mapped units
+- [x] 07-01: Build complete old-to-new parity matrix
+- [x] 07-02: Author target implementation notes for TS/Bun/Solid
+- [x] 07-03: Create intended-vs-observed discrepancy ledger
+- [x] 07-04: Attach risk/mitigation annotations to mapped units
 
 ### Phase 8: Reconstruction Checklist & Acceptance Gates
 **Goal**: Deliver executable regeneration sequence and final readiness criteria.
@@ -163,5 +163,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 4. Full File-Level Contract Capture | 4/4 | Complete | 2026-02-24 |
 | 5. Surface Contracts (API + WebSocket) | 3/3 | Complete | 2026-02-24 |
 | 6. Surface Contracts (Data + Process + Security) | 4/4 | Complete | 2026-02-28 |
-| 7. TS/Bun/Solid Parity Matrix & Discrepancies | 0/4 | Not started | - |
+| 7. TS/Bun/Solid Parity Matrix & Discrepancies | 4/4 | Complete | 2026-02-28 |
 | 8. Reconstruction Checklist & Acceptance Gates | 0/3 | Not started | - |
