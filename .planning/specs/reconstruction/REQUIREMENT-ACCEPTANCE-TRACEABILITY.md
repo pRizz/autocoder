@@ -45,3 +45,14 @@
   - `SURFACE-ACCEPTANCE-CHECKS.md` for SURF requirements.
   - `PARITY-ACCEPTANCE-CHECKS.md` for MIGR requirements.
   - reconstruction corpus artifacts for VERI requirements.
+
+## Acceptance Checks
+
+**Requirement:** `VERI-02`
+
+| Check ID | Requirement | Assertion | Evidence Method | pass/fail Criteria |
+| --- | --- | --- | --- | --- |
+| VERI-02-AC-01 | VERI-02 | Requirement traceability row count is exactly `24`. | Count `Requirement ID` rows in this matrix. | pass when coverage is `24/24`; fail otherwise. |
+| VERI-02-AC-02 | VERI-02 | One-row-per-requirement uniqueness is enforced. | Check duplicate requirement IDs in this matrix. | pass when duplicate count is zero; fail otherwise. |
+| VERI-02-AC-03 | VERI-02 | Evidence anchors are non-empty for all requirements. | Verify every row has at least one canonical acceptance artifact/check anchor. | pass when no row has empty evidence anchor fields; fail otherwise. |
+| VERI-02-AC-04 | VERI-02 | Requirement families map to appropriate evidence corpora. | Validate INVT/GARD/FILE/SURF/MIGR/VERI families against required anchor rules. | pass when family-to-corpus mapping is complete; fail otherwise. |
