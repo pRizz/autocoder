@@ -266,6 +266,17 @@ Total parity mappings: **237**
 | ART-0236 | `ui/tsconfig.node.json` | frontend_ui | FRONTEND_CONFIG | FRONTEND_CONFIG | solid-frontend | C08-SOLID-TOOLING | Preserve user-facing UI workflows and frontend-consumed protocol contracts 1:1. |
 | ART-0237 | `ui/vite.config.ts` | frontend_ui | FRONTEND_CONFIG | FRONTEND_CONFIG | solid-frontend | C08-SOLID-TOOLING | Preserve user-facing UI workflows and frontend-consumed protocol contracts 1:1. |
 
+## Acceptance Checks
+
+**Requirement:** `MIGR-01`
+
+| Check ID | Requirement | Assertion | Evidence Method | pass/fail Criteria |
+| --- | --- | --- | --- | --- |
+| MIGR-01-AC-01 | MIGR-01 | Parity matrix row count is exactly `237`. | Count `ART-####` rows in this matrix. | pass when row count is 237; fail otherwise. |
+| MIGR-01-AC-02 | MIGR-01 | Matrix parity coverage is `237/237` against canonical lane matrices. | Reconcile all matrix IDs against the union of backend/frontend/non-TS lane matrices. | pass when all canonical IDs are mapped and no extra IDs exist; fail on any delta. |
+| MIGR-01-AC-03 | MIGR-01 | `one-row-per-ART` uniqueness is enforced. | Check duplicate ART IDs in this matrix. | pass when each ART appears exactly once; fail on any duplicate. |
+| MIGR-01-AC-04 | MIGR-01 | No unmapped canonical inventory IDs remain. | Compare against `FILE-CONTRACT-COVERAGE.md` canonical set. | pass when unmapped count is zero; fail otherwise. |
+
 ## References
 
 - `.planning/specs/contracts/FILE-CONTRACT-COVERAGE.md`
