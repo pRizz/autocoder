@@ -47,3 +47,12 @@ All discrepancy decisions must be reconciled against `TS-BUN-SOLID-PARITY-MATRIX
 | Q14 | `TS-BUN-SOLID-PARITY-MATRIX.md` (`ART-0027`, `ART-0086`, `ART-0087`, `ART-0123`) | `SECURITY-POLICY-CONTRACTS.md`, `DATA-PERSISTENCE-CONTRACTS.md` | Preserve external surface `1:1`; config loader internals may change. |
 | Q15 | `TS-BUN-SOLID-PARITY-MATRIX.md` (`ART-0061`..`ART-0068`, `ART-0031`..`ART-0034`) | `SURFACE-ACCEPTANCE-CHECKS.md` | Preserve external surface `1:1`; planning-doc wording may update with guardrails. |
 | Q16 | `TS-BUN-SOLID-PARITY-MATRIX.md` (`ART-0071`, `ART-0072`, `ART-0070`) | `SURFACE-ACCEPTANCE-CHECKS.md` | Preserve external surface `1:1`; documentation wording and examples may update. |
+
+## Acceptance Checks
+
+| Check ID | Requirement | Assertion | Evidence Method | pass/fail Criteria |
+| --- | --- | --- | --- | --- |
+| MIGR-03-AC-01 | MIGR-03 | Discrepancy row count is exactly `16`. | Count `Q##` rows in the discrepancy inventory table. | pass when row count is 16; fail otherwise. |
+| MIGR-03-AC-02 | MIGR-03 | Discrepancy coverage is `16/16` with explicit disposition per row. | Check each discrepancy row has one of `preserve`, `clarify`, `defer-with-guardrail`. | pass when all 16 rows include valid disposition values; fail otherwise. |
+| MIGR-04-AC-01 | MIGR-04 | Each discrepancy links to parity mapping and surface contracts. | Verify each `Q##` has `TS-BUN-SOLID-PARITY-MATRIX.md` linkage and at least one surface anchor. | pass when all rows are linked; fail on any missing link. |
+| MIGR-04-AC-02 | MIGR-04 | External behavior impact is explicitly constrained to `1:1` preservation intent. | Verify `external surface impact (1:1)` notes exist for every `Q##` entry. | pass when all entries include explicit `1:1` impact notes; fail otherwise. |
