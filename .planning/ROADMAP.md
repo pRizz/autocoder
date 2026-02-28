@@ -17,7 +17,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 3: File Contract Framework & Pilot Pass** - Establish file-spec schema and complete a representative pilot set.
 - [x] **Phase 4: Full File-Level Contract Capture** - Complete exhaustive per-file contracts across all in-scope artifacts.
 - [x] **Phase 5: Surface Contracts (API + WebSocket)** - Specify all external API and realtime protocol behavior.
-- [ ] **Phase 6: Surface Contracts (Data + Process + Security)** - Specify persistence, orchestration lifecycle, and policy contracts.
+- [x] **Phase 6: Surface Contracts (Data + Process + Security)** - Specify persistence, orchestration lifecycle, and policy contracts.
 - [ ] **Phase 7: TS/Bun/Solid Parity Matrix & Discrepancies** - Map all current units to target stack with risk/discrepancy tracking.
 - [ ] **Phase 8: Reconstruction Checklist & Acceptance Gates** - Create dependency-ordered implementation waves and final readiness gate.
 
@@ -112,10 +112,10 @@ Plans:
 **Plans**: 4 plans
 
 Plans:
-- [ ] 06-01: Document persistence/schema/migration contracts
-- [ ] 06-02: Document orchestration and process lifecycle contracts
-- [ ] 06-03: Document security/policy contracts
-- [ ] 06-04: Run cross-contract consistency check
+- [x] 06-01: Document persistence/schema/migration contracts
+- [x] 06-02: Document orchestration and process lifecycle contracts
+- [x] 06-03: Document security/policy contracts
+- [x] 06-04: Run cross-contract consistency check
 
 ### Phase 7: TS/Bun/Solid Parity Matrix & Discrepancies
 **Goal**: Produce complete old-to-new mapping with explicit migration guidance and risk controls.
@@ -162,6 +162,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 3. File Contract Framework & Pilot Pass | 3/3 | Complete | 2026-02-24 |
 | 4. Full File-Level Contract Capture | 4/4 | Complete | 2026-02-24 |
 | 5. Surface Contracts (API + WebSocket) | 3/3 | Complete | 2026-02-24 |
-| 6. Surface Contracts (Data + Process + Security) | 0/4 | Not started | - |
+| 6. Surface Contracts (Data + Process + Security) | 4/4 | Complete | 2026-02-28 |
 | 7. TS/Bun/Solid Parity Matrix & Discrepancies | 0/4 | Not started | - |
 | 8. Reconstruction Checklist & Acceptance Gates | 0/3 | Not started | - |

@@ -28,9 +28,9 @@
 
 - [x] **SURF-01**: REST/API contracts are fully specified (routes, payload shapes, status/error behavior).
 - [x] **SURF-02**: WebSocket and streaming message contracts are fully specified (event types, payloads, ordering assumptions).
-- [ ] **SURF-03**: Data and persistence contracts are fully specified (schemas, migrations, lifecycle rules).
-- [ ] **SURF-04**: Process/session/orchestration lifecycle contracts are fully specified (start/stop/retry/lock/cleanup semantics).
-- [ ] **SURF-05**: Security and policy contracts are fully specified (command/path constraints, trust boundaries, safe defaults).
+- [x] **SURF-03**: Data and persistence contracts are fully specified (schemas, migrations, lifecycle rules).
+- [x] **SURF-04**: Process/session/orchestration lifecycle contracts are fully specified (start/stop/retry/lock/cleanup semantics).
+- [x] **SURF-05**: Security and policy contracts are fully specified (command/path constraints, trust boundaries, safe defaults).
 
 ### TS/Bun/Solid Parity Mapping
 
@@ -81,9 +81,9 @@
 | FILE-05 | Phase 4 | Complete |
 | SURF-01 | Phase 5 | Complete |
 | SURF-02 | Phase 5 | Complete |
-| SURF-03 | Phase 6 | Pending |
-| SURF-04 | Phase 6 | Pending |
-| SURF-05 | Phase 6 | Pending |
+| SURF-03 | Phase 6 | Complete |
+| SURF-04 | Phase 6 | Complete |
+| SURF-05 | Phase 6 | Complete |
 | MIGR-01 | Phase 7 | Pending |
 | MIGR-02 | Phase 7 | Pending |
 | MIGR-03 | Phase 7 | Pending |
@@ -101,4 +101,4 @@
 
 ---
 *Requirements defined: 2026-02-24*
-*Last updated: 2026-02-24 after Phase 5 execution/verification*
+*Last updated: 2026-02-28 after Phase 6 execution/verification*
