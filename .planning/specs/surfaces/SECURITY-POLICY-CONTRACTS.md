@@ -132,4 +132,10 @@
 
 ## Acceptance Checks
 
-Task 3 adds explicit SURF-05 pass/fail checks for policy parity, trust-boundary coverage, and security-test linkage.
+| Check ID | Requirement | Assertion | Evidence Method | pass/fail Criteria |
+| --- | --- | --- | --- | --- |
+| SURF-05-AC-01 | SURF-05 | Security policy matrix count is exactly `15`. | Count `S##` rows in `SECURITY-POLICY-MATRIX.md`. | pass when 15 rows exist; fail otherwise. |
+| SURF-05-AC-02 | SURF-05 | Matrix-to-contract parity is `15/15`. | Map each unit (`S01`..`S15`) to concrete policy clauses in this document. | pass when all units are represented with no omissions; fail on missing coverage. |
+| SURF-05-AC-03 | SURF-05 | Command policy controls are complete. | Verify `ALLOWED_COMMANDS`, `BLOCKED_COMMANDS`, `DANGEROUS_COMMANDS`, command hierarchy, and validator clauses (`pkill`, `chmod`, `playwright-cli`, devserver strict validation). | pass when all command policy controls are documented; fail otherwise. |
+| SURF-05-AC-04 | SURF-05 | Path and trust-boundary controls are complete. | Verify `SENSITIVE_DIRECTORIES`, `UNC` handling, project-name policy, and localhost/`ALLOW_REMOTE` trust-boundary behavior are documented. | pass when all path/boundary controls are explicit; fail otherwise. |
+| SURF-05-AC-05 | SURF-05 | Security test linkage is explicit and complete. | Verify this contract references `ART-0141`, `ART-0142`, `ART-0143`, and `ART-0144` as evidence anchors. | pass when all four test anchors are linked; fail otherwise. |
