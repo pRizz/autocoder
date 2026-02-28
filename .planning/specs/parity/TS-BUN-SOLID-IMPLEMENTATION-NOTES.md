@@ -46,6 +46,15 @@
   - remove Python runtime dependency from target implementation, but do not alter externally observable behavior.
   - every replacement should be documented as `no Python runtime` internal swap with parity-safe behavior constraints.
 
+## Acceptance Checks
+
+| Check ID | Requirement | Assertion | Evidence Method | pass/fail Criteria |
+| --- | --- | --- | --- | --- |
+| MIGR-02-AC-01 | MIGR-02 | Cluster coverage is complete for parity execution planning. | Verify `C01`..`C12` clusters exist with explicit TS/Bun/Solid direction. | pass when all 12 clusters are documented; fail on any missing cluster. |
+| MIGR-02-AC-02 | MIGR-02 | TS/Bun/Solid implementation direction is explicit for each cluster. | Check each cluster row includes runtime ownership and migration direction notes. | pass when no cluster has undefined target direction; fail otherwise. |
+| MIGR-04-AC-01 | MIGR-04 | External-surface preservation rules are explicit and objective. | Verify rules reference REST, WebSocket, data, process, and security contract anchors. | pass when all five surface families are covered; fail otherwise. |
+| MIGR-04-AC-02 | MIGR-04 | Migration guidance preserves 1:1 behavior while removing Python runtime internals. | Verify explicit `1:1` behavior statement and `no Python runtime` constraint. | pass when both constraints are present; fail otherwise. |
+
 ## References
 
 - `TS-BUN-SOLID-PARITY-MATRIX.md`
