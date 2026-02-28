@@ -29,6 +29,23 @@
 - Cluster plans must remain compatible with lane mapping in `TS-BUN-SOLID-PARITY-MATRIX.md`.
 - Any cluster change that reassigns external-surface ownership requires updating parity/discrepancy/risk artifacts together.
 
+## External Surface Preservation Rules
+
+- Migration target is strict `1:1` external behavior preservation, even when internal runtime implementation changes.
+- `REST` behavior parity:
+  - route set, method/path semantics, request/response shapes, and status/error behavior stay contract-equivalent to `REST-API-CONTRACTS.md`.
+- `WebSocket` behavior parity:
+  - channel paths, message types, ordering assumptions, heartbeat behavior, and close/error semantics stay contract-equivalent to `WEBSOCKET-CONTRACTS.md`.
+- Data/process/security parity:
+  - persistence, migration, and transaction behavior follow `DATA-PERSISTENCE-CONTRACTS.md`.
+  - lifecycle transitions, retry rules, lock handling, and cleanup follow `PROCESS-LIFECYCLE-CONTRACTS.md`.
+  - command and path policy behavior, trust boundary enforcement, and safe defaults follow `SECURITY-POLICY-CONTRACTS.md`.
+- Command and policy controls:
+  - command allow/block policy outcomes, command validators, and path restrictions must preserve policy behavior and user-visible failure semantics.
+- Runtime change boundary:
+  - remove Python runtime dependency from target implementation, but do not alter externally observable behavior.
+  - every replacement should be documented as `no Python runtime` internal swap with parity-safe behavior constraints.
+
 ## References
 
 - `TS-BUN-SOLID-PARITY-MATRIX.md`
