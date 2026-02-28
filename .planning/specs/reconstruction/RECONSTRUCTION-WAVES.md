@@ -34,6 +34,17 @@
 - Stop rule: any unresolved `blocker` condition halts progression to subsequent waves.
 - Escalation rule: unresolved blockers require explicit remediation documentation before continuing.
 
+## Acceptance Checks
+
+**Requirement:** `VERI-01`
+
+| Check ID | Requirement | Assertion | Evidence Method | pass/fail Criteria |
+| --- | --- | --- | --- | --- |
+| VERI-01-AC-01 | VERI-01 | Reconstruction wave count is exactly `10`. | Count `W##` rows in the wave matrix. | pass when row count is `10/10`; fail otherwise. |
+| VERI-01-AC-02 | VERI-01 | Wave dependencies are explicit and complete. | Verify each wave row contains non-empty prerequisite definitions and objective outputs. | pass when every wave defines prerequisites + outputs; fail on missing dependency metadata. |
+| VERI-01-AC-03 | VERI-01 | blocker criteria exist for every wave. | Verify each wave row includes explicit blocker criteria text. | pass when all `W01`..`W10` rows include blocker conditions; fail otherwise. |
+| VERI-01-AC-04 | VERI-01 | Canonical prerequisite corpus is referenced for reconstruction control. | Verify dependency rules include INDEX + file/surface/parity acceptance anchors. | pass when all required canonical anchors are listed; fail otherwise. |
+
 ## References
 
 - `.planning/specs/INDEX.md`
