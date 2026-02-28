@@ -122,4 +122,10 @@
 
 ## Acceptance Checks
 
-Task 3 adds explicit SURF-03 pass/fail acceptance checks and matrix-to-contract verification steps.
+| Check ID | Requirement | Assertion | Evidence Method | pass/fail Criteria |
+| --- | --- | --- | --- | --- |
+| SURF-03-AC-01 | SURF-03 | Data matrix count is exactly `12`. | Count `D##` rows in `DATA-PERSISTENCE-MATRIX.md`. | pass when 12 rows exist; fail otherwise. |
+| SURF-03-AC-02 | SURF-03 | Matrix-to-contract parity is `12/12`. | Map each matrix unit (`D01`..`D12`) to a concrete contract subsection/statement in this document. | pass when every unit is represented exactly once with no omissions; fail on any gap or duplicate mapping. |
+| SURF-03-AC-03 | SURF-03 | Migration behavior is explicit for both in-place upgrades and JSON import/export. | Verify presence of in-place migration guarantees plus `feature_list.json` import/backup/export lifecycle notes. | pass when both migration classes are fully documented with deterministic behavior; fail otherwise. |
+| SURF-03-AC-04 | SURF-03 | Transaction and lock lifecycle semantics are explicit. | Verify explicit coverage of `BEGIN IMMEDIATE`, `busy_timeout`, and journal mode (`WAL`/`DELETE`) behavior. | pass when all three controls are documented with expected intent; fail otherwise. |
+| SURF-03-AC-05 | SURF-03 | Assistant persistence lifecycle is linked and bounded. | Verify `conversations`/`conversation_messages` and engine cache/disposal lifecycle are documented and linked to `ART-0118`. | pass when schema + lifecycle behavior are both present; fail otherwise. |
