@@ -109,10 +109,21 @@ Phase 6 required prerequisites for Phase 7:
 - `SURFACE-CROSS-CONTRACT-CONSISTENCY.md` as the Phase 6 no-blocker consistency gate
 - `SURFACE-TRACEABILITY.md` and `SURFACE-ACCEPTANCE-CHECKS.md` as required prerequisites for Phase 7 parity/discrepancy mapping
 
-## Migration and Parity Sections (Planned)
+## Parity and Migration Corpus
 
-- TS/Bun/Solid parity matrix (Phase 7)
-- Intended-vs-observed discrepancy ledger (Phase 7)
+- [TS/Bun/Solid Parity Matrix](./parity/TS-BUN-SOLID-PARITY-MATRIX.md)
+- [TS/Bun/Solid Implementation Notes](./parity/TS-BUN-SOLID-IMPLEMENTATION-NOTES.md)
+- [Intended vs Observed Discrepancy Ledger](./parity/INTENDED-VS-OBSERVED-DISCREPANCY-LEDGER.md)
+- [Parity Risk Register](./parity/PARITY-RISK-REGISTER.md)
+- [Parity Acceptance Checks](./parity/PARITY-ACCEPTANCE-CHECKS.md)
+
+Phase 7 required prerequisites for Phase 8:
+- `TS-BUN-SOLID-PARITY-MATRIX.md` as canonical `237/237` parity coverage evidence (`MIGR-01`)
+- `TS-BUN-SOLID-IMPLEMENTATION-NOTES.md` as cluster-level TypeScript/Bun/Solid direction and surface-preservation policy (`MIGR-02`, `MIGR-04`)
+- `INTENDED-VS-OBSERVED-DISCREPANCY-LEDGER.md` as discrepancy governance and disposition evidence (`MIGR-03`, `MIGR-04`)
+- `PARITY-RISK-REGISTER.md` as risk/mitigation authority linked to mapped units (`MIGR-05`)
+- `PARITY-ACCEPTANCE-CHECKS.md` as requirement-linked pass/fail gates for all MIGR requirements
+- Existing surface acceptance/traceability corpus as dependency anchors for reconstruction-wave planning in Phase 8
 
 ## Verification and Reconstruction Sections (Planned)
 
