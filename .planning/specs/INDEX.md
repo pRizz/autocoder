@@ -86,6 +86,13 @@ Phase 4 required prerequisites for Phase 5:
 - [REST API Contracts](./surfaces/REST-API-CONTRACTS.md)
 - [WebSocket Endpoint Matrix](./surfaces/WEBSOCKET-ENDPOINT-MATRIX.md)
 - [WebSocket Contracts](./surfaces/WEBSOCKET-CONTRACTS.md)
+- [Data Persistence Matrix](./surfaces/DATA-PERSISTENCE-MATRIX.md)
+- [Data Persistence Contracts](./surfaces/DATA-PERSISTENCE-CONTRACTS.md)
+- [Process Lifecycle Matrix](./surfaces/PROCESS-LIFECYCLE-MATRIX.md)
+- [Process Lifecycle Contracts](./surfaces/PROCESS-LIFECYCLE-CONTRACTS.md)
+- [Security Policy Matrix](./surfaces/SECURITY-POLICY-MATRIX.md)
+- [Security Policy Contracts](./surfaces/SECURITY-POLICY-CONTRACTS.md)
+- [Surface Cross-Contract Consistency](./surfaces/SURFACE-CROSS-CONTRACT-CONSISTENCY.md)
 - [Surface Traceability](./surfaces/SURFACE-TRACEABILITY.md)
 - [Surface Acceptance Checks](./surfaces/SURFACE-ACCEPTANCE-CHECKS.md)
 
@@ -94,6 +101,13 @@ Phase 5 required prerequisites for Phase 6:
 - `WEBSOCKET-ENDPOINT-MATRIX.md` and `WEBSOCKET-CONTRACTS.md` as canonical realtime protocol contracts
 - `SURFACE-TRACEABILITY.md` for implementation/consumer artifact linkage (`ART-0102`..`ART-0115`, `ART-0131`, `ART-0225`, `ART-0226`, `ART-0229`)
 - `SURFACE-ACCEPTANCE-CHECKS.md` for requirement-linked pass/fail gates (`SURF-01`, `SURF-02`)
+
+Phase 6 required prerequisites for Phase 7:
+- `DATA-PERSISTENCE-MATRIX.md` and `DATA-PERSISTENCE-CONTRACTS.md` as canonical data/schema/migration/lifecycle contract inputs (`SURF-03`)
+- `PROCESS-LIFECYCLE-MATRIX.md` and `PROCESS-LIFECYCLE-CONTRACTS.md` as canonical orchestration/session lifecycle contract inputs (`SURF-04`)
+- `SECURITY-POLICY-MATRIX.md` and `SECURITY-POLICY-CONTRACTS.md` as canonical policy/trust-boundary contract inputs (`SURF-05`)
+- `SURFACE-CROSS-CONTRACT-CONSISTENCY.md` as the Phase 6 no-blocker consistency gate
+- `SURFACE-TRACEABILITY.md` and `SURFACE-ACCEPTANCE-CHECKS.md` as required prerequisites for Phase 7 parity/discrepancy mapping
 
 ## Migration and Parity Sections (Planned)
 
